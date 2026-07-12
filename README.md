@@ -67,10 +67,10 @@ main branch와 하위 각 팀원별 branch 이용
 
 ## 코드 컨벤션
 코드 작성하면서 이름을 지정해야 하는 것들에 대한 규칙
-- 클래스, 인터페이스: PascalCase(파스칼 케이스) ex) `TrashSpawnManager`
-- 함수, 변수: camelCase(카멜 케이스) ex) `spawnTrashItem()`, `remainingTime`
-- Private 필드: camelCase + 언더스코어 접두사(선택) ex) `_currentScore`
-- 상수: UPPER_CASE(어퍼 케이스) ex) `const int MAX_TIME = 10;`
+- 클래스, 인터페이스: PascalCase ex) `TrashSpawnManager`
+- 함수, 변수: camelCase ex) `spawnTrashItem()`, `remainingTime`
+- Private 필드: camelCase + 언더스코어 접두사(_) ex) `_currentScore`
+- 상수: UPPER_CASE ex) `const int MAX_TIME = 10;`
 - Scene 파일명: PascalCase ex) `TrashPickingScene`, `SeatYieldScene`, `WordPuzzleScene`
 
 ---
