@@ -81,3 +81,6 @@ main branch와 하위 각 팀원별 branch 이용
 - Asset Serialization: Force Text
 - Version Control Mode: Visible Meta Files
 - 테스트: Unity Editor Play Mode 및 빌드 후 실기기 테스트
+
+## 개발 환경 세팅
+Unity 프로젝트 Git 설정은 [docs/GIT_SETUP.md](./docs/GIT_SETUP.md) 참고

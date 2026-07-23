@@ -1,0 +1,5 @@
+*.unity merge=unityyamlmerge diff=unityyamlmerge
+*.prefab merge=unityyamlmerge diff=unityyamlmerge
+*.asset merge=unityyamlmerge diff=unityyamlmerge
+*.meta merge=unityyamlmerge diff=unityyamlmerge
+*.mat merge=unityyamlmerge diff=unityyamlmerge
