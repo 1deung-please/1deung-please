@@ -83,4 +83,5 @@ main branch와 하위 각 팀원별 branch 이용
 - 테스트: Unity Editor Play Mode 및 빌드 후 실기기 테스트
 
 ## 개발 환경 세팅
-Unity 프로젝트 Git 설정은 [docs/GIT_SETUP.md](./docs/GIT_SETUP.md) 참고
+- 화면 사이즈 / 카메라 / Canvas 세팅: [docs/SCREEN_SETUP.md](./docs/SCREEN_SETUP.md)
+- Unity 씬/프리팹 Git 병합 도구 세팅: [docs/GIT_SETUP.md](./docs/GIT_SETUP.md)
