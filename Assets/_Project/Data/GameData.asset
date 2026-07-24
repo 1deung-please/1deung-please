@@ -16,3 +16,6 @@ MonoBehaviour:
   miniGame2Score: 0
   miniGame3Score: 0
   tutorialDone: 0
+  globalTimeRemaining: 300
+  isTimerFrozen: 1
+  lotteryRoomUnlocked: 0
