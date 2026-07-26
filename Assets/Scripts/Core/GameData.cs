@@ -9,26 +9,40 @@ public class GameData : ScriptableObject
     public int miniGame1Score;
     public int miniGame2Score;
     public int miniGame3Score;
+    public bool[] playedGames = new bool[3];
+    // í”Œë ˆì´ íšŸìˆ˜
+    public int[] playCount = new int[3];
+    // ì„±ê³µ ì—¬ë¶€(ì—…ì ìš©)
+    public bool[] successGames = new bool[3];
+    // ì‹¤íŒ¨ ì—¬ë¶€(ì—…ì ìš©)
+    public bool[] failGames = new bool[3];
 
     [Header("Flags")]
     public bool tutorialDone;
 
     [Header("Global Timer")]
     public float globalTimeRemaining = 300f;
-    public bool isTimerFrozen = true; // Æ©Åä¸®¾ó ³¡³ª±â Àü±îÁö´Â ¾ó·ÁµÐ »óÅÂ·Î ½ÃÀÛ
+    public bool isTimerFrozen = true; // Æ©ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½ï¿½ï¿½
     public bool lotteryRoomUnlocked = false;
 
     public int TotalScore => miniGame1Score + miniGame2Score + miniGame3Score;
 
-    // °³¹ß Áß ÃÊ±âÈ­¿ë
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½ï¿½
     public void ResetData()
     {
         miniGame1Score = 0;
         miniGame2Score = 0;
         miniGame3Score = 0;
+
         tutorialDone = false;
+
         globalTimeRemaining = 300f;
         isTimerFrozen = true;
         lotteryRoomUnlocked = false;
+
+        playedGames = new bool[3];
+        playCount = new int[3];
+        successGames = new bool[3];
+        failGames = new bool[3];
     }
 }

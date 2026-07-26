@@ -68,6 +68,9 @@ public class GameManager_mg02 : MonoBehaviour
         isGameOver = false;
         isGameStarted = true;
 
+        // 플레이 기록
+        GameManager.Instance.RecordMiniGamePlay(2);
+
         UpdateMeritUI();
         SpawnPassenger();
     }
@@ -220,6 +223,11 @@ public class GameManager_mg02 : MonoBehaviour
         isGameOver = true;
 
         int finalScore = isSuccess ? currentMeritScore : 0;
+
+        // 성공/실패 기록
+        GameManager.Instance.RecordMiniGameResult(2, isSuccess);
+        GameManager.Instance.OnMiniGameComplete(2, finalScore);
+
         string reason = isSuccess ? "클리어 (정상)" : "게이지0 (오버)";
 
         if (resultPanel != null)

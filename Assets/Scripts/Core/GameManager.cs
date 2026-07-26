@@ -43,15 +43,15 @@ public class GameManager : MonoBehaviour
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
-            SceneLoader.Instance.LoadScene("Lobby"); // ÀÌ¹Ì Æ©Åä¸®¾ó ºÃÀ¸¸é ½ºÅµ
+            SceneLoader.Instance.LoadScene("Lobby"); // ï¿½Ì¹ï¿½ Æ©ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Åµ
         else
-            SceneLoader.Instance.LoadScene("Tutorial"); // Ã³À½ÀÌ¸é Æ©Åä¸®¾ó·Î
+            SceneLoader.Instance.LoadScene("Tutorial"); // Ã³ï¿½ï¿½ï¿½Ì¸ï¿½ Æ©ï¿½ä¸®ï¿½ï¿½ï¿½
     }
 
     public void OnTutorialComplete()
     {
         gameData.tutorialDone = true;
-        gameData.isTimerFrozen = false; // ·Îºñ ÁøÀÔ°ú ÇÔ²² Àü¿ª Å¸ÀÌ¸Ó ½ÃÀÛ
+        gameData.isTimerFrozen = false; // ï¿½Îºï¿½ ï¿½ï¿½ï¿½Ô°ï¿½ ï¿½Ô²ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -71,13 +71,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RecordMiniGamePlay(int miniGameIndex)
+    {
+        gameData.playedGames[miniGameIndex - 1] = true;
+        gameData.playCount[miniGameIndex - 1]++;
+    }
+
+    public void RecordMiniGameResult(int miniGameIndex, bool success)
+    {
+        if (success)
+            gameData.successGames[miniGameIndex - 1] = true;
+        else
+            gameData.failGames[miniGameIndex - 1] = true;
+    }
+
+    public int GetPlayedGameCount()
+    {
+        int count = 0;
+
+        foreach (bool played in gameData.playedGames)
+        {
+            if (played)
+                count++;
+        }
+
+        return count;
+    }
+    
     public void ReturnToLobby()
     {
         isMiniGamePlaying = false;
 
         if (pendingEndingTransition)
         {
-            // Àü¿ª Å¸ÀÌ¸Ó°¡ ÀÌ ¹Ì´Ï°ÔÀÓ µµÁß ÀÌ¹Ì Á¾·áµÆ´ø °æ¿ì ¡æ º¹±Ç¹æ È°¼ºÈ­ »óÅÂ·Î ·Îºñ ÁøÀÔ
+            // ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½Ì¸Ó°ï¿½ ï¿½ï¿½ ï¿½Ì´Ï°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ç¹ï¿½ È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½Îºï¿½ ï¿½ï¿½ï¿½ï¿½
             pendingEndingTransition = false;
             gameData.lotteryRoomUnlocked = true;
         }
@@ -89,12 +116,12 @@ public class GameManager : MonoBehaviour
     {
         if (isMiniGamePlaying)
         {
-            pendingEndingTransition = true; // ÁøÇà ÁßÀÎ °ÔÀÓÀº ³¡±îÁö ÀÎÁ¤, Á¾·á ÈÄ Ã³¸® ¿¹¾à
+            pendingEndingTransition = true; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
         else
         {
             gameData.lotteryRoomUnlocked = true;
-            SceneLoader.Instance.LoadScene("Lobby"); // º¹±Ç¹æ È°¼ºÈ­µÈ ·Îºñ·Î Áï½Ã ÀÌµ¿
+            SceneLoader.Instance.LoadScene("Lobby"); // ï¿½ï¿½ï¿½Ç¹ï¿½ È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½Îºï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
         }
     }
 
