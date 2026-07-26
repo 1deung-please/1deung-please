@@ -8,14 +8,8 @@ public class WordButton : MonoBehaviour
 
     private string letter;
     private Transform originalParent;
-
-    private Button button;
-
-    private void Awake()
-    {
-        button = GetComponent<Button>();
-        button.onClick.AddListener(Click);
-    }
+    private int originalSiblingIndex;
+    private GameObject placeholder;
 
     public void Initialize(string value)
     {
@@ -23,11 +17,13 @@ public class WordButton : MonoBehaviour
         text.text = value;
 
         originalParent = transform.parent;
+        originalSiblingIndex = transform.GetSiblingIndex();
     }
 
     public void Click()
     {
-        AnswerManager.Instance.SelectWord(this);
+        if (AnswerManager.Instance != null)
+            AnswerManager.Instance.SelectWord(this);
     }
 
     public string GetWord()
@@ -35,8 +31,45 @@ public class WordButton : MonoBehaviour
         return letter;
     }
 
+    public void MoveToAnswerPanel(Transform answerPanel)
+    {
+        if (originalParent == null)
+            originalParent = transform.parent;
+
+        originalSiblingIndex = transform.GetSiblingIndex();
+
+        // 원래 버튼과 같은 크기의 빈자리 생성
+        placeholder = new GameObject(
+            "WordPlaceholder",
+            typeof(RectTransform),
+            typeof(LayoutElement)
+        );
+
+        placeholder.transform.SetParent(originalParent, false);
+        placeholder.transform.SetSiblingIndex(originalSiblingIndex);
+
+        RectTransform myRect = GetComponent<RectTransform>();
+        LayoutElement layout = placeholder.GetComponent<LayoutElement>();
+
+        layout.preferredWidth = myRect.rect.width;
+        layout.preferredHeight = myRect.rect.height;
+        layout.minWidth = myRect.rect.width;
+        layout.minHeight = myRect.rect.height;
+        layout.flexibleWidth = 0;
+        layout.flexibleHeight = 0;
+
+        transform.SetParent(answerPanel, false);
+    }
+
     public void ReturnToOrigin()
     {
         transform.SetParent(originalParent, false);
+        transform.SetSiblingIndex(originalSiblingIndex);
+
+        if (placeholder != null)
+        {
+            Destroy(placeholder);
+            placeholder = null;
+        }
     }
 }
