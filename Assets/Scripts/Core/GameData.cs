@@ -10,6 +10,9 @@ public class GameData : ScriptableObject
     public int miniGame2Score;
     public int miniGame3Score;
 
+    [Header("Merit Point")]
+    public int meritPoint;
+
     [Header("Flags")]
     public bool tutorialDone;
 
@@ -26,6 +29,7 @@ public class GameData : ScriptableObject
         miniGame1Score = 0;
         miniGame2Score = 0;
         miniGame3Score = 0;
+        meritPoint = 0;
         tutorialDone = false;
         globalTimeRemaining = 300f;
         isTimerFrozen = true;

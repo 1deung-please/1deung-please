@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public GameData gameData;
 
+    private const int MAX_MERIT_POINT = 10000;
+
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
 
@@ -65,10 +67,59 @@ public class GameManager : MonoBehaviour
     {
         switch (miniGameIndex)
         {
-            case 1: gameData.miniGame1Score = score; break;
-            case 2: gameData.miniGame2Score = score; break;
-            case 3: gameData.miniGame3Score = score; break;
+            case 1:
+                CompleteMiniGame1(score, score); break;
+
+            case 2:
+                CompleteMiniGame2(score); break;
+
+            case 3:
+                CompleteMiniGame3(score > 0); break;
         }
+    }
+
+    public void CompleteMiniGame1(int collectedCount, int targetCount)
+    {
+        gameData.miniGame1Score = collectedCount;
+
+        if (collectedCount >= targetCount)
+        {
+            addMeritPoint(collectedCount + 50);
+        }
+        else
+        {
+            int merit = Mathf.RoundToInt(collectedCount * 0.5f);
+            addMeritPoint(merit);
+        }
+    }
+
+    public void CompleteMiniGame2(int correctCount)
+    {
+        gameData.miniGame2Score = correctCount;
+        addMeritPoint(correctCount * 20);
+    }
+
+    public void CompleteMiniGame3(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            addMeritPoint(700);
+        }
+    }
+
+    public void addMeritPoint(int amount)
+    {
+        gameData.meritPoint += amount;
+
+        if (gameData.meritPoint > MAX_MERIT_POINT)
+        {
+            gameData.meritPoint = MAX_MERIT_POINT;
+        }
+    }
+
+    public int getMeritPoint()
+    {
+        return gameData.meritPoint;
     }
 
     public void ReturnToLobby()
@@ -105,11 +156,11 @@ public class GameManager : MonoBehaviour
 
     public void DetermineEnding()
     {
-        int total = gameData.TotalScore;
+        int total = gameData.meritPoint;
 
-        if (total >= 61)
+        if (total >= 8500)
             SceneLoader.Instance.LoadScene("Ending_C");
-        else if (total >= 31)
+        else if (total >= 2000)
             SceneLoader.Instance.LoadScene("Ending_B");
         else
             SceneLoader.Instance.LoadScene("Ending_A");
