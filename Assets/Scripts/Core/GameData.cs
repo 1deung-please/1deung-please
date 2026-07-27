@@ -17,23 +17,24 @@ public class GameData : ScriptableObject
     // 실패 여부(업적용)
     public bool[] failGames = new bool[3];
 
+    [Header("Merit Point")]
+    public int meritPoint;
+
     [Header("Flags")]
     public bool tutorialDone;
 
     [Header("Global Timer")]
     public float globalTimeRemaining = 300f;
-    public bool isTimerFrozen = true; // Ʃ�丮�� ������ �������� ����� ���·� ����
+    public bool isTimerFrozen = true; // 튜토리얼 끝나기 전까지는 얼려둔 상태로 시작
     public bool lotteryRoomUnlocked = false;
 
-    public int TotalScore => miniGame1Score + miniGame2Score + miniGame3Score;
-
-    // ���� �� �ʱ�ȭ��
+    // 개발 중 초기화용
     public void ResetData()
     {
         miniGame1Score = 0;
         miniGame2Score = 0;
         miniGame3Score = 0;
-
+        meritPoint = 0;
         tutorialDone = false;
 
         globalTimeRemaining = 300f;

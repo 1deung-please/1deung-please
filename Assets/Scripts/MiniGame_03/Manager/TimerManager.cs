@@ -5,7 +5,8 @@ public class TimerManager : MonoBehaviour
 {
     public TMP_Text timerText;
 
-    float time = 30f;
+    private float time = 60f;
+    private bool timerEnded = false;
 
     void Start()
     {
@@ -16,7 +17,7 @@ public class TimerManager : MonoBehaviour
 
     void Update()
     {
-        if (isGameOver)
+        if (timerEnded)
             return;
 
         time -= Time.deltaTime;
@@ -28,12 +29,12 @@ public class TimerManager : MonoBehaviour
 
         if (time <= 0)
         {
-            isGameOver = true;
-
-            GameManager.Instance.RecordMiniGameResult(3, false);
-            GameManager.Instance.OnMiniGameComplete(3, 0);
+            timerEnded = true;
 
             Debug.Log("시간 종료");
+
+            if (Game3Manager.Instance != null)
+                Game3Manager.Instance.GameFail();
         }
     }
 }

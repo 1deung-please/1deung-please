@@ -2,36 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager_mg02 : MonoBehaviour
 {
     [Header("UI Panels")]
-    public GameObject titlePanel;       
-    public GameObject resultPanel;      
+    public GameObject titlePanel;
+    public GameObject resultPanel;
 
     [Header("In-Game UI")]
     public Image passengerImage;
     public Sprite[] passengerSprites;
     public Slider healthBar;
     public TMP_Text timerText;
-    public TMP_Text meritText;         
+    public TMP_Text meritText;
+    public TMP_Text currentMeritText;
+    public TMP_Text decreaseText;
 
     [Header("Result UI Texts")]
-    public TMP_Text TitleText;
-    public TMP_Text ResultReasonText;
-    public TMP_Text RecordText;
-    
+    public TMP_Text titleText;
+    public TMP_Text resultReasonText;
+    public TMP_Text recordText;
+
     [Header("Game Settings")]
     public float maxGameTime = 20f;
     float currentGameTime;
-
     public float maxHealth = 100f;
     float currentHealth;
-
-    public int scorePerCorrect = 10;
-    int currentMeritScore = 0;
 
     bool needSeat;
     bool isGameOver;
@@ -40,13 +37,16 @@ public class GameManager_mg02 : MonoBehaviour
     int correctCount;
     int wrongCount;
 
-    List<float> clickTimestamps = new List<float>(); 
-    float maxCPS = 0f;                               
+    List<float> clickTimestamps = new List<float>();
+    float maxCPS = 0f;
 
     void Start()
     {
-        if (titlePanel != null) titlePanel.SetActive(true);
-        if (resultPanel != null) resultPanel.SetActive(false);
+        if (titlePanel != null)
+            titlePanel.SetActive(true);
+
+        if (resultPanel != null)
+            resultPanel.SetActive(false);
 
         isGameStarted = false;
         isGameOver = false;
@@ -54,31 +54,28 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void StartGame()
     {
-        if (titlePanel != null) titlePanel.SetActive(false);
+        if (titlePanel != null)
+            titlePanel.SetActive(false);
 
         currentGameTime = maxGameTime;
         currentHealth = maxHealth;
-        currentMeritScore = 0;
+
         correctCount = 0;
         wrongCount = 0;
 
         clickTimestamps.Clear();
         maxCPS = 0f;
-
         isGameOver = false;
         isGameStarted = true;
 
-        // 플레이 기록
-        GameManager.Instance.RecordMiniGamePlay(2);
+        updateMeritUI();
 
-        UpdateMeritUI();
-        SpawnPassenger();
+        spawnPassenger();
     }
 
     void Update()
     {
-        if (!isGameStarted || isGameOver)
-            return;
+        if (!isGameStarted || isGameOver) return;
 
         currentGameTime -= Time.deltaTime;
 
@@ -98,37 +95,43 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
+
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         healthBar.value = currentHealth / maxHealth;
         timerText.text = Mathf.Ceil(currentGameTime) + "s";
 
-        UpdateCPSData();
+        if (decreaseText != null)
+        {
+            decreaseText.text = $"-{decreaseSpeed:F0}/s";
+        }
+
+        updateCpsData();
 
         if (currentHealth <= 0)
         {
-            GameOver(isSuccess: false);
+            gameOver(false);
         }
         else if (currentGameTime <= 0)
         {
-            GameOver(isSuccess: true);
+            gameOver(true);
         }
     }
 
-    void RegisterClick()
+    void registerClick()
     {
         clickTimestamps.Add(Time.time);
-        UpdateCPSData();
+        updateCpsData();
     }
 
-    void UpdateCPSData()
+    void updateCpsData()
     {
         float currentTime = Time.time;
         int current1SecClicks = 0;
 
         for (int i = clickTimestamps.Count - 1; i >= 0; i--)
         {
-            if (currentTime - clickTimestamps[i] <= 1.0f)
+            if (currentTime - clickTimestamps[i] <= 1f)
             {
                 current1SecClicks++;
             }
@@ -144,10 +147,12 @@ public class GameManager_mg02 : MonoBehaviour
         }
     }
 
-    void SpawnPassenger()
+    void spawnPassenger()
     {
         int random = Random.Range(0, passengerSprites.Length);
-        passengerImage.sprite = passengerSprites[random];
+
+        passengerImage.sprite =
+            passengerSprites[random];
 
         switch (random)
         {
@@ -166,16 +171,16 @@ public class GameManager_mg02 : MonoBehaviour
         }
     }
 
-    public void GiveSeat()
+    public void giveSeat()
     {
-        if (!isGameStarted || isGameOver) return;
+        if (!isGameStarted || isGameOver)
+            return;
 
-        RegisterClick();
+        registerClick();
 
         if (needSeat)
         {
             currentHealth += 15f;
-            currentMeritScore += scorePerCorrect;
             correctCount++;
         }
         else
@@ -185,20 +190,21 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        UpdateMeritUI();
-        SpawnPassenger();
+
+        updateMeritUI();
+        spawnPassenger();
     }
 
-    public void IgnoreSeat()
+    public void ignoreSeat()
     {
-        if (!isGameStarted || isGameOver) return;
+        if (!isGameStarted || isGameOver)
+            return;
 
-        RegisterClick();
+        registerClick();
 
         if (!needSeat)
         {
             currentHealth += 15f;
-            currentMeritScore += scorePerCorrect;
             correctCount++;
         }
         else
@@ -207,70 +213,96 @@ public class GameManager_mg02 : MonoBehaviour
             wrongCount++;
         }
 
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        UpdateMeritUI();
-        SpawnPassenger();
+        currentHealth = Mathf.Clamp( currentHealth, 0, maxHealth);
+
+        updateMeritUI();
+        spawnPassenger();
     }
 
-    void UpdateMeritUI()
+    void updateMeritUI()
     {
         if (meritText != null)
-            meritText.text = $"공덕 {currentMeritScore}";
+        {
+            meritText.text =
+                $"정답 {correctCount}";
+        }
+
+        if (currentMeritText != null)
+        {
+            int earnedMerit = correctCount * 20;
+            currentMeritText.text = $"공덕 {earnedMerit}";
+        }
     }
 
-    void GameOver(bool isSuccess)
+    void gameOver(bool isSuccess)
     {
         isGameOver = true;
 
-        int finalScore = isSuccess ? currentMeritScore : 0;
+        // 전역 공덕 시스템 전달
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameComplete(2, correctCount);
+        }
 
-        // 성공/실패 기록
-        GameManager.Instance.RecordMiniGameResult(2, isSuccess);
-        GameManager.Instance.OnMiniGameComplete(2, finalScore);
+        string reason;
 
-        string reason = isSuccess ? "클리어 (정상)" : "게이지0 (오버)";
+        if (isSuccess)
+        {
+            reason = "시간종료(정상)";
+        }
+        else
+        {
+            reason = "게이지0(오버)";
+        }
 
         if (resultPanel != null)
         {
             resultPanel.SetActive(true);
 
-            if (TitleText != null)
-                TitleText.text = "플레이 기록";
+            if (titleText != null)
+                titleText.text = "플레이 기록";
 
             float survivedTime =
-                maxGameTime - Mathf.Max(0, currentGameTime);
+                maxGameTime -
+                Mathf.Max(0, currentGameTime);
 
             int totalAttempts =
                 correctCount + wrongCount;
 
             float accuracy =
                 totalAttempts > 0
-                ? ((float)correctCount / totalAttempts) * 100f
-                : 0f;
+                ? ((float)correctCount / totalAttempts) * 100f : 0f;
 
-            float avgCPS =
+            float avgCps =
                 survivedTime > 0
-                ? (float)totalAttempts / survivedTime
-                : 0f;
+                ? (float)totalAttempts / survivedTime: 0f;
 
-            if (ResultReasonText != null)
-                ResultReasonText.text = reason;
+            if (resultReasonText != null)
+                resultReasonText.text = reason;
 
-            if (RecordText != null)
+            if (recordText != null)
             {
-                RecordText.text =
-                    $"공덕 {finalScore} " +
+                int earnedMerit =
+                    correctCount * 20;
+
+                recordText.text =
+                    $"공덕 {earnedMerit} " +
                     $"생존 {survivedTime:F0}s " +
                     $"정답/오답 {correctCount}/{wrongCount} " +
                     $"정확도 {accuracy:F0}% " +
-                    $"평균 CPS {avgCPS:F1} " +
-                    $"최고 CPS {maxCPS:F0}";
+                    $"평균 CPS {avgCps:F1} " +
+                    $"최고 CPS {maxCPS:F0} ";
             }
         }
     }
 
-    public void RestartGame()
+    public void restartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneLoader.Instance.LoadScene("MiniGame_02");
+    }
+
+    public void returnToLobby()
+    {
+        GameManager.Instance.ReturnToLobby();
     }
 }
