@@ -241,7 +241,7 @@ public class GameManager_mg02 : MonoBehaviour
         // 전역 공덕 시스템 전달
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnMiniGameComplete(2, correctCount);
+            GameManager.Instance.CompleteMiniGame2(correctCount);
         }
 
         string reason;
