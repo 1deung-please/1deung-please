@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public GameData gameData;
 
+    private const int MAX_MERIT_POINT = 10000;
+
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
 
@@ -43,15 +45,15 @@ public class GameManager : MonoBehaviour
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
-            SceneLoader.Instance.LoadScene("Lobby"); // �̹� Ʃ�丮�� ������ ��ŵ
+            SceneLoader.Instance.LoadScene("Lobby"); // 이미 튜토리얼 봤으면 스킵
         else
-            SceneLoader.Instance.LoadScene("Tutorial"); // ó���̸� Ʃ�丮���
+            SceneLoader.Instance.LoadScene("Tutorial"); // 처음이면 튜토리얼로
     }
 
     public void OnTutorialComplete()
     {
         gameData.tutorialDone = true;
-        gameData.isTimerFrozen = false; // �κ� ���԰� �Բ� ���� Ÿ�̸� ����
+        gameData.isTimerFrozen = false; // 로비 진입과 함께 전역 타이머 시작
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -59,16 +61,6 @@ public class GameManager : MonoBehaviour
     {
         isMiniGamePlaying = true;
         SceneLoader.Instance.LoadScene(miniGameSceneName);
-    }
-
-    public void OnMiniGameComplete(int miniGameIndex, int score)
-    {
-        switch (miniGameIndex)
-        {
-            case 1: gameData.miniGame1Score = score; break;
-            case 2: gameData.miniGame2Score = score; break;
-            case 3: gameData.miniGame3Score = score; break;
-        }
     }
 
     public void RecordMiniGamePlay(int miniGameIndex)
@@ -98,13 +90,57 @@ public class GameManager : MonoBehaviour
         return count;
     }
     
+    public void CompleteMiniGame1(int collectedCount, int targetCount)
+    {
+        gameData.miniGame1Score = collectedCount;
+
+        if (collectedCount >= targetCount)
+        {
+            addMeritPoint(collectedCount + 50);
+        }
+        else
+        {
+            int merit = Mathf.RoundToInt(collectedCount * 0.5f);
+            addMeritPoint(merit);
+        }
+    }
+
+    public void CompleteMiniGame2(int correctCount)
+    {
+        gameData.miniGame2Score = correctCount;
+        addMeritPoint(correctCount * 20);
+    }
+
+    public void CompleteMiniGame3(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            addMeritPoint(700);
+        }
+    }
+
+    public void addMeritPoint(int amount)
+    {
+        gameData.meritPoint += amount;
+
+        if (gameData.meritPoint > MAX_MERIT_POINT)
+        {
+            gameData.meritPoint = MAX_MERIT_POINT;
+        }
+    }
+
+    public int getMeritPoint()
+    {
+        return gameData.meritPoint;
+    }
+
     public void ReturnToLobby()
     {
         isMiniGamePlaying = false;
 
         if (pendingEndingTransition)
         {
-            // ���� Ÿ�̸Ӱ� �� �̴ϰ��� ���� �̹� ����ƴ� ��� �� ���ǹ� Ȱ��ȭ ���·� �κ� ����
+            // 전역 타이머가 이 미니게임 도중 이미 종료됐던 경우 → 복권방 활성화 상태로 로비 진입
             pendingEndingTransition = false;
             gameData.lotteryRoomUnlocked = true;
         }
@@ -116,12 +152,12 @@ public class GameManager : MonoBehaviour
     {
         if (isMiniGamePlaying)
         {
-            pendingEndingTransition = true; // ���� ���� ������ ������ ����, ���� �� ó�� ����
+            pendingEndingTransition = true; // 진행 중인 게임은 끝까지 인정, 종료 후 처리 예약
         }
         else
         {
             gameData.lotteryRoomUnlocked = true;
-            SceneLoader.Instance.LoadScene("Lobby"); // ���ǹ� Ȱ��ȭ�� �κ�� ��� �̵�
+            SceneLoader.Instance.LoadScene("Lobby"); // 복권방 활성화된 로비로 즉시 이동
         }
     }
 
@@ -132,11 +168,11 @@ public class GameManager : MonoBehaviour
 
     public void DetermineEnding()
     {
-        int total = gameData.TotalScore;
+        int total = gameData.meritPoint;
 
-        if (total >= 61)
+        if (total >= 8500)
             SceneLoader.Instance.LoadScene("Ending_C");
-        else if (total >= 31)
+        else if (total >= 2000)
             SceneLoader.Instance.LoadScene("Ending_B");
         else
             SceneLoader.Instance.LoadScene("Ending_A");
