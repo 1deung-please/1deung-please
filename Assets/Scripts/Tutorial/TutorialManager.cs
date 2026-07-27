@@ -24,8 +24,7 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        bool tutorialCompleted =
-            PlayerPrefs.GetInt("TutorialCompleted", 0) == 1;
+        bool tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
 
         skipButton.SetActive(tutorialCompleted);
 
@@ -46,18 +45,9 @@ public class TutorialManager : MonoBehaviour
         dialogueManager.StartDialogue(tutorialDialogue);
     }
 
-    public void MoveLobby()
+    public void MoveLobbyAndStartTimer()
     {
-        Debug.Log("▶ 로비 이동");
-
-        // 나중에 플레이어 이동 코드 작성
-    }
-
-    public void StartGameTimer()
-    {
-        Debug.Log("▶ 5분 타이머 시작");
-
-        // 나중에 타이머 실행
+        GameManager.Instance.OnTutorialComplete();
     }
 
     public void FadeOut()
@@ -116,6 +106,6 @@ public class TutorialManager : MonoBehaviour
     {
         dialogueManager.SkipDialogue();
 
-        MoveLobby();
+        MoveLobbyAndStartTimer();
     }
 }

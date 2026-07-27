@@ -157,11 +157,11 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case DialogueEvent.MoveLobby:
-                TutorialManager.Instance.MoveLobby();
+                TutorialManager.Instance.MoveLobbyAndStartTimer();
                 break;
 
             case DialogueEvent.StartTimer:
-                TutorialManager.Instance.StartGameTimer();
+                // 이미 MoveLobby 쪽에서 다 처리되니, 이 case는 비워두거나 지워도 됨
                 break;
 
             case DialogueEvent.FadeOut:
