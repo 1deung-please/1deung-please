@@ -188,6 +188,10 @@ public class DialogueManager : MonoBehaviour
         {
             NextDialogue();
         }
+        else
+        {
+            AchievementManager.Instance.OnTutorialNoButtonClicked(); 
+        }
     }
 
     public void RepeatCurrentDialogue(string newText)

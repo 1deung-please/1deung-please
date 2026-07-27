@@ -17,6 +17,11 @@ public class GameData : ScriptableObject
     // 실패 여부(업적용)
     public bool[] failGames = new bool[3];
 
+    [Header("Achievement Tracking")]
+    public int[] consecutiveSuccess = new int[3];
+    public int[] consecutiveFail = new int[3];
+    public int tutorialNoButtonCount;
+
     [Header("Merit Point")]
     public int meritPoint;
 
@@ -36,14 +41,15 @@ public class GameData : ScriptableObject
         miniGame3Score = 0;
         meritPoint = 0;
         tutorialDone = false;
-
         globalTimeRemaining = 300f;
         isTimerFrozen = true;
         lotteryRoomUnlocked = false;
-
         playedGames = new bool[3];
         playCount = new int[3];
         successGames = new bool[3];
         failGames = new bool[3];
+        consecutiveSuccess = new int[3];
+        consecutiveFail = new int[3];
+        tutorialNoButtonCount = 0;
     }
 }

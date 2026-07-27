@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class TestTrigger : MonoBehaviour
 {
+    public GameObject achievementBookPanel;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -22,6 +24,17 @@ public class TestTrigger : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             GameManager.Instance.ReturnToLobby(); // MiniGame_01 → Lobby
+        }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            for (int i = 0; i < 10; i++)
+                AchievementManager.Instance.OnTutorialNoButtonClicked();
+        }
+
+        if (Input.GetKeyDown(KeyCode.B)) // 임시 테스트
+        {
+            achievementBookPanel.SetActive(!achievementBookPanel.activeSelf);
         }
 
         // 아래는 전역 타이머 테스트 전용 (실제 게임 로직 아님)

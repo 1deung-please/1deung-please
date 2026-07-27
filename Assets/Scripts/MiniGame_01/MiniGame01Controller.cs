@@ -121,6 +121,7 @@ public class MiniGame01Controller : MonoBehaviour
 
         // 성공/실패 기록
         GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+        AchievementManager.Instance.OnMiniGameResult(MiniGameKind.PickTrash, isSuccess); 
 
         int merit = isSuccess
             ? currentCount + successBonus

@@ -168,13 +168,47 @@ public class GameManager : MonoBehaviour
 
     public void DetermineEnding()
     {
-        int total = gameData.meritPoint;
+        string endingId;
+        string sceneName;
 
-        if (total >= 8500)
-            SceneLoader.Instance.LoadScene("Ending_C");
-        else if (total >= 2000)
-            SceneLoader.Instance.LoadScene("Ending_B");
+        bool allPlayed = gameData.playedGames[0] && gameData.playedGames[1] && gameData.playedGames[2];
+
+        if (!allPlayed)
+        {
+            // 얄팍한 속셈: 공덕 무관, 최우선 조건
+            endingId = "얄팍한속셈";
+            sceneName = "Ending_Shallow";
+        }
         else
-            SceneLoader.Instance.LoadScene("Ending_A");
+        {
+            int total = gameData.meritPoint;
+
+            if (total >= 8500)
+            {
+                endingId = "진정한귀인";
+                sceneName = "Ending_TrueBenefactor";
+            }
+            else if (total >= 2000)
+            {
+                endingId = "절반의성공";
+                sceneName = "Ending_HalfSuccess";
+            }
+            else
+            {
+                endingId = "자격미달";
+                sceneName = "Ending_Unqualified";
+            }
+        }
+
+        // 히든 엔딩: 나머지 4개를 이미 다 모았으면 공덕/조건 무관하게 즉시 히든으로
+        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15)
+            && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
+        {
+            endingId = "히든";
+            sceneName = "Ending_Hidden";
+        }
+
+        AchievementManager.Instance.OnEndingConfirmed(endingId);
+        SceneLoader.Instance.LoadScene(sceneName);
     }
 }
