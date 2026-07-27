@@ -8,6 +8,13 @@ public class TimerManager : MonoBehaviour
     private float time = 60f;
     private bool timerEnded = false;
 
+    void Start()
+    {
+        GameManager.Instance.RecordMiniGamePlay(3);
+    }
+
+    bool isGameOver = false;
+
     void Update()
     {
         if (timerEnded)

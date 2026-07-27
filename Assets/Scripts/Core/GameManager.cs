@@ -45,15 +45,15 @@ public class GameManager : MonoBehaviour
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
-            SceneLoader.Instance.LoadScene("Lobby"); // ÀÌ¹Ì Æ©Åä¸®¾ó ºÃÀ¸¸é ½ºÅµ
+            SceneLoader.Instance.LoadScene("Lobby"); // ì´ë¯¸ íŠœí† ë¦¬ì–¼ ë´¤ìœ¼ë©´ ìŠ¤í‚µ
         else
-            SceneLoader.Instance.LoadScene("Tutorial"); // Ã³À½ÀÌ¸é Æ©Åä¸®¾ó·Î
+            SceneLoader.Instance.LoadScene("Tutorial"); // ì²˜ìŒì´ë©´ íŠœí† ë¦¬ì–¼ë¡œ
     }
 
     public void OnTutorialComplete()
     {
         gameData.tutorialDone = true;
-        gameData.isTimerFrozen = false; // ·Îºñ ÁøÀÔ°ú ÇÔ²² Àü¿ª Å¸ÀÌ¸Ó ½ÃÀÛ
+        gameData.isTimerFrozen = false; // ë¡œë¹„ ì§„ì…ê³¼ í•¨ê»˜ ì „ì—­ íƒ€ì´ë¨¸ ì‹œì‘
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -63,21 +63,33 @@ public class GameManager : MonoBehaviour
         SceneLoader.Instance.LoadScene(miniGameSceneName);
     }
 
-    public void OnMiniGameComplete(int miniGameIndex, int score)
+    public void RecordMiniGamePlay(int miniGameIndex)
     {
-        switch (miniGameIndex)
-        {
-            case 1:
-                CompleteMiniGame1(score, score); break;
-
-            case 2:
-                CompleteMiniGame2(score); break;
-
-            case 3:
-                CompleteMiniGame3(score > 0); break;
-        }
+        gameData.playedGames[miniGameIndex - 1] = true;
+        gameData.playCount[miniGameIndex - 1]++;
     }
 
+    public void RecordMiniGameResult(int miniGameIndex, bool success)
+    {
+        if (success)
+            gameData.successGames[miniGameIndex - 1] = true;
+        else
+            gameData.failGames[miniGameIndex - 1] = true;
+    }
+
+    public int GetPlayedGameCount()
+    {
+        int count = 0;
+
+        foreach (bool played in gameData.playedGames)
+        {
+            if (played)
+                count++;
+        }
+
+        return count;
+    }
+    
     public void CompleteMiniGame1(int collectedCount, int targetCount)
     {
         gameData.miniGame1Score = collectedCount;
@@ -128,7 +140,7 @@ public class GameManager : MonoBehaviour
 
         if (pendingEndingTransition)
         {
-            // Àü¿ª Å¸ÀÌ¸Ó°¡ ÀÌ ¹Ì´Ï°ÔÀÓ µµÁß ÀÌ¹Ì Á¾·áµÆ´ø °æ¿ì ¡æ º¹±Ç¹æ È°¼ºÈ­ »óÅÂ·Î ·Îºñ ÁøÀÔ
+            // ì „ì—­ íƒ€ì´ë¨¸ê°€ ì´ ë¯¸ë‹ˆê²Œì„ ë„ì¤‘ ì´ë¯¸ ì¢…ë£Œëë˜ ê²½ìš° â†’ ë³µê¶Œë°© í™œì„±í™” ìƒíƒœë¡œ ë¡œë¹„ ì§„ì…
             pendingEndingTransition = false;
             gameData.lotteryRoomUnlocked = true;
         }
@@ -140,12 +152,12 @@ public class GameManager : MonoBehaviour
     {
         if (isMiniGamePlaying)
         {
-            pendingEndingTransition = true; // ÁøÇà ÁßÀÎ °ÔÀÓÀº ³¡±îÁö ÀÎÁ¤, Á¾·á ÈÄ Ã³¸® ¿¹¾à
+            pendingEndingTransition = true; // ì§„í–‰ ì¤‘ì¸ ê²Œì„ì€ ëê¹Œì§€ ì¸ì •, ì¢…ë£Œ í›„ ì²˜ë¦¬ ì˜ˆì•½
         }
         else
         {
             gameData.lotteryRoomUnlocked = true;
-            SceneLoader.Instance.LoadScene("Lobby"); // º¹±Ç¹æ È°¼ºÈ­µÈ ·Îºñ·Î Áï½Ã ÀÌµ¿
+            SceneLoader.Instance.LoadScene("Lobby"); // ë³µê¶Œë°© í™œì„±í™”ëœ ë¡œë¹„ë¡œ ì¦‰ì‹œ ì´ë™
         }
     }
 

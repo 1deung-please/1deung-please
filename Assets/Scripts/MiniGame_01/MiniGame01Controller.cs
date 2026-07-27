@@ -17,17 +17,17 @@ public class MiniGame01Controller : MonoBehaviour
     public int countdownSeconds = 3;
 
     [Header("UI")]
-    public GameObject readyPanel;      // Á¶»ó½Å ´ë»ç ÆĞ³Î
-    public GameObject countdownPanel;  // 3,2,1 ÆĞ³Î
-    public GameObject resultPanel;     // °á°ú ÆĞ³Î
-    public TMP_Text targetText;        // "192°³ ÀÌ»ó ¾²·¹±â¸¦ Áİ°Å¶ó!"
+    public GameObject readyPanel;      // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ğ³ï¿½
+    public GameObject countdownPanel;  // 3,2,1 ï¿½Ğ³ï¿½
+    public GameObject resultPanel;     // ï¿½ï¿½ï¿½ ï¿½Ğ³ï¿½
+    public TMP_Text targetText;        // "192ï¿½ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½â¸¦ ï¿½İ°Å¶ï¿½!"
     public TMP_Text countdownText;     // 3,2,1
     public TMP_Text timerText;         // TIME 8.46
-    public Slider timerBar;            // Å¸ÀÌ¸Ó ¹Ù
-    public TMP_Text collectCountText;  // ÁÂÃø »ó´Ü ¼öÁı °³¼ö
-    public TMP_Text resultReasonText;  // ¼º°ø/½ÇÆĞ
-    public TMP_Text resultRecordText;  // ¸ñÇ¥/¼öÁı/°ø´ö
-    public TMP_Text meritText;         // °ø´ö
+    public Slider timerBar;            // Å¸ï¿½Ì¸ï¿½ ï¿½ï¿½
+    public TMP_Text collectCountText;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public TMP_Text resultReasonText;  // ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
+    public TMP_Text resultRecordText;  // ï¿½ï¿½Ç¥/ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
+    public TMP_Text meritText;         // ï¿½ï¿½ï¿½ï¿½
 
     private MiniGame01Phase currentPhase;
     private int targetCount;
@@ -40,7 +40,7 @@ public class MiniGame01Controller : MonoBehaviour
         targetCount = Random.Range(minTarget, maxTarget + 1);
 
         if (targetText != null)
-            targetText.text = $"Èì... {targetCount}°³ ÀÌ»ó ¾²·¹±â¸¦ Áİ°Å¶ó!";
+            targetText.text = $"ï¿½ï¿½... {targetCount}ï¿½ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½â¸¦ ï¿½İ°Å¶ï¿½!";
 
         ShowPanel(readyPanel);
     }
@@ -80,7 +80,10 @@ public class MiniGame01Controller : MonoBehaviour
         currentCount = 0;
         remainingTime = timeLimit;
 
-        ShowPanel(null); // °ÔÀÓ È­¸éÀº º°µµ ÆĞ³Î ¾øÀÌ Ç×»ó º¸ÀÌ´Â ¹è°æÀÌ¶ó °¡Á¤
+        // í”Œë ˆì´ ê¸°ë¡
+        GameManager.Instance.RecordMiniGamePlay(1);
+
+        ShowPanel(null); // ï¿½ï¿½ï¿½ï¿½ È­ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ğ³ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×»ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ ï¿½ï¿½ï¿½ï¿½
         UpdateCollectUI();
     }
 
@@ -107,7 +110,7 @@ public class MiniGame01Controller : MonoBehaviour
     void UpdateCollectUI()
     {
         if (collectCountText != null)
-            collectCountText.text = $"{currentCount}°³";
+            collectCountText.text = $"{currentCount}ï¿½ï¿½";
     }
 
     void EndGame(bool naturalEnd)
@@ -115,6 +118,10 @@ public class MiniGame01Controller : MonoBehaviour
         currentPhase = MiniGame01Phase.Result;
 
         bool isSuccess = currentCount >= targetCount;
+
+        // ì„±ê³µ/ì‹¤íŒ¨ ê¸°ë¡
+        GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+
         int merit = isSuccess
             ? currentCount + successBonus
             : Mathf.RoundToInt(currentCount * failPenaltyRate);
@@ -126,11 +133,11 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"Á¶»ó½ÅÀÌ ÁÖ¿ì¶ó°í ÇÑ ¾²·¹±â ¼ö: {targetCount}°³\n" +
-                $"ÁÖÀÎ°øÀÌ ÁÖ¿î ¾²·¹±â ¼ö: {currentCount}°³";
+                $"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½: {targetCount}ï¿½ï¿½\n" +
+                $"ï¿½ï¿½ï¿½Î°ï¿½ï¿½ï¿½ ï¿½Ö¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½: {currentCount}ï¿½ï¿½";
 
         if (meritText != null)
-            meritText.text = $"È¹µæ °ø´ö: {merit}P";
+            meritText.text = $"È¹ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: {merit}P";
 
         GameManager.Instance.OnMiniGameComplete(1, merit);
     }
@@ -142,7 +149,7 @@ public class MiniGame01Controller : MonoBehaviour
         if (resultPanel != null) resultPanel.SetActive(target == resultPanel);
     }
 
-    // °á°ú È­¸é ¹öÆ°¿ë
+    // ï¿½ï¿½ï¿½ È­ï¿½ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½
     public void OnClickRetry()
     {
         SceneLoader.Instance.LoadScene("MiniGame_01");
