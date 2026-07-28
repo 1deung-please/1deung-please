@@ -14,7 +14,7 @@ public class AchievementManager : MonoBehaviour
     public float popupDuration = 2f;
 
     [Header("Achievement Data")]
-    public AchievementListData achievementList; // 20개 이름/뱃지 정보
+    public AchievementListData achievementList;
 
     private Coroutine popupCoroutine;
 
@@ -104,6 +104,8 @@ public class AchievementManager : MonoBehaviour
             TryUnlock(12);
         }
     }
+
+    public void TryUnlockPublic(int id) => TryUnlock(id); // PersistentStats 등 외부에서 호출용
 
     void TryUnlock(int id)
     {

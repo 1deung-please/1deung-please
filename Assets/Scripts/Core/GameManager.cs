@@ -45,15 +45,15 @@ public class GameManager : MonoBehaviour
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
-            SceneLoader.Instance.LoadScene("Lobby"); // 이미 튜토리얼 봤으면 스킵
+            SceneLoader.Instance.LoadScene("Lobby");
         else
-            SceneLoader.Instance.LoadScene("Tutorial"); // 처음이면 튜토리얼로
+            SceneLoader.Instance.LoadScene("Tutorial");
     }
 
     public void OnTutorialComplete()
     {
         gameData.tutorialDone = true;
-        gameData.isTimerFrozen = false; // 로비 진입과 함께 전역 타이머 시작
+        gameData.isTimerFrozen = false;
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -80,29 +80,21 @@ public class GameManager : MonoBehaviour
     public int GetPlayedGameCount()
     {
         int count = 0;
-
         foreach (bool played in gameData.playedGames)
         {
-            if (played)
-                count++;
+            if (played) count++;
         }
-
         return count;
     }
-    
+
     public void CompleteMiniGame1(int collectedCount, int targetCount)
     {
         gameData.miniGame1Score = collectedCount;
 
         if (collectedCount >= targetCount)
-        {
             addMeritPoint(collectedCount + 50);
-        }
         else
-        {
-            int merit = Mathf.RoundToInt(collectedCount * 0.5f);
-            addMeritPoint(merit);
-        }
+            addMeritPoint(Mathf.RoundToInt(collectedCount * 0.5f));
     }
 
     public void CompleteMiniGame2(int correctCount)
@@ -113,20 +105,14 @@ public class GameManager : MonoBehaviour
 
     public void CompleteMiniGame3(bool isSuccess)
     {
-        if (isSuccess)
-        {
-            addMeritPoint(700);
-        }
+        if (isSuccess) addMeritPoint(700);
     }
 
     public void addMeritPoint(int amount)
     {
         gameData.meritPoint += amount;
-
         if (gameData.meritPoint > MAX_MERIT_POINT)
-        {
             gameData.meritPoint = MAX_MERIT_POINT;
-        }
     }
 
     public int getMeritPoint()
@@ -140,9 +126,9 @@ public class GameManager : MonoBehaviour
 
         if (pendingEndingTransition)
         {
-            // 전역 타이머가 이 미니게임 도중 이미 종료됐던 경우 → 복권방 활성화 상태로 로비 진입
             pendingEndingTransition = false;
             gameData.lotteryRoomUnlocked = true;
+            AchievementManager.Instance.OnGlobalTimerEnd();
         }
 
         SceneLoader.Instance.LoadScene("Lobby");
@@ -152,12 +138,13 @@ public class GameManager : MonoBehaviour
     {
         if (isMiniGamePlaying)
         {
-            pendingEndingTransition = true; // 진행 중인 게임은 끝까지 인정, 종료 후 처리 예약
+            pendingEndingTransition = true;
         }
         else
         {
             gameData.lotteryRoomUnlocked = true;
-            SceneLoader.Instance.LoadScene("Lobby"); // 복권방 활성화된 로비로 즉시 이동
+            AchievementManager.Instance.OnGlobalTimerEnd();
+            SceneLoader.Instance.LoadScene("Lobby");
         }
     }
 
@@ -175,7 +162,6 @@ public class GameManager : MonoBehaviour
 
         if (!allPlayed)
         {
-            // 얄팍한 속셈: 공덕 무관, 최우선 조건
             endingId = "얄팍한속셈";
             sceneName = "Ending_Shallow";
         }
@@ -200,7 +186,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 히든 엔딩: 나머지 4개를 이미 다 모았으면 공덕/조건 무관하게 즉시 히든으로
         if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15)
             && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
         {
@@ -209,6 +194,22 @@ public class GameManager : MonoBehaviour
         }
 
         AchievementManager.Instance.OnEndingConfirmed(endingId);
+        EndingStorage.Unlock(endingId);
         SceneLoader.Instance.LoadScene(sceneName);
+    }
+
+    // ---- 사이클 초기화 (F-15) ----
+    public void ResetCycle()
+    {
+        // 19번 업적 체크: 전역 5분 중 3분(180초) 이상 흘렀는지 = 남은 시간이 120초 이하였는지
+        bool playedOver3Min = gameData.globalTimeRemaining <= 120f;
+        if (playedOver3Min)
+        {
+            PersistentStats.IncrementResetCycleCount();
+        }
+
+        gameData.ResetData(); // 세션 데이터만 리셋 (엔딩/업적 해금 현황은 별도 PlayerPrefs라 영향 없음)
+
+        SceneLoader.Instance.LoadScene("MainMenu"); // 시작화면 → 이후 튜토리얼(스킵 가능)
     }
 }
