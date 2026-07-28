@@ -105,12 +105,14 @@ public class Game3Manager : MonoBehaviour
     // 성공 처리
     public void GameSuccess()
     {
+        AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress, true);
         ShowResult(true, 700);
     }
 
     // 실패 처리
     public void GameFail()
     {
+        AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress, false);
         ShowResult(false, 0);
     }
 

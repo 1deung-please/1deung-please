@@ -242,6 +242,7 @@ public class GameManager_mg02 : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.CompleteMiniGame2(correctCount);
+            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
         }
 
         string reason;
