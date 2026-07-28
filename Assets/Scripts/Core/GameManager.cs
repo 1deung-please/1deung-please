@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,6 +42,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void PauseTimer()
+    {
+        gameData.isTimerFrozen = true;
+    }
+
+    public void ResumeTimer()
+    {
+        if (!gameData.isTimeOver)
+            gameData.isTimerFrozen = false;
+    }
+
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
@@ -60,7 +71,13 @@ public class GameManager : MonoBehaviour
     public void EnterMiniGame(string miniGameSceneName)
     {
         isMiniGamePlaying = true;
+        PauseTimer();
         SceneLoader.Instance.LoadScene(miniGameSceneName);
+    }
+
+    public void OnMiniGameStart()
+    {
+        ResumeTimer();
     }
 
     public void RecordMiniGamePlay(int miniGameIndex)
@@ -131,11 +148,19 @@ public class GameManager : MonoBehaviour
             AchievementManager.Instance.OnGlobalTimerEnd();
         }
 
+        if (!gameData.isTimeOver)
+        {
+            ResumeTimer();
+        }
+
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
     void OnGlobalTimerEnd()
     {
+        gameData.isTimeOver = true;
+        gameData.isTimerFrozen = true;
+
         if (isMiniGamePlaying)
         {
             pendingEndingTransition = true;

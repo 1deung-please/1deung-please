@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -105,6 +105,7 @@ public class Game3Manager : MonoBehaviour
     // 성공 처리
     public void GameSuccess()
     {
+        GameManager.Instance.CompleteMiniGame3(true);
         AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress, true);
         ShowResult(true, 700);
     }
@@ -112,6 +113,7 @@ public class Game3Manager : MonoBehaviour
     // 실패 처리
     public void GameFail()
     {
+        GameManager.Instance.CompleteMiniGame3(false);
         AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress, false);
         ShowResult(false, 0);
     }
@@ -122,6 +124,8 @@ public class Game3Manager : MonoBehaviour
             return;
 
         gameEnded = true;
+
+        GameManager.Instance.PauseTimer();
 
         ClearWordButtons();
 
@@ -172,11 +176,23 @@ public class Game3Manager : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ReturnToLobby();
+            return;
+        }
+
         SceneManager.LoadScene(streetSceneName);
     }
 
     private void StartGame()
     {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameStart();
+            GameManager.Instance.RecordMiniGamePlay(3);
+        }
+
         gameStarted = true;
 
         if (ReadyPanel != null)
