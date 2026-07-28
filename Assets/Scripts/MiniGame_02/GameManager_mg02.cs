@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,6 +54,16 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void StartGame()
     {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameStart();
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGamePlay(2);
+        }
+
         if (titlePanel != null)
             titlePanel.SetActive(false);
 
@@ -238,9 +248,10 @@ public class GameManager_mg02 : MonoBehaviour
     {
         isGameOver = true;
 
-        // 전역 공덕 시스템 전달
+        // 전역 공덕 시스템 전달, 결과창에서는 전역 타이머 정지
         if (GameManager.Instance != null)
         {
+            GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
             AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
         }

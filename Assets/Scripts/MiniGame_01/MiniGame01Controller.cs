@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,8 +80,17 @@ public class MiniGame01Controller : MonoBehaviour
         currentCount = 0;
         remainingTime = timeLimit;
 
+        // 전역 타이머 재개
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameStart();
+        }
+
         // 플레이 기록
-        GameManager.Instance.RecordMiniGamePlay(1);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGamePlay(1);
+        }
 
         ShowPanel(null); // 게임 화면은 별도 패널 없이 항상 보이는 배경이라 가정
         UpdateCollectUI();
@@ -118,6 +127,9 @@ public class MiniGame01Controller : MonoBehaviour
         currentPhase = MiniGame01Phase.Result;
 
         bool isSuccess = currentCount >= targetCount;
+
+        // 결과창에서는 전역 타이머 정지
+        GameManager.Instance.PauseTimer();
 
         // 성공/실패 기록
         GameManager.Instance.RecordMiniGameResult(1, isSuccess);
