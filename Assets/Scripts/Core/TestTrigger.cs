@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class TestTrigger : MonoBehaviour
 {
@@ -9,22 +9,32 @@ public class TestTrigger : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            GameManager.Instance.OnStartGame(); // MainMenu ¡æ Tutorial
+            GameManager.Instance.OnStartGame(); // MainMenu â†’ Tutorial
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            GameManager.Instance.OnTutorialComplete(); // Tutorial ¡æ Lobby (Àü¿ª Å¸ÀÌ¸Ó ½ÃÀÛ)
+            GameManager.Instance.OnTutorialComplete(); // Tutorial â†’ Lobby (ì „ì—­ íƒ€ì´ë¨¸ ì‹œì‘)
         }
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            GameManager.Instance.EnterMiniGame("MiniGame_01"); // Lobby ¡æ MiniGame_01
+            GameManager.Instance.EnterMiniGame("MiniGame_01"); // Lobby â†’ MiniGame_01
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            GameManager.Instance.EnterMiniGame("MiniGame_02"); // Lobby â†’ MiniGame_02
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            GameManager.Instance.EnterMiniGame("MiniGame_03"); // Lobby â†’ MiniGame_03
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            GameManager.Instance.ReturnToLobby(); // MiniGame_01 ¡æ Lobby
+            GameManager.Instance.ReturnToLobby(); // ë¯¸ë‹ˆê²Œì„ â†’ Lobby (1,2,3 ê³µí†µ)
         }
 
         if (Input.GetKeyDown(KeyCode.U))
@@ -33,25 +43,25 @@ public class TestTrigger : MonoBehaviour
                 AchievementManager.Instance.OnTutorialNoButtonClicked();
         }
 
-        if (Input.GetKeyDown(KeyCode.B)) // ¾÷Àû µµ°¨ Å×½ºÆ®
+        if (Input.GetKeyDown(KeyCode.B)) // ì—…ì  ë„ê° í…ŒìŠ¤íŠ¸
         {
             achievementBookPanel.SetActive(!achievementBookPanel.activeSelf);
         }
 
-        if (Input.GetKeyDown(KeyCode.N)) // Ending µµ°¨ Å×½ºÆ®
+        if (Input.GetKeyDown(KeyCode.N)) // Ending ë„ê° í…ŒìŠ¤íŠ¸
         {
             endingBookPanel.SetActive(!endingBookPanel.activeSelf);
         }
 
-        // ¾Æ·¡´Â Àü¿ª Å¸ÀÌ¸Ó Å×½ºÆ® Àü¿ë (½ÇÁ¦ °ÔÀÓ ·ÎÁ÷ ¾Æ´Ô)
+        // ì•„ë˜ëŠ” ì „ì—­ íƒ€ì´ë¨¸ í…ŒìŠ¤íŠ¸ ì „ìš© (ì‹¤ì œ ê²Œì„ ë¡œì§ ì•„ë‹˜)
         if (Input.GetKeyDown(KeyCode.T))
         {
-            GameManager.Instance.gameData.globalTimeRemaining = 3f; // 5ºĞ ´Ù ±â´Ù¸®±â ±ÍÂúÀ¸´Ï 3ÃÊ·Î °­Á¦ ´ÜÃà
+            GameManager.Instance.gameData.globalTimeRemaining = 3f; // 5ë¶„ ë‹¤ ê¸°ë‹¤ë¦¬ê¸° ê·€ì°®ìœ¼ë‹ˆ 3ì´ˆë¡œ ê°•ì œ ë‹¨ì¶•
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            Debug.Log("³²Àº ½Ã°£: " + GameManager.Instance.gameData.globalTimeRemaining);
+            Debug.Log("ë‚¨ì€ ì‹œê°„: " + GameManager.Instance.gameData.globalTimeRemaining);
         }
     }
 }
