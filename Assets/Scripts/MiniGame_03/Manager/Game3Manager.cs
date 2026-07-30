@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -135,6 +136,11 @@ public class Game3Manager : MonoBehaviour
         pointText.text = "획득 공덕포인트\n" + earnedPoint;
 
         Time.timeScale = 0f;
+
+        if (GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition())
+        {
+            StartCoroutine(AutoReturnToLobbyAfterDelay());
+        }
     }
 
     private void ClearWordButtons()
@@ -183,6 +189,12 @@ public class Game3Manager : MonoBehaviour
         }
 
         SceneManager.LoadScene(streetSceneName);
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        GameManager.Instance.ReturnToLobby();
     }
 
     private void StartGame()
