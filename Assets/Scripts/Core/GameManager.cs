@@ -158,6 +158,11 @@ public class GameManager : MonoBehaviour
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
+    public bool IsPendingEndingTransition()
+    {
+        return pendingEndingTransition;
+    }
+
     void OnGlobalTimerEnd()
     {
         gameData.isTimeOver = true;
