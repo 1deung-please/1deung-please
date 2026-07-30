@@ -237,4 +237,6 @@ public class GameManager : MonoBehaviour
 
         SceneLoader.Instance.LoadScene("MainMenu"); // 시작화면 → 이후 튜토리얼(스킵 가능)
     }
+
+    public bool IsPendingEndingTransition() => pendingEndingTransition;
 }
