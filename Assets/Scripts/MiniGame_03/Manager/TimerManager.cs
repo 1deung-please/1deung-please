@@ -9,11 +9,14 @@ public class TimerManager : MonoBehaviour
     private bool timerEnded = false;
 
     void Start()
+{
+    if (GameManager.Instance != null)
     {
         GameManager.Instance.RecordMiniGamePlay(3);
     }
 
-    bool isGameOver = false;
+    timerText.text = time.ToString("F1");
+}
 
     void Update()
     {
