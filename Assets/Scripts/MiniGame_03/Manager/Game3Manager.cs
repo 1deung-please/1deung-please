@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -105,16 +106,43 @@ public class Game3Manager : MonoBehaviour
     // 성공 처리
     public void GameSuccess()
     {
-        GameManager.Instance.CompleteMiniGame3(true);
-        AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress, true);
+        // 로비에서 정상적으로 들어온 경우에만 저장 및 업적 처리
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CompleteMiniGame3(true);
+
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,true);
+            }
+        }
+        else
+        {
+            Debug.Log("미니게임 재시작 상태: 결과 저장과 업적 처리를 생략합니다.");
+        }
+
         ShowResult(true, 700);
     }
+
 
     // 실패 처리
     public void GameFail()
     {
-        GameManager.Instance.CompleteMiniGame3(false);
-        AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress, false);
+        // 로비에서 정상적으로 들어온 경우에만 저장 및 업적 처리
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CompleteMiniGame3(false);
+
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,false);
+            }
+        }
+        else
+        {
+            Debug.Log("미니게임 재시작 상태: 결과 저장과 업적 처리를 생략합니다.");
+        }
+
         ShowResult(false, 0);
     }
 
@@ -125,17 +153,37 @@ public class Game3Manager : MonoBehaviour
 
         gameEnded = true;
 
-        GameManager.Instance.PauseTimer();
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PauseTimer();
+        }
 
         ClearWordButtons();
 
-        resultPanel.SetActive(true);
+        if (resultPanel != null)
+            resultPanel.SetActive(true);
 
-        resultTitleText.text = isSuccess ? "성공!" : "실패!";
-        pointText.text = "획득 공덕포인트\n" + earnedPoint;
+        if (resultTitleText != null)
+            resultTitleText.text = isSuccess ? "성공!" : "실패!";
+
+        if (pointText != null)
+            pointText.text = "획득 공덕포인트\n" + earnedPoint;
 
         Time.timeScale = 0f;
+
+        if (GameManager.Instance != null &&
+        GameManager.Instance.IsPendingEndingTransition())
+    {
+        StartCoroutine(AutoReturnToLobbyAfterDelay());
     }
+    }
+
+private IEnumerator AutoReturnToLobbyAfterDelay()
+{
+    yield return new WaitForSecondsRealtime(2f);
+
+    GameManager.Instance.ReturnToLobby();
+}
 
     private void ClearWordButtons()
 {
@@ -202,4 +250,6 @@ public class Game3Manager : MonoBehaviour
         
         Time.timeScale = 1f;
     }
+
+    
 }
