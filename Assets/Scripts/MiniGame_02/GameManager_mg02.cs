@@ -306,6 +306,12 @@ public class GameManager_mg02 : MonoBehaviour
                     $"최고 CPS {maxCPS:F0} ";
             }
         }
+
+        if (GameManager.Instance != null &&
+        GameManager.Instance.IsPendingEndingTransition())
+        {
+            StartCoroutine(AutoReturnToLobbyAfterDelay());
+        }
     }
 
     public void restartGame()
@@ -315,6 +321,12 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void returnToLobby()
     {
+        GameManager.Instance.ReturnToLobby();
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
         GameManager.Instance.ReturnToLobby();
     }
 }
