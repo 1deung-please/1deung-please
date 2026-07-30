@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
 
+    public bool IsPendingEndingTransition() => pendingEndingTransition;
+
     void Awake()
     {
         if (Instance == null)

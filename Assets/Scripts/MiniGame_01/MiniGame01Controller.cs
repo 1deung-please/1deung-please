@@ -153,6 +153,12 @@ public class MiniGame01Controller : MonoBehaviour
             meritText.text = $"획득 공덕: {merit}P";
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
+
+        // 전역 타이머가 이 판 도중 이미 끝나있었다면 → 결과 확인 후 자동으로 로비 복귀
+        if (GameManager.Instance.IsPendingEndingTransition())
+        {
+            StartCoroutine(AutoReturnToLobbyAfterDelay());
+        }
     }
 
     void ShowPanel(GameObject target)
@@ -179,5 +185,11 @@ public class MiniGame01Controller : MonoBehaviour
         GUI.Label(new Rect(10, 40, 300, 30), $"Target: {targetCount}");
         GUI.Label(new Rect(10, 70, 300, 30), $"Count: {currentCount}");
         GUI.Label(new Rect(10, 100, 300, 30), $"Time: {remainingTime:F2}");
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f); // 결과를 잠깐 보여준 뒤 자동 전환 
+        GameManager.Instance.ReturnToLobby();
     }
 }
