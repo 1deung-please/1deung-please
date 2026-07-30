@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -177,13 +177,6 @@ public class Game3Manager : MonoBehaviour
         StartCoroutine(AutoReturnToLobbyAfterDelay());
     }
     }
-
-private IEnumerator AutoReturnToLobbyAfterDelay()
-{
-    yield return new WaitForSecondsRealtime(2f);
-
-    GameManager.Instance.ReturnToLobby();
-}
 
     private void ClearWordButtons()
 {
