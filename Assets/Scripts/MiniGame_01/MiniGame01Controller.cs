@@ -196,10 +196,4 @@ public class MiniGame01Controller : MonoBehaviour
         GUI.Label(new Rect(10, 70, 300, 30), $"Count: {currentCount}");
         GUI.Label(new Rect(10, 100, 300, 30), $"Time: {remainingTime:F2}");
     }
-
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSeconds(2f); // 결과를 잠깐 보여준 뒤 자동 전환 
-        GameManager.Instance.ReturnToLobby();
-    }
 }
