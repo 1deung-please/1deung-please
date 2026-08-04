@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -147,6 +147,7 @@ public class DialogueManager : MonoBehaviour
         PlayerPrefs.Save();
 
         Debug.Log("튜토리얼 완료");
+        TutorialManager.Instance.MoveLobbyAndStartTimer();
     }
 
     void ExecuteEvent(DialogueEvent dialogueEvent)

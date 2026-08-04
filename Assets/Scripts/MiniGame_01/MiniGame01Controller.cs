@@ -128,12 +128,16 @@ public class MiniGame01Controller : MonoBehaviour
 
         bool isSuccess = currentCount >= targetCount;
 
-        // 결과창에서는 전역 타이머 정지
-        GameManager.Instance.PauseTimer();
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PauseTimer();
+            GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+        }
 
-        // 성공/실패 기록
-        GameManager.Instance.RecordMiniGameResult(1, isSuccess);
-        AchievementManager.Instance.OnMiniGameResult(MiniGameKind.PickTrash, isSuccess); 
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.PickTrash, isSuccess);
+        }
 
         int merit = isSuccess
             ? currentCount + successBonus
@@ -179,17 +183,17 @@ public class MiniGame01Controller : MonoBehaviour
         GameManager.Instance.ReturnToLobby();
     }
 
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        GameManager.Instance.ReturnToLobby();
+    }
+
     void OnGUI()
     {
         GUI.Label(new Rect(10, 10, 300, 30), $"Phase: {currentPhase}");
         GUI.Label(new Rect(10, 40, 300, 30), $"Target: {targetCount}");
         GUI.Label(new Rect(10, 70, 300, 30), $"Count: {currentCount}");
         GUI.Label(new Rect(10, 100, 300, 30), $"Time: {remainingTime:F2}");
-    }
-
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSeconds(2f); // 결과를 잠깐 보여준 뒤 자동 전환 
-        GameManager.Instance.ReturnToLobby();
     }
 }
