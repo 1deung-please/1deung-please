@@ -58,9 +58,13 @@ public class GameManager : MonoBehaviour
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
+        {
             SceneLoader.Instance.LoadScene("Lobby");
+        }
         else
+        {
             SceneLoader.Instance.LoadScene("Tutorial");
+        }
     }
 
     public void OnTutorialComplete()
