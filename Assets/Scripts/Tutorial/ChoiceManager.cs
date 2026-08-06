@@ -5,10 +5,11 @@ using UnityEngine.UI;
 public class ChoiceManager : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] private GameObject choicePanel;
 
+    [SerializeField] private GameObject choicePanel;
     [SerializeField] private Button yesButton;
     [SerializeField] private Button noButton;
+    [SerializeField] private Sprite domitGirlPortrait;
 
     [Header("Optional")]
     [SerializeField] private TextMeshProUGUI noButtonText;
@@ -69,9 +70,7 @@ public class ChoiceManager : MonoBehaviour
             begging += "제발 ";
         }
 
-        dialogueManager.RepeatCurrentDialogue(
-            begging + "운명 한 번 맡겨보시겠어요?"
-        );
+        dialogueManager.RepeatCurrentDialogue("도믿걸", domitGirlPortrait, begging + "운명 한 번 맡겨보시겠어요?");
     }
 
     public void ResetChoice()

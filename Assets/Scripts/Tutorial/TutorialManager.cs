@@ -9,11 +9,12 @@ public class TutorialManager : MonoBehaviour
     [Header("Dialogue")]
     [SerializeField] private DialogueManager dialogueManager;
     [SerializeField] private DialogueData tutorialDialogue;
+    
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadePanel;
+    
     [Header("UI")]
     [SerializeField] private GameObject skipButton;
-
     private bool waitingForClick = false;
     private bool isFading = false;
 
@@ -29,6 +30,9 @@ public class TutorialManager : MonoBehaviour
         skipButton.SetActive(tutorialCompleted);
 
         StartTutorial();
+
+        // 튜토리얼 여부 초기화 코드
+        //PlayerPrefs.DeleteKey("TutorialCompleted");
     }
 
     private void Update()
