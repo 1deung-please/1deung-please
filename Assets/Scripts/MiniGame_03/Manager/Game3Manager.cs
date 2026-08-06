@@ -1,3 +1,4 @@
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -105,12 +106,43 @@ public class Game3Manager : MonoBehaviour
     // 성공 처리
     public void GameSuccess()
     {
+        // 로비에서 정상적으로 들어온 경우에만 저장 및 업적 처리
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CompleteMiniGame3(true);
+
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,true);
+            }
+        }
+        else
+        {
+            Debug.Log("미니게임 재시작 상태: 결과 저장과 업적 처리를 생략합니다.");
+        }
+
         ShowResult(true, 700);
     }
+
 
     // 실패 처리
     public void GameFail()
     {
+        // 로비에서 정상적으로 들어온 경우에만 저장 및 업적 처리
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CompleteMiniGame3(false);
+
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,false);
+            }
+        }
+        else
+        {
+            Debug.Log("미니게임 재시작 상태: 결과 저장과 업적 처리를 생략합니다.");
+        }
+
         ShowResult(false, 0);
     }
 
@@ -121,14 +153,29 @@ public class Game3Manager : MonoBehaviour
 
         gameEnded = true;
 
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PauseTimer();
+        }
+
         ClearWordButtons();
 
-        resultPanel.SetActive(true);
+        if (resultPanel != null)
+            resultPanel.SetActive(true);
 
-        resultTitleText.text = isSuccess ? "성공!" : "실패!";
-        pointText.text = "획득 공덕포인트\n" + earnedPoint;
+        if (resultTitleText != null)
+            resultTitleText.text = isSuccess ? "성공!" : "실패!";
+
+        if (pointText != null)
+            pointText.text = "획득 공덕포인트\n" + earnedPoint;
 
         Time.timeScale = 0f;
+
+        if (GameManager.Instance != null &&
+        GameManager.Instance.IsPendingEndingTransition())
+    {
+        StartCoroutine(AutoReturnToLobbyAfterDelay());
+    }
     }
 
     private void ClearWordButtons()
@@ -170,11 +217,29 @@ public class Game3Manager : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ReturnToLobby();
+            return;
+        }
+
         SceneManager.LoadScene(streetSceneName);
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        GameManager.Instance.ReturnToLobby();
     }
 
     private void StartGame()
     {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameStart();
+            GameManager.Instance.RecordMiniGamePlay(3);
+        }
+
         gameStarted = true;
 
         if (ReadyPanel != null)
@@ -184,4 +249,6 @@ public class Game3Manager : MonoBehaviour
         
         Time.timeScale = 1f;
     }
+
+    
 }

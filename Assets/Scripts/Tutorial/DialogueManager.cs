@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,13 +43,14 @@ public class DialogueManager : MonoBehaviour
         if (portraitImage != null)
             portraitImage.gameObject.SetActive(false);
 
+        if (choicePanel != null)
         choicePanel.SetActive(false);
     }
 
     private void Update()
     {
         // 선택지가 떠 있으면 대사 넘기기 금지
-        if (choicePanel.activeSelf)
+        if (choicePanel != null && choicePanel.activeSelf)
             return;
 
         if (Input.GetMouseButtonDown(0))
@@ -84,7 +85,6 @@ public class DialogueManager : MonoBehaviour
 
         currentLine = dialogueData.lines[currentIndex];
         DialogueLine line = currentLine;
-        ExecuteEvent(line.dialogueEvent);
 
         // 이름 표시
         nameText.text = line.speaker;
@@ -93,13 +93,19 @@ public class DialogueManager : MonoBehaviour
         if (line.speaker == "Narration")
         {
             nameText.gameObject.SetActive(false);
-            portraitImage.gameObject.SetActive(false);
+
+            if (portraitImage != null)
+                portraitImage.gameObject.SetActive(false);
         }
         else
         {
             nameText.gameObject.SetActive(true);
-            portraitImage.gameObject.SetActive(true);
-            portraitImage.sprite = line.portrait;
+
+            if (portraitImage != null)
+            {
+                portraitImage.gameObject.SetActive(true);
+                portraitImage.sprite = line.portrait;
+            }
         }
 
         currentSentence = line.text;
@@ -111,13 +117,12 @@ public class DialogueManager : MonoBehaviour
 
         ExecuteEvent(line.dialogueEvent);
 
-        if (line.isChoice)
+        if (choicePanel != null)
         {
-            choicePanel.SetActive(true);
-        }
-        else
-        {
-            choicePanel.SetActive(false);
+            if (line.isChoice)
+                choicePanel.SetActive(true);
+            else
+                choicePanel.SetActive(false);
         }
     }
 
@@ -143,10 +148,17 @@ public class DialogueManager : MonoBehaviour
 
     public void EndDialogue()
     {
-        PlayerPrefs.SetInt("TutorialCompleted", 1);
-        PlayerPrefs.Save();
+        Debug.Log("대화 종료");
 
-        Debug.Log("튜토리얼 완료");
+        // TutorialManager가 있는 씬에서만 튜토리얼 종료 처리
+        if (TutorialManager.Instance != null)
+        {
+            PlayerPrefs.SetInt("TutorialCompleted", 1);
+            PlayerPrefs.Save();
+
+            Debug.Log("튜토리얼 완료");
+            TutorialManager.Instance.MoveLobbyAndStartTimer();
+        }
     }
 
     void ExecuteEvent(DialogueEvent dialogueEvent)
@@ -157,11 +169,11 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case DialogueEvent.MoveLobby:
-                TutorialManager.Instance.MoveLobby();
+                TutorialManager.Instance.MoveLobbyAndStartTimer();
                 break;
 
             case DialogueEvent.StartTimer:
-                TutorialManager.Instance.StartGameTimer();
+                // 이미 MoveLobby 쪽에서 다 처리되니, 이 case는 비워두거나 지워도 됨
                 break;
 
             case DialogueEvent.FadeOut:
@@ -188,11 +200,21 @@ public class DialogueManager : MonoBehaviour
         {
             NextDialogue();
         }
+        else
+        {
+            AchievementManager.Instance.OnTutorialNoButtonClicked(); 
+        }
     }
 
-    public void RepeatCurrentDialogue(string newText)
+   public void RepeatCurrentDialogue(string speaker, Sprite portrait, string newText)
     {
         currentSentence = newText;
+
+        nameText.gameObject.SetActive(true);
+        portraitImage.gameObject.SetActive(true);
+
+        nameText.text = speaker;
+        portraitImage.sprite = portrait;
 
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);

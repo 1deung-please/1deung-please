@@ -1,11 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class BackgroundManager : MonoBehaviour
 {
     public static BackgroundManager Instance;
-
-    [SerializeField] private SpriteRenderer backgroundRenderer;
-
+    [SerializeField] private Image backgroundImage;
     [SerializeField] private Sprite streetBackground;
     [SerializeField] private Sprite cafeBackground;
 
@@ -16,11 +15,11 @@ public class BackgroundManager : MonoBehaviour
 
     public void ChangeToStreet()
     {
-        backgroundRenderer.sprite = streetBackground;
+        backgroundImage.sprite = streetBackground;
     }
 
     public void ChangeToCafe()
     {
-        backgroundRenderer.sprite = cafeBackground;
+        backgroundImage.sprite = cafeBackground;
     }
 }

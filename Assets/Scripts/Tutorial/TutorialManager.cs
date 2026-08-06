@@ -9,11 +9,12 @@ public class TutorialManager : MonoBehaviour
     [Header("Dialogue")]
     [SerializeField] private DialogueManager dialogueManager;
     [SerializeField] private DialogueData tutorialDialogue;
+    
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadePanel;
+    
     [Header("UI")]
     [SerializeField] private GameObject skipButton;
-
     private bool waitingForClick = false;
     private bool isFading = false;
 
@@ -24,12 +25,34 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        bool tutorialCompleted =
-            PlayerPrefs.GetInt("TutorialCompleted", 0) == 1;
+        bool tutorialCompleted = false;
 
-        skipButton.SetActive(tutorialCompleted);
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance가 null입니다.");
+        }
+        else if (GameManager.Instance.gameData == null)
+        {
+            Debug.LogError("gameData가 null입니다.");
+        }
+        else
+        {
+            tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
+        }
+
+        if (skipButton != null)
+        {
+            skipButton.SetActive(tutorialCompleted);
+        }
+        else
+        {
+            Debug.LogError("skipButton이 연결되지 않았습니다.");
+        }
 
         StartTutorial();
+    
+        // 튜토리얼 여부 초기화 코드
+        //PlayerPrefs.DeleteKey("TutorialCompleted");
     }
 
     private void Update()
@@ -46,18 +69,9 @@ public class TutorialManager : MonoBehaviour
         dialogueManager.StartDialogue(tutorialDialogue);
     }
 
-    public void MoveLobby()
+    public void MoveLobbyAndStartTimer()
     {
-        Debug.Log("▶ 로비 이동");
-
-        // 나중에 플레이어 이동 코드 작성
-    }
-
-    public void StartGameTimer()
-    {
-        Debug.Log("▶ 5분 타이머 시작");
-
-        // 나중에 타이머 실행
+        GameManager.Instance.OnTutorialComplete();
     }
 
     public void FadeOut()
@@ -116,6 +130,6 @@ public class TutorialManager : MonoBehaviour
     {
         dialogueManager.SkipDialogue();
 
-        MoveLobby();
+        MoveLobbyAndStartTimer();
     }
 }

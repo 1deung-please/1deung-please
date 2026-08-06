@@ -1,10 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public enum MiniGame01Phase { Ready, Countdown, Playing, Result }
+public enum MiniGame01Phase { Start, Ready, Countdown, Playing, Result }
 
 public class MiniGame01Controller : MonoBehaviour
 {
@@ -17,38 +17,45 @@ public class MiniGame01Controller : MonoBehaviour
     public int countdownSeconds = 3;
 
     [Header("UI")]
-    public GameObject readyPanel;      // ����� ��� �г�
-    public GameObject countdownPanel;  // 3,2,1 �г�
-    public GameObject resultPanel;     // ��� �г�
-    public TMP_Text targetText;        // "192�� �̻� �����⸦ �ݰŶ�!"
+    public GameObject startPanel;      // 시작 화면 (오버레이 + 타이포 + 터치안내)
+    public TMP_Text touchToStartText;  // "터치하여 시작하기" (Blink 대상)
+    public GameObject flashPanel;      // 터치 시 Flash 효과용 (흰색, 화면 전체)
+    public GameObject readyPanel;      // 조상신 대사 패널
+    public GameObject countdownPanel;  // 3,2,1 패널
+    public GameObject resultPanel;     // 결과 패널
+    public TMP_Text targetText;        // "192개 이상 쓰레기를 줍거라!"
     public TMP_Text countdownText;     // 3,2,1
     public TMP_Text timerText;         // TIME 8.46
-    public Slider timerBar;            // Ÿ�̸� ��
-    public TMP_Text collectCountText;  // ���� ��� ���� ����
-    public TMP_Text resultReasonText;  // ����/����
-    public TMP_Text resultRecordText;  // ��ǥ/����/����
-    public TMP_Text meritText;         // ����
+    public Slider timerBar;            // 타이머 바
+    public TMP_Text collectCountText;  // 좌측 상단 수집 개수
+    public TMP_Text resultReasonText;  // 성공/실패
+    public TMP_Text resultRecordText;  // 목표/수집/공덕
+    public TMP_Text meritText;         // 공덕
 
     private MiniGame01Phase currentPhase;
     private int targetCount;
     private int currentCount;
     private float remainingTime;
+    private Coroutine blinkCoroutine;
 
     void Start()
     {
-        currentPhase = MiniGame01Phase.Ready;
-        targetCount = Random.Range(minTarget, maxTarget + 1);
+        currentPhase = MiniGame01Phase.Start;
+        ShowPanel(startPanel);
 
-        if (targetText != null)
-            targetText.text = $"��... {targetCount}�� �̻� �����⸦ �ݰŶ�!";
-
-        ShowPanel(readyPanel);
+        if (touchToStartText != null)
+            blinkCoroutine = StartCoroutine(BlinkText());
     }
 
     void Update()
     {
         switch (currentPhase)
         {
+            case MiniGame01Phase.Start:
+                if (Input.GetMouseButtonDown(0))
+                    StartCoroutine(FlashThenReady());
+                break;
+
             case MiniGame01Phase.Ready:
                 if (Input.GetMouseButtonDown(0))
                     StartCoroutine(CountdownRoutine());
@@ -58,6 +65,49 @@ public class MiniGame01Controller : MonoBehaviour
                 UpdatePlaying();
                 break;
         }
+    }
+
+    IEnumerator BlinkText()
+    {
+        while (true)
+        {
+            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
+            Color c = touchToStartText.color;
+            c.a = alpha;
+            touchToStartText.color = c;
+            yield return null;
+        }
+    }
+
+    IEnumerator FlashThenReady()
+    {
+        if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
+
+        // 화면 Flash 효과
+        if (flashPanel != null)
+        {
+            Image flashImage = flashPanel.GetComponent<Image>();
+            flashPanel.SetActive(true);
+            flashImage.color = new Color(1, 1, 1, 1);
+
+            float t = 0;
+            while (t < 0.3f)
+            {
+                t += Time.deltaTime;
+                flashImage.color = new Color(1, 1, 1, Mathf.Lerp(1, 0, t / 0.3f));
+                yield return null;
+            }
+            flashPanel.SetActive(false);
+        }
+
+        // 조상신 대사 화면(Ready)으로 이동 + 목표 개수 산정
+        currentPhase = MiniGame01Phase.Ready;
+        targetCount = Random.Range(minTarget, maxTarget + 1);
+
+        if (targetText != null)
+            targetText.text = $"흠... {targetCount}개 이상 쓰레기를 줍거라!";
+
+        ShowPanel(readyPanel);
     }
 
     IEnumerator CountdownRoutine()
@@ -80,10 +130,13 @@ public class MiniGame01Controller : MonoBehaviour
         currentCount = 0;
         remainingTime = timeLimit;
 
-        // 플레이 기록
-        GameManager.Instance.RecordMiniGamePlay(1);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameStart();
+            GameManager.Instance.RecordMiniGamePlay(1);
+        }
 
-        ShowPanel(null); // ���� ȭ���� ���� �г� ���� �׻� ���̴� ����̶� ����
+        ShowPanel(null);
         UpdateCollectUI();
     }
 
@@ -110,7 +163,7 @@ public class MiniGame01Controller : MonoBehaviour
     void UpdateCollectUI()
     {
         if (collectCountText != null)
-            collectCountText.text = $"{currentCount}��";
+            collectCountText.text = $"{currentCount}개";
     }
 
     void EndGame(bool naturalEnd)
@@ -119,8 +172,16 @@ public class MiniGame01Controller : MonoBehaviour
 
         bool isSuccess = currentCount >= targetCount;
 
-        // 성공/실패 기록
-        GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PauseTimer();
+            GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+        }
+
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.PickTrash, isSuccess);
+        }
 
         int merit = isSuccess
             ? currentCount + successBonus
@@ -133,23 +194,28 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"������� �ֿ��� �� ������ ��: {targetCount}��\n" +
-                $"���ΰ��� �ֿ� ������ ��: {currentCount}��";
+                $"조상신이 주우라고 한 쓰레기 수: {targetCount}개\n" +
+                $"주인공이 주운 쓰레기 수: {currentCount}개";
 
         if (meritText != null)
-            meritText.text = $"ȹ�� ����: {merit}P";
+            meritText.text = $"획득 공덕: {merit}P";
 
-        GameManager.Instance.OnMiniGameComplete(1, merit);
+        GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
+
+        if (GameManager.Instance.IsPendingEndingTransition())
+        {
+            StartCoroutine(AutoReturnToLobbyAfterDelay());
+        }
     }
 
     void ShowPanel(GameObject target)
     {
+        if (startPanel != null) startPanel.SetActive(target == startPanel);
         if (readyPanel != null) readyPanel.SetActive(target == readyPanel);
         if (countdownPanel != null) countdownPanel.SetActive(target == countdownPanel);
         if (resultPanel != null) resultPanel.SetActive(target == resultPanel);
     }
 
-    // ��� ȭ�� ��ư��
     public void OnClickRetry()
     {
         SceneLoader.Instance.LoadScene("MiniGame_01");
@@ -157,6 +223,12 @@ public class MiniGame01Controller : MonoBehaviour
 
     public void OnClickReturnToLobby()
     {
+        GameManager.Instance.ReturnToLobby();
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
         GameManager.Instance.ReturnToLobby();
     }
 

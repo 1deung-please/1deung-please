@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
 
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
+
+    public bool IsPendingEndingTransition() => pendingEndingTransition;
 
     void Awake()
     {
@@ -42,25 +44,46 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void PauseTimer()
+    {
+        gameData.isTimerFrozen = true;
+    }
+
+    public void ResumeTimer()
+    {
+        if (!gameData.isTimeOver)
+            gameData.isTimerFrozen = false;
+    }
+
     public void OnStartGame()
     {
         if (gameData.tutorialDone)
-            SceneLoader.Instance.LoadScene("Lobby"); // 이미 튜토리얼 봤으면 스킵
+        {
+            SceneLoader.Instance.LoadScene("Lobby");
+        }
         else
-            SceneLoader.Instance.LoadScene("Tutorial"); // 처음이면 튜토리얼로
+        {
+            SceneLoader.Instance.LoadScene("Tutorial");
+        }
     }
 
     public void OnTutorialComplete()
     {
         gameData.tutorialDone = true;
-        gameData.isTimerFrozen = false; // 로비 진입과 함께 전역 타이머 시작
+        gameData.isTimerFrozen = false;
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
     public void EnterMiniGame(string miniGameSceneName)
     {
         isMiniGamePlaying = true;
+        PauseTimer();
         SceneLoader.Instance.LoadScene(miniGameSceneName);
+    }
+
+    public void OnMiniGameStart()
+    {
+        ResumeTimer();
     }
 
     public void RecordMiniGamePlay(int miniGameIndex)
@@ -80,29 +103,21 @@ public class GameManager : MonoBehaviour
     public int GetPlayedGameCount()
     {
         int count = 0;
-
         foreach (bool played in gameData.playedGames)
         {
-            if (played)
-                count++;
+            if (played) count++;
         }
-
         return count;
     }
-    
+
     public void CompleteMiniGame1(int collectedCount, int targetCount)
     {
         gameData.miniGame1Score = collectedCount;
 
         if (collectedCount >= targetCount)
-        {
             addMeritPoint(collectedCount + 50);
-        }
         else
-        {
-            int merit = Mathf.RoundToInt(collectedCount * 0.5f);
-            addMeritPoint(merit);
-        }
+            addMeritPoint(Mathf.RoundToInt(collectedCount * 0.5f));
     }
 
     public void CompleteMiniGame2(int correctCount)
@@ -113,20 +128,14 @@ public class GameManager : MonoBehaviour
 
     public void CompleteMiniGame3(bool isSuccess)
     {
-        if (isSuccess)
-        {
-            addMeritPoint(700);
-        }
+        if (isSuccess) addMeritPoint(700);
     }
 
     public void addMeritPoint(int amount)
     {
         gameData.meritPoint += amount;
-
         if (gameData.meritPoint > MAX_MERIT_POINT)
-        {
             gameData.meritPoint = MAX_MERIT_POINT;
-        }
     }
 
     public int getMeritPoint()
@@ -140,9 +149,14 @@ public class GameManager : MonoBehaviour
 
         if (pendingEndingTransition)
         {
-            // 전역 타이머가 이 미니게임 도중 이미 종료됐던 경우 → 복권방 활성화 상태로 로비 진입
             pendingEndingTransition = false;
             gameData.lotteryRoomUnlocked = true;
+            AchievementManager.Instance.OnGlobalTimerEnd();
+        }
+
+        if (!gameData.isTimeOver)
+        {
+            ResumeTimer();
         }
 
         SceneLoader.Instance.LoadScene("Lobby");
@@ -150,14 +164,18 @@ public class GameManager : MonoBehaviour
 
     void OnGlobalTimerEnd()
     {
+        gameData.isTimeOver = true;
+        gameData.isTimerFrozen = true;
+
         if (isMiniGamePlaying)
         {
-            pendingEndingTransition = true; // 진행 중인 게임은 끝까지 인정, 종료 후 처리 예약
+            pendingEndingTransition = true;
         }
         else
         {
             gameData.lotteryRoomUnlocked = true;
-            SceneLoader.Instance.LoadScene("Lobby"); // 복권방 활성화된 로비로 즉시 이동
+            AchievementManager.Instance.OnGlobalTimerEnd();
+            SceneLoader.Instance.LoadScene("Lobby");
         }
     }
 
@@ -168,13 +186,61 @@ public class GameManager : MonoBehaviour
 
     public void DetermineEnding()
     {
-        int total = gameData.meritPoint;
+        string endingId;
+        string sceneName;
 
-        if (total >= 8500)
-            SceneLoader.Instance.LoadScene("Ending_C");
-        else if (total >= 2000)
-            SceneLoader.Instance.LoadScene("Ending_B");
+        bool allPlayed = gameData.playedGames[0] && gameData.playedGames[1] && gameData.playedGames[2];
+
+        if (!allPlayed)
+        {
+            endingId = "얄팍한속셈";
+            sceneName = "Ending_Shallow";
+        }
         else
-            SceneLoader.Instance.LoadScene("Ending_A");
+        {
+            int total = gameData.meritPoint;
+
+            if (total >= 8500)
+            {
+                endingId = "진정한귀인";
+                sceneName = "Ending_TrueBenefactor";
+            }
+            else if (total >= 2000)
+            {
+                endingId = "절반의성공";
+                sceneName = "Ending_HalfSuccess";
+            }
+            else
+            {
+                endingId = "자격미달";
+                sceneName = "Ending_Unqualified";
+            }
+        }
+
+        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15)
+            && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
+        {
+            endingId = "히든";
+            sceneName = "Ending_Hidden";
+        }
+
+        AchievementManager.Instance.OnEndingConfirmed(endingId);
+        EndingStorage.Unlock(endingId);
+        SceneLoader.Instance.LoadScene(sceneName);
+    }
+
+    // ---- 사이클 초기화 (F-15) ----
+    public void ResetCycle()
+    {
+        // 19번 업적 체크: 전역 5분 중 3분(180초) 이상 흘렀는지 = 남은 시간이 120초 이하였는지
+        bool playedOver3Min = gameData.globalTimeRemaining <= 120f;
+        if (playedOver3Min)
+        {
+            PersistentStats.IncrementResetCycleCount();
+        }
+
+        gameData.ResetData(); // 세션 데이터만 리셋 (엔딩/업적 해금 현황은 별도 PlayerPrefs라 영향 없음)
+
+        SceneLoader.Instance.LoadScene("MainMenu"); // 시작화면 → 이후 튜토리얼(스킵 가능)
     }
 }
