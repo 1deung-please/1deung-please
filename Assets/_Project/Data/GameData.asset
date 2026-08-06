@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f2fe4894faec964b94399bc7e9547a0, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  miniGame1Score: 0
-  miniGame2Score: 0
-  miniGame3Score: 0
+  miniGame1Score: 3000
+  miniGame2Score: 3000
+  miniGame3Score: 3000
+  playedGames: 010101
+  playCount: 010000000100000001000000
+  successGames: 000000
+  failGames: 000000
   tutorialDone: 0
   globalTimeRemaining: 300
   isTimerFrozen: 1

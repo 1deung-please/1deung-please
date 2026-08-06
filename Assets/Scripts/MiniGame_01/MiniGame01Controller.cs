@@ -81,7 +81,10 @@ public class MiniGame01Controller : MonoBehaviour
         remainingTime = timeLimit;
 
         // 플레이 기록
-        GameManager.Instance.RecordMiniGamePlay(1);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGamePlay(1);
+        }
 
         ShowPanel(null); // ���� ȭ���� ���� �г� ���� �׻� ���̴� ����̶� ����
         UpdateCollectUI();
@@ -120,7 +123,10 @@ public class MiniGame01Controller : MonoBehaviour
         bool isSuccess = currentCount >= targetCount;
 
         // 성공/실패 기록
-        GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGameResult(1, isSuccess);
+        }
 
         int merit = isSuccess
             ? currentCount + successBonus
@@ -139,7 +145,10 @@ public class MiniGame01Controller : MonoBehaviour
         if (meritText != null)
             meritText.text = $"ȹ�� ����: {merit}P";
 
-        GameManager.Instance.OnMiniGameComplete(1, merit);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnMiniGameComplete(1, merit);
+        }
     }
 
     void ShowPanel(GameObject target)

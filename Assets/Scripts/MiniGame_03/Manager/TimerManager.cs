@@ -9,7 +9,10 @@ public class TimerManager : MonoBehaviour
 
     void Start()
     {
-        GameManager.Instance.RecordMiniGamePlay(3);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGamePlay(3);
+        }
     }
 
     bool isGameOver = false;
@@ -30,8 +33,10 @@ public class TimerManager : MonoBehaviour
         {
             isGameOver = true;
 
-            GameManager.Instance.RecordMiniGameResult(3, false);
-            GameManager.Instance.OnMiniGameComplete(3, 0);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.RecordMiniGameResult(3, false);
+            }
 
             Debug.Log("시간 종료");
         }

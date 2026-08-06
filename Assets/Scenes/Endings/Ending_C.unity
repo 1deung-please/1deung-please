@@ -324,7 +324,7 @@ GameObject:
   - component: {fileID: 1057107160}
   - component: {fileID: 1057107161}
   m_Layer: 0
-  m_Name: Ending_BManager
+  m_Name: ShortcutManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1057107157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 305f02a736faceb4a9b28cfeabd08817, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f1d5e0537313d24385a3516874b93f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gameData: {fileID: 11400000, guid: 5e04b0731a56a9e4bb6fe24675231b40, type: 2}

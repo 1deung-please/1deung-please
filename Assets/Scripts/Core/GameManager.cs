@@ -124,21 +124,4 @@ public class GameManager : MonoBehaviour
             SceneLoader.Instance.LoadScene("Lobby"); // ���ǹ� Ȱ��ȭ�� �κ�� ��� �̵�
         }
     }
-
-    public void OnLotteryRoomClicked()
-    {
-        DetermineEnding();
-    }
-
-    public void DetermineEnding()
-    {
-        int total = gameData.TotalScore;
-
-        if (total >= 61)
-            SceneLoader.Instance.LoadScene("Ending_C");
-        else if (total >= 31)
-            SceneLoader.Instance.LoadScene("Ending_B");
-        else
-            SceneLoader.Instance.LoadScene("Ending_A");
-    }
 }

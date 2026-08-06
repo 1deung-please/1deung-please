@@ -12,6 +12,14 @@ public class Game3Manager : MonoBehaviour
         Instance = this;
     }
 
+    void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGamePlay(3);
+        }
+    }
+
     // 글자 선택
     public void SelectChar(char c)
     {

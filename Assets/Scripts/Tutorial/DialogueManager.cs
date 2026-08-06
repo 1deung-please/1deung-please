@@ -190,9 +190,15 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void RepeatCurrentDialogue(string newText)
+   public void RepeatCurrentDialogue(string speaker, Sprite portrait, string newText)
     {
         currentSentence = newText;
+
+        nameText.gameObject.SetActive(true);
+        portraitImage.gameObject.SetActive(true);
+
+        nameText.text = speaker;
+        portraitImage.sprite = portrait;
 
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);

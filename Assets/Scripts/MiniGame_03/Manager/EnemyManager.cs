@@ -33,9 +33,14 @@ public class EnemyManager : MonoBehaviour
 
         hpSlider.value = currentHp;
 
-        if(currentHp == 0)
+        if (currentHp == 0)
         {
             Debug.Log("게임 성공!");
+            
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.RecordMiniGameResult(3, true);
+            }
         }
     }
 }
