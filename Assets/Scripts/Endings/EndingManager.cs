@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EndingManager : MonoBehaviour
 {
@@ -8,19 +7,113 @@ public class EndingManager : MonoBehaviour
     [SerializeField] private DialogueManager dialogueManager;
     [SerializeField] private DialogueData endingDialogue;
 
-    void Start()
+    private GameData gameData;
+
+    [Header("í…ŒìŠ¤íŠ¸")]
+    [SerializeField] private bool useTestData = false;
+    [SerializeField] private GameData testGameData;
+
+
+    public enum EndingType
     {
-        StartEndingDialogue();
+        Ending_Shallow,    // ì–„íŒí•œ ì†ì…ˆ
+        Ending_Unqualified,   // ìê²© ë¯¸ë‹¬
+        Ending_HalfSuccess,   // ì ˆë°˜ì˜ ì„±ê³µ
+        Ending_TrueBenefactor   // ì§„ì •í•œ ê·€ì¸
     }
 
+
+    private void Start()
+    {
+        Debug.Log("Start ì‹¤í–‰");
+
+        if (useTestData)
+        {
+            gameData = testGameData;
+            Debug.Log("í…ŒìŠ¤íŠ¸ GameData ì‚¬ìš©");
+        }
+        else
+        {
+            gameData = GameManager.Instance.gameData;
+        }
+
+        Debug.Log("gameData = " + gameData);
+    }
+
+    public void DetermineEnding()
+    {
+        Debug.Log("DetermineEnding");
+        Debug.Log("gameData = " + gameData);
+
+        if (gameData == null)
+        {
+            Debug.LogWarning("GameDataê°€ ì—†ìŠµë‹ˆë‹¤.");
+            return;
+        }
+
+
+        // í”Œë ˆì´í•˜ì§€ ì•Šì€ ê²Œì„ì´ ìˆìœ¼ë©´ ìµœìš°ì„  ì—”ë”©
+        if (HasUnplayedGame())
+        {
+            Debug.Log("ì—”ë”© : ì–„íŒí•œ ì†ì…ˆ");
+            SceneManager.LoadScene("Ending_Shallow");
+            return;
+        }
+
+
+        int total = gameData.meritPoint;
+
+
+        // ìê²© ë¯¸ë‹¬
+        if (total < 2000)
+        {
+            Debug.Log("ì—”ë”© : ìê²© ë¯¸ë‹¬");
+            SceneManager.LoadScene("Ending_Unqualified");
+        }
+
+        // ì ˆë°˜ì˜ ì„±ê³µ
+        else if (total < 8500)
+        {
+            Debug.Log("ì—”ë”© : ì ˆë°˜ì˜ ì„±ê³µ");
+            SceneManager.LoadScene("Ending_HalfSuccess");
+        }
+
+        // ì§„ì •í•œ ê·€ì¸
+        else
+        {
+            Debug.Log("ì—”ë”© : ì§„ì •í•œ ê·€ì¸");
+            SceneManager.LoadScene("Ending_TrueBenefactor");
+        }
+    }
+
+
+    private bool HasUnplayedGame()
+    {
+        foreach (int count in gameData.playCount)
+        {
+            if (count == 0)
+            {
+                Debug.Log("í”Œë ˆì´í•˜ì§€ ì•Šì€ ê²Œì„ì´ ìˆìŠµë‹ˆë‹¤.");
+                return true;
+            }
+        }
+
+        Debug.Log("ëª¨ë“  ê²Œì„ì„ í”Œë ˆì´í–ˆìŠµë‹ˆë‹¤.");
+        return false;
+    }
+
+
+    // ì—”ë”© ëŒ€í™” ì‹¤í–‰
     public void StartEndingDialogue()
     {
         dialogueManager.StartDialogue(endingDialogue);
     }
 
-    // ´ë»ç ³¡³ª°í ¸¶Áö¸·¿¡ È£ÃâµÉ ÇÔ¼ö (DialogueDataÀÇ ¸¶Áö¸· ÁÙ ÀÌº¥Æ®·Î ¿¬°áÇÏ°Å³ª, DialogueManager.EndDialogue()¿¡¼­ È£Ãâ)
+
+    // ê²Œì„ ì¢…ë£Œ ì²˜ë¦¬
     public void FinishGame()
     {
-        // ¿©±â¼­ Ãß°¡·Î ÇÒ ÀÏÀÌ ÀÖÀ¸¸é (¿¹: ¿£µù ¿Ï·á Ç¥½Ã, ´ÙÀ½ ¹öÆ° È°¼ºÈ­ µî)
+        // ê²Œì„ ì¢…ë£Œ í›„ ì²˜ë¦¬
+        // ì˜ˆ: ë©”ì¸ ë©”ë‰´ ì´ë™, ë²„íŠ¼ í™œì„±í™” ë“±
     }
 }

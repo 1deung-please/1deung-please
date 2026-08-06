@@ -25,12 +25,32 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        bool tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
+        bool tutorialCompleted = false;
 
-        skipButton.SetActive(tutorialCompleted);
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance가 null입니다.");
+        }
+        else if (GameManager.Instance.gameData == null)
+        {
+            Debug.LogError("gameData가 null입니다.");
+        }
+        else
+        {
+            tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
+        }
+
+        if (skipButton != null)
+        {
+            skipButton.SetActive(tutorialCompleted);
+        }
+        else
+        {
+            Debug.LogError("skipButton이 연결되지 않았습니다.");
+        }
 
         StartTutorial();
-
+    
         // 튜토리얼 여부 초기화 코드
         //PlayerPrefs.DeleteKey("TutorialCompleted");
     }

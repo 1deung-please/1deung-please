@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 
-public class ShortcutManager : MonoBehaviour
+public class Ending_BManager : MonoBehaviour
 {
     [Header("Game Data")]
     [SerializeField] private GameData gameData;
@@ -22,8 +22,6 @@ public class ShortcutManager : MonoBehaviour
 
         StartCoroutine(EndingStart());
     }
-
-
 
     IEnumerator EndingStart()
     {
@@ -60,42 +58,16 @@ public class ShortcutManager : MonoBehaviour
 
 
         yield return Dialogue(
-            "흠...\n" +
-            "점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래"
+            "흠... 어디 보자... 참으로 애~매하구나! 열심히 안 한 건 아닌데, 그렇다고 눈물겹게 열심히 한 것도 아니고... 딱 주 5일 턱걸이로 출근 도장만 찍은 느낌이구나..."
         );
 
 
         yield return Dialogue(
-            "뭐얏!!!!"
+            "그래도 이 팍팍한 세상에 평타라도 친 게 어디냐."
         );
 
-
-        string mostPlayedGame = GetMostPlayedGame();
-
-
         yield return Dialogue(
-            "네 이녀석!\n" +
-            "지금까지 진심으로 공덕을 쌓은 것이 아니라\n" +
-            "오로지 돈만 바라보며 공덕을 쌓은 것이구나!!!"
-        );
-
-
-        yield return Dialogue(
-            "가장 공덕 쌓기 쉬운 " +
-            mostPlayedGame +
-            "로 공덕 쌓기만 했어!!!!!!"
-        );
-
-
-        yield return Dialogue(
-            "너는 선행을 위한 선행을 한 것이 아니라\n" +
-            "오로지 돈만 보고 일을 한 것이로구나!"
-        );
-
-
-        yield return Dialogue(
-            "썩 꺼지거라!\n" +
-            "그리고 다시 진심을 다해 공덕을 쌓아오거라!!!"
+            "네 성의를 봐서 대박 복권까지는 아니어도, 로또 3등 당첨권을 내려주마! 감질나느냐? 억울하면 다음엔 눈 딱 감고 풀악셀로 덕 한번 쌓아보거라! 자, 리스폰 고고!"
         );
     }
 
@@ -155,39 +127,6 @@ public class ShortcutManager : MonoBehaviour
 
 
         scoreText.text =
-            "공덕 점수: " + gameData.TotalScore;
-    }
-
-    // 가장 많이 플레이한 게임 찾기
-    string GetMostPlayedGame()
-    {
-        int max = gameData.playCount[0];
-
-        int index = 0;
-
-
-        for(int i = 1; i < gameData.playCount.Length; i++)
-        {
-            if(gameData.playCount[i] > max)
-            {
-                max = gameData.playCount[i];
-                index = i;
-            }
-        }
-
-        switch(index)
-        {
-            case 0:
-                return "<이걸 안 비켜?>";
-
-            case 1:
-                return "<출격! 논리요새>";
-
-            case 2:
-                return "<주워줘, 쓰레기>";
-        }
-
-
-        return "";
+            "공덕 점수: " + gameData.meritPoint;
     }
 }

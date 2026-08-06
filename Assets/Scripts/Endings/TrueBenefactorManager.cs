@@ -127,6 +127,6 @@ public class Ending_CManager : MonoBehaviour
 
 
         scoreText.text =
-            "공덕 점수: " + gameData.TotalScore;
+            "공덕 점수: " + gameData.meritPoint;
     }
 }

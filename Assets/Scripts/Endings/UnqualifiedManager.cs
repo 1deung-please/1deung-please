@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 
-public class Ending_BManager : MonoBehaviour
+public class Ending_AManager : MonoBehaviour
 {
     [Header("Game Data")]
     [SerializeField] private GameData gameData;
@@ -58,16 +58,32 @@ public class Ending_BManager : MonoBehaviour
 
 
         yield return Dialogue(
-            "흠... 어디 보자... 참으로 애~매하구나! 열심히 안 한 건 아닌데, 그렇다고 눈물겹게 열심히 한 것도 아니고... 딱 주 5일 턱걸이로 출근 도장만 찍은 느낌이구나..."
+            "....."
         );
 
 
         yield return Dialogue(
-            "그래도 이 팍팍한 세상에 평타라도 친 게 어디냐."
+            "..............."
         );
 
         yield return Dialogue(
-            "네 성의를 봐서 대박 복권까지는 아니어도, 로또 3등 당첨권을 내려주마! 감질나느냐? 억울하면 다음엔 눈 딱 감고 풀악셀로 덕 한번 쌓아보거라! 자, 리스폰 고고!"
+            "................................................"
+        );
+
+        yield return Dialogue(
+            "정말 보잘 것 없구나.."
+        );
+
+        yield return Dialogue(
+            "오랫동안 봐 왔지만, 학생 때부터 지금까지 참 한결같이 성적이 안 좋구나. 꾸준하네..."
+        );
+
+        yield return Dialogue(
+            "플레이를 한 건 맞느냐? 혹, 회사나 학교에서 몰폰 중이라 플레이를 제대로 못 하였던 것이냐?" 
+        );
+
+        yield return Dialogue(
+            "흠..... 볼 것도 없구나. 돌아가서 다시 공덕을 쌓고 오거라!"
         );
     }
 
@@ -127,6 +143,6 @@ public class Ending_BManager : MonoBehaviour
 
 
         scoreText.text =
-            "공덕 점수: " + gameData.TotalScore;
+            "공덕 점수: " + gameData.meritPoint;
     }
 }

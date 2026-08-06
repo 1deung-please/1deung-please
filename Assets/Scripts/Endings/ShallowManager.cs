@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 
-public class Ending_AManager : MonoBehaviour
+public class ShortcutManager : MonoBehaviour
 {
     [Header("Game Data")]
     [SerializeField] private GameData gameData;
@@ -22,6 +22,8 @@ public class Ending_AManager : MonoBehaviour
 
         StartCoroutine(EndingStart());
     }
+
+
 
     IEnumerator EndingStart()
     {
@@ -58,32 +60,42 @@ public class Ending_AManager : MonoBehaviour
 
 
         yield return Dialogue(
-            "....."
+            "흠...\n" +
+            "점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래"
         );
 
 
         yield return Dialogue(
-            "..............."
+            "뭐얏!!!!"
         );
 
-        yield return Dialogue(
-            "................................................"
-        );
+
+        string mostPlayedGame = GetMostPlayedGame();
+
 
         yield return Dialogue(
-            "정말 보잘 것 없구나.."
+            "네 이녀석!\n" +
+            "지금까지 진심으로 공덕을 쌓은 것이 아니라\n" +
+            "오로지 돈만 바라보며 공덕을 쌓은 것이구나!!!"
         );
 
-        yield return Dialogue(
-            "오랫동안 봐 왔지만, 학생 때부터 지금까지 참 한결같이 성적이 안 좋구나. 꾸준하네..."
-        );
 
         yield return Dialogue(
-            "플레이를 한 건 맞느냐? 혹, 회사나 학교에서 몰폰 중이라 플레이를 제대로 못 하였던 것이냐?" 
+            "가장 공덕 쌓기 쉬운 " +
+            mostPlayedGame +
+            "로 공덕 쌓기만 했어!!!!!!"
         );
 
+
         yield return Dialogue(
-            "흠..... 볼 것도 없구나. 돌아가서 다시 공덕을 쌓고 오거라!"
+            "너는 선행을 위한 선행을 한 것이 아니라\n" +
+            "오로지 돈만 보고 일을 한 것이로구나!"
+        );
+
+
+        yield return Dialogue(
+            "썩 꺼지거라!\n" +
+            "그리고 다시 진심을 다해 공덕을 쌓아오거라!!!"
         );
     }
 
@@ -143,6 +155,39 @@ public class Ending_AManager : MonoBehaviour
 
 
         scoreText.text =
-            "공덕 점수: " + gameData.TotalScore;
+            "공덕 점수: " + gameData.meritPoint;
+    }
+
+    // 가장 많이 플레이한 게임 찾기
+    string GetMostPlayedGame()
+    {
+        int max = gameData.playCount[0];
+
+        int index = 0;
+
+
+        for(int i = 1; i < gameData.playCount.Length; i++)
+        {
+            if(gameData.playCount[i] > max)
+            {
+                max = gameData.playCount[i];
+                index = i;
+            }
+        }
+
+        switch(index)
+        {
+            case 0:
+                return "<이걸 안 비켜?>";
+
+            case 1:
+                return "<출격! 논리요새>";
+
+            case 2:
+                return "<주워줘, 쓰레기>";
+        }
+
+
+        return "";
     }
 }
