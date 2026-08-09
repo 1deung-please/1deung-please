@@ -29,6 +29,13 @@ public class DialogueManager : MonoBehaviour
     private Coroutine typingCoroutine;
     private bool isTyping = false;
     private string currentSentence = "";
+    public System.Action OnDialogueFinished;
+
+    private void Awake()
+    {
+        if (portraitImage != null)
+            portraitImage.gameObject.SetActive(false);
+    }
 
     public void StartDialogue(DialogueData data)
     {
@@ -44,7 +51,15 @@ public class DialogueManager : MonoBehaviour
             portraitImage.gameObject.SetActive(false);
 
         if (choicePanel != null)
-        choicePanel.SetActive(false);
+            choicePanel.SetActive(false);
+
+        gameObject.SetActive(true);
+
+        if (data != null && data.lines.Count > 0 && TutorialManager.Instance != null)
+        {
+            bool isFirstNarration = (data.lines[0].speaker == "Narration");
+            TutorialManager.Instance.SetDialoguePosY(isFirstNarration);
+        }
     }
 
     private void Update()
@@ -86,25 +101,33 @@ public class DialogueManager : MonoBehaviour
         currentLine = dialogueData.lines[currentIndex];
         DialogueLine line = currentLine;
 
-        // 이름 표시
         nameText.text = line.speaker;
 
-        // 내레이션 처리
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.SetDialoguePosY(line.speaker == "Narration");
+        }
+
         if (line.speaker == "Narration")
         {
             nameText.gameObject.SetActive(false);
-
-            if (portraitImage != null)
-                portraitImage.gameObject.SetActive(false);
         }
         else
         {
             nameText.gameObject.SetActive(true);
-
-            if (portraitImage != null)
+            nameText.text = line.speaker;
+        }
+        
+        if (portraitImage != null)
+        {
+            if (line.portrait != null)
             {
-                portraitImage.gameObject.SetActive(true);
                 portraitImage.sprite = line.portrait;
+                portraitImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                portraitImage.gameObject.SetActive(false);
             }
         }
 
@@ -150,6 +173,9 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log("대화 종료");
 
+        // 대화 종료 알림
+        OnDialogueFinished?.Invoke();
+
         // TutorialManager가 있는 씬에서만 튜토리얼 종료 처리
         if (TutorialManager.Instance != null)
         {
@@ -190,6 +216,10 @@ public class DialogueManager : MonoBehaviour
 
             case DialogueEvent.ChangeCafe:
                 BackgroundManager.Instance.ChangeToCafe();
+                break;
+
+            case DialogueEvent.ChangeToTimer:
+                BackgroundManager.Instance.ChangeToTimer();
                 break;
         }
     }

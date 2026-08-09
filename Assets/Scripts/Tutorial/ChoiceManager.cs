@@ -15,6 +15,10 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI noButtonText;
 
     [SerializeField] private DialogueManager dialogueManager;
+
+    [SerializeField] private RectTransform dialoguePanel;
+    [SerializeField] private float dialogueY = -122f;
+
     private int noCount = 0;
 
     private void Awake()
@@ -71,6 +75,10 @@ public class ChoiceManager : MonoBehaviour
         }
 
         dialogueManager.RepeatCurrentDialogue("도믿걸", domitGirlPortrait, begging + "운명 한 번 맡겨보시겠어요?");
+
+        Vector2 pos = dialoguePanel.anchoredPosition;
+        pos.y = dialogueY;
+        dialoguePanel.anchoredPosition = pos;
     }
 
     public void ResetChoice()
