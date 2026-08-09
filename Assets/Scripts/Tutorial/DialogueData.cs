@@ -14,9 +14,9 @@ public enum DialogueEvent
     StartTimer,
     FadeOut,
     Achievement,
-
     ChangeStreet,
-    ChangeCafe
+    ChangeCafe,
+    ChangeToTimer
 }
 
 [System.Serializable]

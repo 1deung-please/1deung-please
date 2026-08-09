@@ -13,6 +13,8 @@ public class EndingManager : MonoBehaviour
     [SerializeField] private bool useTestData = false;
     [SerializeField] private GameData testGameData;
 
+    [Header("Scratch Button")]
+    [SerializeField] private ScratchButtonManager scratchButtonManager;
 
     public enum EndingType
     {
@@ -38,6 +40,8 @@ public class EndingManager : MonoBehaviour
         }
 
         Debug.Log("gameData = " + gameData);
+
+        dialogueManager.OnDialogueFinished += ShowScratchButton;
     }
 
     public void DetermineEnding()
@@ -109,6 +113,20 @@ public class EndingManager : MonoBehaviour
         dialogueManager.StartDialogue(endingDialogue);
     }
 
+    private void ShowScratchButton()
+    {
+        Debug.Log("대화 종료 → 스크래치 버튼 등장");
+
+        scratchButtonManager.ShowButton();
+    }
+
+    private void OnDestroy()
+    {
+        if (dialogueManager != null)
+        {
+            dialogueManager.OnDialogueFinished -= ShowScratchButton;
+        }
+    }
 
     // 게임 종료 처리
     public void FinishGame()

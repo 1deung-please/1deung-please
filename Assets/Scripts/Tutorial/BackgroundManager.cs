@@ -7,6 +7,7 @@ public class BackgroundManager : MonoBehaviour
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Sprite streetBackground;
     [SerializeField] private Sprite cafeBackground;
+    [SerializeField] private Sprite Background_Timer;
 
     private void Awake()
     {
@@ -21,5 +22,10 @@ public class BackgroundManager : MonoBehaviour
     public void ChangeToCafe()
     {
         backgroundImage.sprite = cafeBackground;
+    }
+    
+    public void ChangeToTimer()
+    {
+        backgroundImage.sprite = Background_Timer;
     }
 }
