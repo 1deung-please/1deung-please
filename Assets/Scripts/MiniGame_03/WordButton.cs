@@ -31,14 +31,14 @@ public class WordButton : MonoBehaviour
         return letter;
     }
 
-    public void MoveToAnswerPanel(Transform answerPanel)
+    public void Select()
     {
-        if (originalParent == null)
-            originalParent = transform.parent;
+        if (placeholder != null)
+            return;
 
+        originalParent = transform.parent;
         originalSiblingIndex = transform.GetSiblingIndex();
 
-        // 원래 버튼과 같은 크기의 빈자리 생성
         placeholder = new GameObject(
             "WordPlaceholder",
             typeof(RectTransform),
@@ -58,18 +58,17 @@ public class WordButton : MonoBehaviour
         layout.flexibleWidth = 0;
         layout.flexibleHeight = 0;
 
-        transform.SetParent(answerPanel, false);
+        gameObject.SetActive(false);
     }
 
-    public void ReturnToOrigin()
+    public void ResetWord()
     {
-        transform.SetParent(originalParent, false);
-        transform.SetSiblingIndex(originalSiblingIndex);
-
         if (placeholder != null)
         {
             Destroy(placeholder);
             placeholder = null;
         }
+
+        gameObject.SetActive(true);
     }
 }

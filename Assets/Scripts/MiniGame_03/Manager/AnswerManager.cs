@@ -6,29 +6,52 @@ using UnityEngine;
 public class AnswerManager : MonoBehaviour
 {
     public TMP_Text answerText;
+    public GameObject hintText;
     private bool isPenalty = false;
     public static AnswerManager Instance;
     public Transform answerPanel;
     private List<WordButton> selectedWords = new();
 
+    [Header("말풍선")]
+    public GameObject heroThinkText;
+    public GameObject heroText;
+
+    public TMP_Text thinkAnswerText;
+    public TMP_Text speechAnswerText;
+
     private void Awake()
     {
         Instance = this;
+
+        if (hintText != null)
+            hintText.SetActive(false);
+
+        if (heroThinkText != null)
+            heroThinkText.SetActive(false);
+
+        if (heroText != null)
+            heroText.SetActive(false);
     }
 
     public void SelectWord(WordButton word)
-{
-    if (Game3Manager.Instance != null &&
-        Game3Manager.Instance.IsGameEnded)
+    {
+        if (Game3Manager.Instance != null &&
+            Game3Manager.Instance.IsGameEnded)
+                return;
+
+        if (isPenalty)
         return;
 
-    if (selectedWords.Contains(word))
-        return;
+        if (selectedWords.Contains(word))
+            return;
 
-    selectedWords.Add(word);
+        selectedWords.Add(word);
 
-    word.MoveToAnswerPanel(answerPanel);
-}
+        word.Select();
+
+        if (thinkAnswerText != null)
+            thinkAnswerText.text = GetAnswer();
+    }
 
     public void RemoveWord(WordButton word)
     {
@@ -36,7 +59,8 @@ public class AnswerManager : MonoBehaviour
             return;
 
         selectedWords.Remove(word);
-        word.ReturnToOrigin();
+
+        thinkAnswerText.text = GetAnswer();
     }
 
     public string GetAnswer()
@@ -51,10 +75,19 @@ public class AnswerManager : MonoBehaviour
 
     public void Clear()
     {
-        foreach (WordButton word in new List<WordButton>(selectedWords))
-            word.ReturnToOrigin();
+        foreach (WordButton word in selectedWords)
+        {
+            if (word != null)
+                word.ResetWord();
+        }
 
         selectedWords.Clear();
+
+        if (thinkAnswerText != null)
+            thinkAnswerText.text = "";
+
+        if (speechAnswerText != null)
+            speechAnswerText.text = "";
     }
 
     public void CheckAnswer()
@@ -66,7 +99,19 @@ public class AnswerManager : MonoBehaviour
         Game3Manager.Instance.IsGameEnded)
         return;
 
-    string myAnswer = GetAnswer().Replace(" ", "");
+    string spokenAnswer = GetAnswer();
+
+    if (heroThinkText != null)
+        heroThinkText.SetActive(false);
+
+    if (heroText != null)
+        heroText.SetActive(true);
+
+    if (speechAnswerText != null)
+        speechAnswerText.text = spokenAnswer;
+
+    string myAnswer = spokenAnswer.Replace(" ", "");
+
     string correctAnswer =
         ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
 
@@ -74,20 +119,51 @@ public class AnswerManager : MonoBehaviour
     {
         Debug.Log("정답!");
 
-        FindFirstObjectByType<EnemyManager>().Damage(20);
-        Clear();
-
-        if (Game3Manager.Instance != null &&
-            !Game3Manager.Instance.IsGameEnded)
-        {
-            ProblemManager.Instance.NextProblem();
-        }
+        StartCoroutine(CorrectAnswer());
     }
     else
     {
         StartCoroutine(Penalty());
     }
 }
+
+private void ResetBubble()
+{
+    if (heroThinkText != null)
+        heroThinkText.SetActive(true);
+
+    if (heroText != null)
+        heroText.SetActive(false);
+
+    if (thinkAnswerText != null)
+        thinkAnswerText.text = "";
+
+    if (speechAnswerText != null)
+        speechAnswerText.text = "";
+}
+
+    IEnumerator CorrectAnswer()
+    {
+        yield return new WaitForSeconds(1f);
+
+        EnemyManager enemyManager =
+            FindFirstObjectByType<EnemyManager>();
+
+        if (enemyManager != null)
+            enemyManager.Damage(20);
+
+
+        Clear();
+
+
+        if (Game3Manager.Instance != null &&
+            !Game3Manager.Instance.IsGameEnded)
+        {
+            ProblemManager.Instance.NextProblem();
+
+            ResetBubble();
+        }
+    }
 
     IEnumerator Penalty()
 {
@@ -96,13 +172,17 @@ public class AnswerManager : MonoBehaviour
 
     isPenalty = true;
 
-    answerText.gameObject.SetActive(true);
+    if(hintText != null)
+        hintText.SetActive(true);
+
     answerText.text =
         "정답 : " + ProblemManager.Instance.currentProblem.answer;
 
     yield return new WaitForSeconds(3f);
 
-    answerText.gameObject.SetActive(false);
+    if (hintText != null)
+        hintText.SetActive(false);
+
 
     Clear();
 
@@ -110,6 +190,8 @@ public class AnswerManager : MonoBehaviour
         !Game3Manager.Instance.IsGameEnded)
     {
         ProblemManager.Instance.NextProblem();
+
+        ResetBubble();
     }
 
     isPenalty = false;
