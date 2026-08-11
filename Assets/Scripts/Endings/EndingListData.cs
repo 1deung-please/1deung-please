@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class EndingInfo
 {
-    public string id;      // "¾âÆÅÇÑ¼Ó¼À" µî
-    public string title;   // Ç¥½ÃµÉ ÀÌ¸§
-    public string sceneName; // Àç»ıÇÒ ¾À ÀÌ¸§
+    public string id;      // "ì–„íŒí•œì†ì…ˆ" ë“±
+    public string title;   // í‘œì‹œë  ì´ë¦„
+    public string sceneName; // ì¬ìƒí•  ì”¬ ì´ë¦„
     public Sprite badge;
 }
 

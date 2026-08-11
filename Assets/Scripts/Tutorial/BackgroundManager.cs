@@ -1,13 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class BackgroundManager : MonoBehaviour
 {
     public static BackgroundManager Instance;
-
-    [SerializeField] private SpriteRenderer backgroundRenderer;
-
+    [SerializeField] private Image backgroundImage;
     [SerializeField] private Sprite streetBackground;
     [SerializeField] private Sprite cafeBackground;
+    [SerializeField] private Sprite Background_Timer;
 
     private void Awake()
     {
@@ -16,11 +16,16 @@ public class BackgroundManager : MonoBehaviour
 
     public void ChangeToStreet()
     {
-        backgroundRenderer.sprite = streetBackground;
+        backgroundImage.sprite = streetBackground;
     }
 
     public void ChangeToCafe()
     {
-        backgroundRenderer.sprite = cafeBackground;
+        backgroundImage.sprite = cafeBackground;
+    }
+    
+    public void ChangeToTimer()
+    {
+        backgroundImage.sprite = Background_Timer;
     }
 }

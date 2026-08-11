@@ -15,7 +15,16 @@ MonoBehaviour:
   miniGame1Score: 0
   miniGame2Score: 0
   miniGame3Score: 0
+  playedGames: 000000
+  playCount: 000000000000000000000000
+  successGames: 000000
+  failGames: 000000
+  consecutiveSuccess: 000000000000000000000000
+  consecutiveFail: 000000000000000000000000
+  tutorialNoButtonCount: 0
+  meritPoint: 0
   tutorialDone: 0
   globalTimeRemaining: 300
   isTimerFrozen: 1
   lotteryRoomUnlocked: 0
+  isTimeOver: 0

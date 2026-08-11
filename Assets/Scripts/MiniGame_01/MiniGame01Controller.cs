@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public enum MiniGame01Phase { Ready, Countdown, Playing, Result }
+public enum MiniGame01Phase { Start, Ready, Countdown, Playing, Result }
 
 public class MiniGame01Controller : MonoBehaviour
 {
@@ -17,6 +17,9 @@ public class MiniGame01Controller : MonoBehaviour
     public int countdownSeconds = 3;
 
     [Header("UI")]
+    public GameObject startPanel;      // 시작 화면 (오버레이 + 타이포 + 터치안내)
+    public TMP_Text touchToStartText;  // "터치하여 시작하기" (Blink 대상)
+    public GameObject flashPanel;      // 터치 시 Flash 효과용 (흰색, 화면 전체)
     public GameObject readyPanel;      // 조상신 대사 패널
     public GameObject countdownPanel;  // 3,2,1 패널
     public GameObject resultPanel;     // 결과 패널
@@ -33,22 +36,26 @@ public class MiniGame01Controller : MonoBehaviour
     private int targetCount;
     private int currentCount;
     private float remainingTime;
+    private Coroutine blinkCoroutine;
 
     void Start()
     {
-        currentPhase = MiniGame01Phase.Ready;
-        targetCount = Random.Range(minTarget, maxTarget + 1);
+        currentPhase = MiniGame01Phase.Start;
+        ShowPanel(startPanel);
 
-        if (targetText != null)
-            targetText.text = $"흠... {targetCount}개 이상 쓰레기를 줍거라!";
-
-        ShowPanel(readyPanel);
+        if (touchToStartText != null)
+            blinkCoroutine = StartCoroutine(BlinkText());
     }
 
     void Update()
     {
         switch (currentPhase)
         {
+            case MiniGame01Phase.Start:
+                if (Input.GetMouseButtonDown(0))
+                    StartCoroutine(FlashThenReady());
+                break;
+
             case MiniGame01Phase.Ready:
                 if (Input.GetMouseButtonDown(0))
                     StartCoroutine(CountdownRoutine());
@@ -58,6 +65,49 @@ public class MiniGame01Controller : MonoBehaviour
                 UpdatePlaying();
                 break;
         }
+    }
+
+    IEnumerator BlinkText()
+    {
+        while (true)
+        {
+            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
+            Color c = touchToStartText.color;
+            c.a = alpha;
+            touchToStartText.color = c;
+            yield return null;
+        }
+    }
+
+    IEnumerator FlashThenReady()
+    {
+        if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
+
+        // 화면 Flash 효과
+        if (flashPanel != null)
+        {
+            Image flashImage = flashPanel.GetComponent<Image>();
+            flashPanel.SetActive(true);
+            flashImage.color = new Color(1, 1, 1, 1);
+
+            float t = 0;
+            while (t < 0.3f)
+            {
+                t += Time.deltaTime;
+                flashImage.color = new Color(1, 1, 1, Mathf.Lerp(1, 0, t / 0.3f));
+                yield return null;
+            }
+            flashPanel.SetActive(false);
+        }
+
+        // 조상신 대사 화면(Ready)으로 이동 + 목표 개수 산정
+        currentPhase = MiniGame01Phase.Ready;
+        targetCount = Random.Range(minTarget, maxTarget + 1);
+
+        if (targetText != null)
+            targetText.text = $"흠... {targetCount}개 이상 쓰레기를 줍거라!";
+
+        ShowPanel(readyPanel);
     }
 
     IEnumerator CountdownRoutine()
@@ -80,19 +130,13 @@ public class MiniGame01Controller : MonoBehaviour
         currentCount = 0;
         remainingTime = timeLimit;
 
-        // 전역 타이머 재개
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnMiniGameStart();
-        }
-
-        // 플레이 기록
-        if (GameManager.Instance != null)
-        {
             GameManager.Instance.RecordMiniGamePlay(1);
         }
 
-        ShowPanel(null); // 게임 화면은 별도 패널 없이 항상 보이는 배경이라 가정
+        ShowPanel(null);
         UpdateCollectUI();
     }
 
@@ -158,7 +202,6 @@ public class MiniGame01Controller : MonoBehaviour
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
 
-        // 전역 타이머가 이 판 도중 이미 끝나있었다면 → 결과 확인 후 자동으로 로비 복귀
         if (GameManager.Instance.IsPendingEndingTransition())
         {
             StartCoroutine(AutoReturnToLobbyAfterDelay());
@@ -167,12 +210,12 @@ public class MiniGame01Controller : MonoBehaviour
 
     void ShowPanel(GameObject target)
     {
+        if (startPanel != null) startPanel.SetActive(target == startPanel);
         if (readyPanel != null) readyPanel.SetActive(target == readyPanel);
         if (countdownPanel != null) countdownPanel.SetActive(target == countdownPanel);
         if (resultPanel != null) resultPanel.SetActive(target == resultPanel);
     }
 
-    // 결과 화면 버튼용
     public void OnClickRetry()
     {
         SceneLoader.Instance.LoadScene("MiniGame_01");
@@ -189,11 +232,5 @@ public class MiniGame01Controller : MonoBehaviour
         GUI.Label(new Rect(10, 40, 300, 30), $"Target: {targetCount}");
         GUI.Label(new Rect(10, 70, 300, 30), $"Count: {currentCount}");
         GUI.Label(new Rect(10, 100, 300, 30), $"Time: {remainingTime:F2}");
-    }
-
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSeconds(2f); // 결과를 잠깐 보여준 뒤 자동 전환 
-        GameManager.Instance.ReturnToLobby();
     }
 }

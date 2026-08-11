@@ -4,38 +4,5 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/Scenes/Tutorial.unity
-    guid: d549cbd8f52a7c9489322d9e74ff7448
-  - enabled: 1
-    path: Assets/Scenes/Lobby.unity
-    guid: c95dc671eda0a05419f7356041c0951b
-  - enabled: 1
-    path: Assets/Scenes/MiniGame_01.unity
-    guid: 32f484b0061e6f342a74d3109953ba5c
-  - enabled: 1
-    path: Assets/Scenes/MiniGame_02.unity
-    guid: b17350069e7c74149bfca6c70d774a16
-  - enabled: 1
-    path: Assets/Scenes/MiniGame_03.unity
-    guid: 8590f788bace56841bbb0c927789e4b4
-  - enabled: 1
-    path: Assets/Scenes/Endings/Ending_HalfSuccess.unity
-    guid: abddcdd3a6690f141936ddff1461c923
-  - enabled: 1
-    path: Assets/Scenes/Endings/Ending_Hidden.unity
-    guid: 3f023ed5bf5375b4b9d95db15a7a6f7e
-  - enabled: 1
-    path: Assets/Scenes/Endings/Ending_Shallow.unity
-    guid: 765dc7ecfdd2e454daeb81519b697de3
-  - enabled: 1
-    path: Assets/Scenes/Endings/Ending_TrueBenefactor.unity
-    guid: 68d7875cbe3180f4baec05a45f8df17d
-  - enabled: 1
-    path: Assets/Scenes/Endings/Ending_Unqualified.unity
-    guid: 68f7099b38faf64489429d6448f5b8bb
+  m_Scenes: []
   m_configObjects: {}
