@@ -227,12 +227,6 @@ public class Game3Manager : MonoBehaviour
         SceneManager.LoadScene(streetSceneName);
     }
 
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(2f);
-        GameManager.Instance.ReturnToLobby();
-    }
-
     private void StartGame()
     {
         if (GameManager.Instance != null)
@@ -256,6 +250,4 @@ public class Game3Manager : MonoBehaviour
         
         Time.timeScale = 1f;
     }
-
-    
 }

@@ -20,8 +20,13 @@ public class SceneLoader : MonoBehaviour
         }
     }
 
+    private bool isLoading = false;
+
     public void LoadScene(string sceneName)
     {
+        if (isLoading) return;
+
+        isLoading = true;
         SceneManager.LoadScene(sceneName);
     }
 }
