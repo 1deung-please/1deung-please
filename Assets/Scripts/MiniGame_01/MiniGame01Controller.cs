@@ -183,12 +183,6 @@ public class MiniGame01Controller : MonoBehaviour
         GameManager.Instance.ReturnToLobby();
     }
 
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSeconds(2f);
-        GameManager.Instance.ReturnToLobby();
-    }
-
     void OnGUI()
     {
         GUI.Label(new Rect(10, 10, 300, 30), $"Phase: {currentPhase}");

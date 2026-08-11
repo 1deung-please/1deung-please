@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -316,12 +317,14 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void restartGame()
     {
-        SceneLoader.Instance.LoadScene("MiniGame_02");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MiniGame_02");
     }
 
     public void returnToLobby()
     {
-        GameManager.Instance.ReturnToLobby();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Lobby");
     }
 
     IEnumerator AutoReturnToLobbyAfterDelay()

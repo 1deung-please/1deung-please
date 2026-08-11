@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,8 +20,13 @@ public class SceneLoader : MonoBehaviour
         }
     }
 
+    private bool isLoading = false;
+
     public void LoadScene(string sceneName)
     {
+        if (isLoading) return;
+
+        isLoading = true;
         SceneManager.LoadScene(sceneName);
     }
 }

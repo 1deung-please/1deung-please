@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -233,12 +233,6 @@ private IEnumerator AutoReturnToLobbyAfterDelay()
         SceneManager.LoadScene(streetSceneName);
     }
 
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(2f);
-        GameManager.Instance.ReturnToLobby();
-    }
-
     private void StartGame()
     {
         if (GameManager.Instance != null)
@@ -256,6 +250,4 @@ private IEnumerator AutoReturnToLobbyAfterDelay()
         
         Time.timeScale = 1f;
     }
-
-    
 }
