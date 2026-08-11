@@ -52,7 +52,8 @@ public class Game3Manager : MonoBehaviour
         if (resultPanel != null)
             resultPanel.SetActive(false);
 
-        AnswerManager.Instance.Clear();
+        if (AnswerManager.Instance != null)
+            AnswerManager.Instance.Clear();
 
         if (readyButton != null)
             readyButton.onClick.AddListener(StartGame);
@@ -245,6 +246,12 @@ public class Game3Manager : MonoBehaviour
         if (ReadyPanel != null)
             ReadyPanel.SetActive(false);
 
+         if (AnswerManager.Instance != null &&
+        AnswerManager.Instance.heroThinkText != null)
+        {
+            AnswerManager.Instance.heroThinkText.SetActive(true);
+        }
+        
         ProblemManager.Instance.NextProblem();
         
         Time.timeScale = 1f;
