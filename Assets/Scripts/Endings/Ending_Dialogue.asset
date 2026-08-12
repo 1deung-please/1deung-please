@@ -17,25 +17,25 @@ MonoBehaviour:
     text: "(5\uBD84\uC774 \uB2E4 \uC9C0\uB0AC\uB2E4.. \uB3C4\uBBFF\uAC78\uC774 \uB85C\uB610\uBC29\uC5D0
       \uB4E4\uC5B4\uC624\uBA74 \uBB34\uC2A8 \uC77C\uC774 \uC77C\uC5B4\uB09C\uB2E4\uACE0
       \uD588\uC5B4...)"
-    portrait: {fileID: 21300000, guid: ea7c90b1438232246ba70e3a87ff34ea, type: 3}
+    portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
     isChoice: 0
     maxNoCount: 0
   - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uB85C\uB610 \uD55C \uBC88 \uC0AC\uBCF4\uC790.)"
-    portrait: {fileID: 21300000, guid: ea7c90b1438232246ba70e3a87ff34ea, type: 3}
+    portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
     isChoice: 0
     maxNoCount: 0
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC232\uC774\uB610 \uD558\uB098 \uC8FC\uC138\uC694."
-    portrait: {fileID: 21300000, guid: ea7c90b1438232246ba70e3a87ff34ea, type: 3}
+    portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
     isChoice: 0
     maxNoCount: 0
   - speaker: "\uC885\uC5C5\uC6D0"
     text: "\uB124. \uC5EC\uAE44\uC2B5\uB2C8\uB2E4."
-    portrait: {fileID: 0}
+    portrait: {fileID: 21300000, guid: b24031c123aa8394eade7b07b0df6a90, type: 3}
     dialogueEvent: 0
     isChoice: 0
     maxNoCount: 0
