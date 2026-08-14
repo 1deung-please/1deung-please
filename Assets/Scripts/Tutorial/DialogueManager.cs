@@ -28,13 +28,17 @@ public class DialogueManager : MonoBehaviour
 
     private Coroutine typingCoroutine;
     private bool isTyping = false;
+
     private string currentSentence = "";
+
     public System.Action OnDialogueFinished;
 
     private void Awake()
     {
         if (portraitImage != null)
+        {
             portraitImage.gameObject.SetActive(false);
+        }
     }
 
     public void StartDialogue(DialogueData data)
@@ -48,25 +52,47 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
 
         if (portraitImage != null)
+        {
             portraitImage.gameObject.SetActive(false);
+        }
 
         if (choicePanel != null)
+        {
             choicePanel.SetActive(false);
+        }
 
         gameObject.SetActive(true);
 
-        if (data != null && data.lines.Count > 0 && TutorialManager.Instance != null)
+        if (data != null &&
+            data.lines.Count > 0 &&
+            TutorialManager.Instance != null)
         {
-            bool isFirstNarration = (data.lines[0].speaker == "Narration");
+            bool isFirstNarration =
+                (data.lines[0].speaker == "Narration");
+
             TutorialManager.Instance.SetDialoguePosY(isFirstNarration);
         }
     }
 
     private void Update()
     {
-        // 선택지가 떠 있으면 대사 넘기기 금지
+        if (TutorialManager.Instance != null)
+        {
+            if (TutorialManager.Instance.IsFading())
+            {
+                return;
+            }
+
+            if (TutorialManager.Instance.ConsumeClick())
+            {
+                return;
+            }
+        }
+
         if (choicePanel != null && choicePanel.activeSelf)
+        {
             return;
+        }
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -79,7 +105,11 @@ public class DialogueManager : MonoBehaviour
 
             if (isTyping)
             {
-                StopCoroutine(typingCoroutine);
+                if (typingCoroutine != null)
+                {
+                    StopCoroutine(typingCoroutine);
+                }
+
                 dialogueText.text = currentSentence;
                 isTyping = false;
             }
@@ -92,20 +122,25 @@ public class DialogueManager : MonoBehaviour
 
     private void ShowDialogue()
     {
-        if (currentIndex >= dialogueData.lines.Count)
+        if (dialogueData == null ||
+            dialogueData.lines == null ||
+            currentIndex >= dialogueData.lines.Count)
         {
             EndDialogue();
             return;
         }
 
         currentLine = dialogueData.lines[currentIndex];
+
         DialogueLine line = currentLine;
 
         nameText.text = line.speaker;
 
         if (TutorialManager.Instance != null)
         {
-            TutorialManager.Instance.SetDialoguePosY(line.speaker == "Narration");
+            TutorialManager.Instance.SetDialoguePosY(
+                line.speaker == "Narration"
+            );
         }
 
         if (line.speaker == "Narration")
@@ -117,7 +152,7 @@ public class DialogueManager : MonoBehaviour
             nameText.gameObject.SetActive(true);
             nameText.text = line.speaker;
         }
-        
+
         if (portraitImage != null)
         {
             if (line.portrait != null)
@@ -134,29 +169,39 @@ public class DialogueManager : MonoBehaviour
         currentSentence = line.text;
 
         if (typingCoroutine != null)
+        {
             StopCoroutine(typingCoroutine);
+        }
 
-        typingCoroutine = StartCoroutine(TypeText(currentSentence));
+        typingCoroutine = StartCoroutine(
+            TypeText(currentSentence)
+        );
 
         ExecuteEvent(line.dialogueEvent);
 
         if (choicePanel != null)
         {
             if (line.isChoice)
+            {
                 choicePanel.SetActive(true);
+            }
             else
+            {
                 choicePanel.SetActive(false);
+            }
         }
     }
 
-    IEnumerator TypeText(string text)
+    private IEnumerator TypeText(string text)
     {
         isTyping = true;
+
         dialogueText.text = "";
 
         foreach (char c in text)
         {
             dialogueText.text += c;
+
             yield return new WaitForSeconds(typingSpeed);
         }
 
@@ -173,21 +218,20 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log("대화 종료");
 
-        // 대화 종료 알림
         OnDialogueFinished?.Invoke();
 
-        // TutorialManager가 있는 씬에서만 튜토리얼 종료 처리
         if (TutorialManager.Instance != null)
         {
             PlayerPrefs.SetInt("TutorialCompleted", 1);
             PlayerPrefs.Save();
 
             Debug.Log("튜토리얼 완료");
+
             TutorialManager.Instance.MoveLobbyAndStartTimer();
         }
     }
 
-    void ExecuteEvent(DialogueEvent dialogueEvent)
+    private void ExecuteEvent(DialogueEvent dialogueEvent)
     {
         switch (dialogueEvent)
         {
@@ -199,7 +243,6 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case DialogueEvent.StartTimer:
-                // 이미 MoveLobby 쪽에서 다 처리되니, 이 case는 비워두거나 지워도 됨
                 break;
 
             case DialogueEvent.FadeOut:
@@ -207,7 +250,9 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case DialogueEvent.Achievement:
-                TutorialManager.Instance.UnlockAchievement("사이비 퇴치!");
+                TutorialManager.Instance.UnlockAchievement(
+                    "사이비 퇴치!"
+                );
                 break;
 
             case DialogueEvent.ChangeStreet:
@@ -232,37 +277,52 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            AchievementManager.Instance.OnTutorialNoButtonClicked(); 
+            AchievementManager.Instance.OnTutorialNoButtonClicked();
         }
     }
 
-   public void RepeatCurrentDialogue(string speaker, Sprite portrait, string newText)
+    public void RepeatCurrentDialogue(
+        string speaker,
+        Sprite portrait,
+        string newText)
     {
         currentSentence = newText;
 
         nameText.gameObject.SetActive(true);
-        portraitImage.gameObject.SetActive(true);
+
+        if (portraitImage != null)
+        {
+            portraitImage.gameObject.SetActive(true);
+            portraitImage.sprite = portrait;
+        }
 
         nameText.text = speaker;
-        portraitImage.sprite = portrait;
 
         if (typingCoroutine != null)
+        {
             StopCoroutine(typingCoroutine);
+        }
 
-        typingCoroutine = StartCoroutine(TypeText(currentSentence));
+        typingCoroutine = StartCoroutine(
+            TypeText(currentSentence)
+        );
     }
 
     public void SkipDialogue()
     {
         // 타이핑 중이면 중지
         if (typingCoroutine != null)
+        {
             StopCoroutine(typingCoroutine);
+        }
 
         isTyping = false;
 
         // 선택지 숨기기
         if (choicePanel != null)
+        {
             choicePanel.SetActive(false);
+        }
 
         // 대화 UI 숨기기
         gameObject.SetActive(false);
