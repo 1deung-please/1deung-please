@@ -938,7 +938,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogueManager: {fileID: 1096950477}
   endingDialogue: {fileID: 11400000, guid: 6f15209ebac813b42be3383887705989, type: 2}
-  useTestData: 1
+  useTestData: 0
   testGameData: {fileID: 11400000, guid: 5e04b0731a56a9e4bb6fe24675231b40, type: 2}
   scratchButtonManager: {fileID: 593254008}
 --- !u!4 &1139072341
@@ -1200,7 +1200,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1760198102}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -1270,6 +1270,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f20f388570f0e104cb66b0b020bf3a20, type: 3}
+--- !u!20 &1760198102 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 3352915459776625014, guid: f20f388570f0e104cb66b0b020bf3a20, type: 3}
+  m_PrefabInstance: {fileID: 1760198101}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2066036360
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,6 +25,9 @@ public class GameManager_mg02 : MonoBehaviour
     public TMP_Text resultReasonText;
     public TMP_Text recordText;
 
+    [Header("Result Buttons")]
+    public Button restartButton;
+
     [Header("Game Settings")]
     public float maxGameTime = 20f;
     float currentGameTime;
@@ -308,11 +311,10 @@ public class GameManager_mg02 : MonoBehaviour
             }
         }
 
-        if (GameManager.Instance != null &&
-        GameManager.Instance.IsPendingEndingTransition())
-        {
-            StartCoroutine(AutoReturnToLobbyAfterDelay());
-        }
+        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
+
+        if (restartButton != null)
+            restartButton.gameObject.SetActive(!willAutoReturn);
     }
 
     public void restartGame()

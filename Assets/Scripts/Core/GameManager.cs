@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour
 
     public void OnLotteryRoomClicked()
     {
-        DetermineEnding();
+        SceneLoader.Instance.LoadScene("LotteryRoom");
     }
 
     public void DetermineEnding()

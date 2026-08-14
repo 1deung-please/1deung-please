@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class EndingManager : MonoBehaviour
@@ -47,7 +47,6 @@ public class EndingManager : MonoBehaviour
     public void DetermineEnding()
     {
         Debug.Log("DetermineEnding");
-        Debug.Log("gameData = " + gameData);
 
         if (gameData == null)
         {
@@ -55,39 +54,7 @@ public class EndingManager : MonoBehaviour
             return;
         }
 
-
-        // 플레이하지 않은 게임이 있으면 최우선 엔딩
-        if (HasUnplayedGame())
-        {
-            Debug.Log("엔딩 : 얄팍한 속셈");
-            SceneManager.LoadScene("Ending_Shallow");
-            return;
-        }
-
-
-        int total = gameData.meritPoint;
-
-
-        // 자격 미달
-        if (total < 2000)
-        {
-            Debug.Log("엔딩 : 자격 미달");
-            SceneManager.LoadScene("Ending_Unqualified");
-        }
-
-        // 절반의 성공
-        else if (total < 8500)
-        {
-            Debug.Log("엔딩 : 절반의 성공");
-            SceneManager.LoadScene("Ending_HalfSuccess");
-        }
-
-        // 진정한 귀인
-        else
-        {
-            Debug.Log("엔딩 : 진정한 귀인");
-            SceneManager.LoadScene("Ending_TrueBenefactor");
-        }
+        GameManager.Instance.DetermineEnding(); // GameManager에 이미 있는 로직 그대로 재사용
     }
 
 

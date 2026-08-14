@@ -172,40 +172,39 @@ public class Game3Manager : MonoBehaviour
 
         Time.timeScale = 0f;
 
-        if (GameManager.Instance != null &&
-        GameManager.Instance.IsPendingEndingTransition())
-    {
-        StartCoroutine(AutoReturnToLobbyAfterDelay());
-    }
+        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
+
+        if (retryButton != null)
+            retryButton.gameObject.SetActive(!willAutoReturn);
     }
 
     private void ClearWordButtons()
-{
-    if (AnswerManager.Instance != null)
-        AnswerManager.Instance.Clear();
-
-    if (wordPanel)
     {
-        for (int i = wordPanel.childCount - 1; i >= 0; i--)
-        {
-            Transform child = wordPanel.GetChild(i);
+        if (AnswerManager.Instance != null)
+            AnswerManager.Instance.Clear();
 
-            if (child != null && child.GetComponent<WordButton>() != null)
-                Destroy(child.gameObject);
+        if (wordPanel)
+        {
+            for (int i = wordPanel.childCount - 1; i >= 0; i--)
+            {
+                Transform child = wordPanel.GetChild(i);
+
+                if (child != null && child.GetComponent<WordButton>() != null)
+                    Destroy(child.gameObject);
+            }
+        }
+
+        if (answerPanel)
+        {
+            for (int i = answerPanel.childCount - 1; i >= 0; i--)
+            {
+                Transform child = answerPanel.GetChild(i);
+
+                if (child != null && child.GetComponent<WordButton>() != null)
+                    Destroy(child.gameObject);
+            }
         }
     }
-
-    if (answerPanel)
-    {
-        for (int i = answerPanel.childCount - 1; i >= 0; i--)
-        {
-            Transform child = answerPanel.GetChild(i);
-
-            if (child != null && child.GetComponent<WordButton>() != null)
-                Destroy(child.gameObject);
-        }
-    }
-}
 
     private void RetryGame()
     {
@@ -249,5 +248,11 @@ public class Game3Manager : MonoBehaviour
         ProblemManager.Instance.NextProblem();
         
         Time.timeScale = 1f;
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        GameManager.Instance.ReturnToLobby();
     }
 }
