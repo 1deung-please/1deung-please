@@ -31,6 +31,7 @@ public class MiniGame01Controller : MonoBehaviour
     public TMP_Text resultReasonText;  // 성공/실패
     public TMP_Text resultRecordText;  // 목표/수집/공덕
     public TMP_Text meritText;         // 공덕
+    public Button retryButton; // 다시하기 버튼
 
     private MiniGame01Phase currentPhase;
     private int targetCount;
@@ -202,10 +203,11 @@ public class MiniGame01Controller : MonoBehaviour
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
 
-        if (GameManager.Instance.IsPendingEndingTransition())
-        {
-            StartCoroutine(AutoReturnToLobbyAfterDelay());
-        }
+        bool willAutoReturn = GameManager.Instance.IsPendingEndingTransition();
+
+        // 자동 복귀 예정이면 다시하기 버튼 비활성화
+        if (retryButton != null)
+            retryButton.gameObject.SetActive(!willAutoReturn); 
     }
 
     void ShowPanel(GameObject target)
@@ -232,5 +234,11 @@ public class MiniGame01Controller : MonoBehaviour
         GUI.Label(new Rect(10, 40, 300, 30), $"Target: {targetCount}");
         GUI.Label(new Rect(10, 70, 300, 30), $"Count: {currentCount}");
         GUI.Label(new Rect(10, 100, 300, 30), $"Time: {remainingTime:F2}");
+    }
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        GameManager.Instance.ReturnToLobby();
     }
 }
