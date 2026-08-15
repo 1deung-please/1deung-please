@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -23,6 +24,9 @@ public class GameManager_mg02 : MonoBehaviour
     public TMP_Text titleText;
     public TMP_Text resultReasonText;
     public TMP_Text recordText;
+
+    [Header("Result Buttons")]
+    public Button restartButton;
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
@@ -307,21 +311,22 @@ public class GameManager_mg02 : MonoBehaviour
             }
         }
 
-        if (GameManager.Instance != null &&
-        GameManager.Instance.IsPendingEndingTransition())
-        {
-            StartCoroutine(AutoReturnToLobbyAfterDelay());
-        }
+        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
+
+        if (restartButton != null)
+            restartButton.gameObject.SetActive(!willAutoReturn);
     }
 
     public void restartGame()
     {
-        SceneLoader.Instance.LoadScene("MiniGame_02");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MiniGame_02");
     }
 
     public void returnToLobby()
     {
-        GameManager.Instance.ReturnToLobby();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Lobby");
     }
 
     IEnumerator AutoReturnToLobbyAfterDelay()

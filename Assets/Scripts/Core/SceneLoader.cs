@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class SceneLoader : MonoBehaviour
 {
     public static SceneLoader Instance;
+    private bool isLoading = false;
 
     void Awake()
     {
@@ -13,6 +14,7 @@ public class SceneLoader : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded; // 씬 로드 완료 감지
         }
         else
         {
@@ -20,8 +22,15 @@ public class SceneLoader : MonoBehaviour
         }
     }
 
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        isLoading = false; // 새 씬 로드가 끝나면 다시 로드 가능 상태로
+    }
+
     public void LoadScene(string sceneName)
     {
+        if (isLoading) return;
+        isLoading = true;
         SceneManager.LoadScene(sceneName);
     }
 }

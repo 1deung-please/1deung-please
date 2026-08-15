@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class LotteryRoomUI : MonoBehaviour
 {
     public GameObject lotteryRoomButton;
-    public GameObject[] normalLobbyButtons; // 미니게임 입구 등, 평소 보이는 버튼들
+    public GameObject[] normalLobbyButtons; // 미니게임 입구들 + 가방 아이콘 포함
 
     void Update()
     {
