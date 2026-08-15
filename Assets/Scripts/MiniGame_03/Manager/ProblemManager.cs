@@ -6,6 +6,7 @@ public class ProblemManager : MonoBehaviour
 {
     public static ProblemManager Instance;
 
+    public GameObject DomitgirlText;
     public TMP_Text dialogText;
 
     public List<Problem> problems = new List<Problem>();
@@ -13,6 +14,7 @@ public class ProblemManager : MonoBehaviour
 
     // 아직 이번 회차에서 나오지 않은 문제 번호
     private List<int> remainingProblemIndexes = new List<int>();
+
 
     private void Awake()
     {

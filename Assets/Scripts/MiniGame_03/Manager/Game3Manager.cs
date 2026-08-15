@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Game3Manager : MonoBehaviour
 {
     public static Game3Manager Instance;
-
+    
     [Header("기존 게임 연결")]
     public EnemyManager enemy;
 
@@ -19,6 +19,9 @@ public class Game3Manager : MonoBehaviour
     [Header("시작 화면")]
     public GameObject ReadyPanel;
     public Button readyButton;
+    public Image touchToStartImage;
+
+    private Coroutine blinkCoroutine;
 
     private bool gameStarted = false;
     
@@ -32,10 +35,31 @@ public class Game3Manager : MonoBehaviour
     [Header("거리 씬 이름")]
     public string streetSceneName = "Lobby";
 
+    [Header("화면 Flash")]
+    public GameObject flashPanel;
+
+    [Header("결과 버튼 효과음")]
+    public AudioSource audioSource;
+    public AudioClip buttonSfx;
+
     private List<char> selectedChars = new List<char>();
     private bool gameEnded = false;
     public bool IsGameEnded => gameEnded;
     
+    IEnumerator BlinkImage()
+{
+    while (true)
+    {
+        float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
+
+        Color c = touchToStartImage.color;
+        c.a = alpha;
+        touchToStartImage.color = c;
+
+        yield return null;
+    }
+}
+
     private void Awake()
     {
         Instance = this;
@@ -59,10 +83,27 @@ public class Game3Manager : MonoBehaviour
             readyButton.onClick.AddListener(StartGame);
 
         if (retryButton != null)
+        {
             retryButton.onClick.AddListener(RetryGame);
 
+            Image retryImage = retryButton.GetComponent<Image>();
+
+            if (retryImage != null)
+                retryImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
+
         if (returnButton != null)
+        {
             returnButton.onClick.AddListener(ReturnToStreet);
+
+            Image returnImage = returnButton.GetComponent<Image>();
+
+            if (returnImage != null)
+                returnImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
+
+        if (touchToStartImage != null)
+            blinkCoroutine = StartCoroutine(BlinkImage());
     }
 
     // 글자 선택
@@ -161,6 +202,12 @@ public class Game3Manager : MonoBehaviour
 
         ClearWordButtons();
 
+        if (ProblemManager.Instance != null &&
+        ProblemManager.Instance.DomitgirlText != null)
+        {
+            ProblemManager.Instance.DomitgirlText.SetActive(false);
+        }
+
         if (resultPanel != null)
             resultPanel.SetActive(true);
 
@@ -172,87 +219,147 @@ public class Game3Manager : MonoBehaviour
 
         Time.timeScale = 0f;
 
-        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
-
-        if (retryButton != null)
-            retryButton.gameObject.SetActive(!willAutoReturn);
+        if (GameManager.Instance != null &&
+        GameManager.Instance.IsPendingEndingTransition())
+    {
+        StartCoroutine(AutoReturnToLobbyAfterDelay());
+    }
     }
 
     private void ClearWordButtons()
+{
+    if (AnswerManager.Instance != null)
+        AnswerManager.Instance.Clear();
+
+    if (wordPanel)
     {
-        if (AnswerManager.Instance != null)
-            AnswerManager.Instance.Clear();
-
-        if (wordPanel)
+        for (int i = wordPanel.childCount - 1; i >= 0; i--)
         {
-            for (int i = wordPanel.childCount - 1; i >= 0; i--)
-            {
-                Transform child = wordPanel.GetChild(i);
+            Transform child = wordPanel.GetChild(i);
 
-                if (child != null && child.GetComponent<WordButton>() != null)
-                    Destroy(child.gameObject);
-            }
-        }
-
-        if (answerPanel)
-        {
-            for (int i = answerPanel.childCount - 1; i >= 0; i--)
-            {
-                Transform child = answerPanel.GetChild(i);
-
-                if (child != null && child.GetComponent<WordButton>() != null)
-                    Destroy(child.gameObject);
-            }
+            if (child != null && child.GetComponent<WordButton>() != null)
+                Destroy(child.gameObject);
         }
     }
 
+    if (answerPanel)
+    {
+        for (int i = answerPanel.childCount - 1; i >= 0; i--)
+        {
+            Transform child = answerPanel.GetChild(i);
+
+            if (child != null && child.GetComponent<WordButton>() != null)
+                Destroy(child.gameObject);
+        }
+    }
+}
+
     private void RetryGame()
     {
-        Time.timeScale = 1f;
+        StartCoroutine(RetryGameRoutine());
+    }
 
+    private IEnumerator RetryGameRoutine()
+    {
+        if (audioSource != null && buttonSfx != null)
+            audioSource.PlayOneShot(buttonSfx);
+
+        yield return new WaitForSecondsRealtime(0.2f);
+
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void ReturnToStreet()
     {
-        Time.timeScale = 1f;
+         StartCoroutine(ReturnToStreetRoutine());
+    }
 
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.ReturnToLobby();
-            return;
-        }
+    private IEnumerator ReturnToStreetRoutine()
+{
+    if (audioSource != null && buttonSfx != null)
+        audioSource.PlayOneShot(buttonSfx);
 
-        SceneManager.LoadScene(streetSceneName);
+    yield return new WaitForSecondsRealtime(0.2f);
+
+    Time.timeScale = 1f;
+
+    if (GameManager.Instance != null)
+    {
+        GameManager.Instance.ReturnToLobby();
+        yield break;
+    }
+
+    SceneManager.LoadScene(streetSceneName);
+}
+
+    IEnumerator AutoReturnToLobbyAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(2f);
+        GameManager.Instance.ReturnToLobby();
     }
 
     private void StartGame()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnMiniGameStart();
-            GameManager.Instance.RecordMiniGamePlay(3);
-        }
-
-        gameStarted = true;
-
-        if (ReadyPanel != null)
-            ReadyPanel.SetActive(false);
-
-         if (AnswerManager.Instance != null &&
-        AnswerManager.Instance.heroThinkText != null)
-        {
-            AnswerManager.Instance.heroThinkText.SetActive(true);
-        }
-        
-        ProblemManager.Instance.NextProblem();
-        
-        Time.timeScale = 1f;
+        StartCoroutine(FlashThenStart());
     }
 
-    IEnumerator AutoReturnToLobbyAfterDelay()
+IEnumerator FlashThenStart()
+{
+    // 터치하여 시작하기 Blink 중지
+    if (blinkCoroutine != null)
     {
-        yield return new WaitForSeconds(2f);
-        GameManager.Instance.ReturnToLobby();
+        StopCoroutine(blinkCoroutine);
+        blinkCoroutine = null;
     }
+
+    // 화면 Flash 효과
+    if (flashPanel != null)
+    {
+        Image flashImage = flashPanel.GetComponent<Image>();
+
+        flashPanel.SetActive(true);
+        flashImage.color = new Color(1, 1, 1, 1);
+
+        float t = 0f;
+
+        while (t < 0.3f)
+        {
+            t += Time.unscaledDeltaTime;
+
+            flashImage.color = new Color(
+                1,
+                1,
+                1,
+                Mathf.Lerp(1, 0, t / 0.3f)
+            );
+
+            yield return null;
+        }
+
+        flashPanel.SetActive(false);
+    }
+
+    // Flash 끝난 후 게임 시작
+    if (GameManager.Instance != null)
+    {
+        GameManager.Instance.OnMiniGameStart();
+        GameManager.Instance.RecordMiniGamePlay(3);
+    }
+
+    gameStarted = true;
+
+    if (ReadyPanel != null)
+        ReadyPanel.SetActive(false);
+
+    if (AnswerManager.Instance != null &&
+        AnswerManager.Instance.heroThinkText != null)
+    {
+        AnswerManager.Instance.heroThinkText.text = "";
+    }
+
+    ProblemManager.Instance.NextProblem();
+
+    Time.timeScale = 1f;
+}
 }
