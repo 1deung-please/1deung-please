@@ -1,199 +1,243 @@
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AnswerManager : MonoBehaviour
 {
-    public TMP_Text answerText;
-    public GameObject hintText;
-    private bool isPenalty = false;
     public static AnswerManager Instance;
-    public Transform answerPanel;
-    private List<WordButton> selectedWords = new();
 
-    [Header("말풍선")]
-    public GameObject heroThinkText;
+    [Header("텍스트")]
+    public TMP_Text heroThinkText;
+    public TMP_Text answerText;
+
+    [Header("힌트")]
+    public GameObject hintText;
+
+    [Header("버튼 이미지")]
+    public Image cancelButtonImage;
+    public Image attackButtonImage;
+
+    [Header("주인공 말풍선")]
+    public GameObject heroThinkBubble;  // 평소 생각 말풍선 전체
     public GameObject heroText;
+    public TMP_Text heroTextText;
 
-    public TMP_Text thinkAnswerText;
-    public TMP_Text speechAnswerText;
+    [Header("효과음")]
+    public AudioSource audioSource;
+    public AudioClip correctSfx;
+    public AudioClip wrongSfx;
+    public AudioClip wordButtonSfx;
+    public AudioClip attackButtonSfx;
+
+    private List<WordButton> selectedButtons = new List<WordButton>();
+    private List<char> selectedLetters = new List<char>();
+
+    private bool isChecking = false;
 
     private void Awake()
     {
         Instance = this;
+    }
+
+    private void Start()
+    {
+        if (heroText != null)
+            heroText.SetActive(false);
+
+        if (heroThinkBubble != null)
+            heroThinkBubble.SetActive(true);
+
+        // Cancel / Attack 투명 영역 클릭 방지
+        if (cancelButtonImage != null)
+            cancelButtonImage.alphaHitTestMinimumThreshold = 0.1f;
+
+        if (attackButtonImage != null)
+            attackButtonImage.alphaHitTestMinimumThreshold = 0.1f;
+
+        if (heroThinkText != null)
+            heroThinkText.text = "";
+
+        if (answerText != null)
+            answerText.text = "";
 
         if (hintText != null)
             hintText.SetActive(false);
+    }
 
+    // 단어 버튼 클릭
+    public void SelectWord(WordButton button, char letter)
+    {
+        if (isChecking)
+            return;
+
+        selectedButtons.Add(button);
+        selectedLetters.Add(letter);
+        
+        if (audioSource != null && wordButtonSfx != null)
+            audioSource.PlayOneShot(wordButtonSfx);
+
+        // 선택한 글자를 HeroThinkText에 표시
         if (heroThinkText != null)
-            heroThinkText.SetActive(false);
-
-        if (heroText != null)
-            heroText.SetActive(false);
-    }
-
-    public void SelectWord(WordButton word)
-    {
-        if (Game3Manager.Instance != null &&
-            Game3Manager.Instance.IsGameEnded)
-                return;
-
-        if (isPenalty)
-        return;
-
-        if (selectedWords.Contains(word))
-            return;
-
-        selectedWords.Add(word);
-
-        word.Select();
-
-        if (thinkAnswerText != null)
-            thinkAnswerText.text = GetAnswer();
-    }
-
-    public void RemoveWord(WordButton word)
-    {
-        if (!selectedWords.Contains(word))
-            return;
-
-        selectedWords.Remove(word);
-
-        thinkAnswerText.text = GetAnswer();
+        {
+            heroThinkText.text =
+                new string(selectedLetters.ToArray());
+        }
     }
 
     public string GetAnswer()
     {
-        string result = "";
-
-        foreach (WordButton word in selectedWords)
-            result += word.GetWord();
-
-        return result;
+        return new string(selectedLetters.ToArray());
     }
 
+    // 취소 버튼
     public void Clear()
     {
-        foreach (WordButton word in selectedWords)
+        if (isChecking)
+            return;
+
+        foreach (WordButton button in selectedButtons)
         {
-            if (word != null)
-                word.ResetWord();
+            if (button != null)
+                button.Restore();
         }
 
-        selectedWords.Clear();
+        selectedButtons.Clear();
+        selectedLetters.Clear();
 
-        if (thinkAnswerText != null)
-            thinkAnswerText.text = "";
-
-        if (speechAnswerText != null)
-            speechAnswerText.text = "";
+        if (heroThinkText != null)
+            heroThinkText.text = "";
     }
 
+    // Attack 버튼
     public void CheckAnswer()
-{
-    if (isPenalty)
-        return;
-
-    if (Game3Manager.Instance != null &&
-        Game3Manager.Instance.IsGameEnded)
-        return;
-
-    string spokenAnswer = GetAnswer();
-
-    if (heroThinkText != null)
-        heroThinkText.SetActive(false);
-
-    if (heroText != null)
-        heroText.SetActive(true);
-
-    if (speechAnswerText != null)
-        speechAnswerText.text = spokenAnswer;
-
-    string myAnswer = spokenAnswer.Replace(" ", "");
-
-    string correctAnswer =
-        ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
-
-    if (myAnswer == correctAnswer)
     {
-        Debug.Log("정답!");
+        if (isChecking)
+            return;
 
-        StartCoroutine(CorrectAnswer());
+        if (ProblemManager.Instance == null ||
+            ProblemManager.Instance.currentProblem == null)
+            return;
+
+        if (audioSource != null && attackButtonSfx != null)
+            audioSource.PlayOneShot(attackButtonSfx);
+        
+        StartCoroutine(CheckAnswerRoutine());
     }
-    else
+
+    private IEnumerator CheckAnswerRoutine()
     {
-        StartCoroutine(Penalty());
-    }
-}
+        isChecking = true;
 
-private void ResetBubble()
-{
-    if (heroThinkText != null)
-        heroThinkText.SetActive(true);
+        string playerAnswer = GetAnswer();
 
-    if (heroText != null)
-        heroText.SetActive(false);
+        string correctAnswer =
+            ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
 
-    if (thinkAnswerText != null)
-        thinkAnswerText.text = "";
-
-    if (speechAnswerText != null)
-        speechAnswerText.text = "";
-}
-
-    IEnumerator CorrectAnswer()
-    {
-        yield return new WaitForSeconds(1f);
-
-        EnemyManager enemyManager =
-            FindFirstObjectByType<EnemyManager>();
-
-        if (enemyManager != null)
-            enemyManager.Damage(20);
-
-
-        Clear();
-
-
-        if (Game3Manager.Instance != null &&
-            !Game3Manager.Instance.IsGameEnded)
+        // =====================
+        // 정답
+        // =====================
+        if (playerAnswer == correctAnswer)
         {
+            Debug.Log("정답!");
+
+            if (audioSource != null && correctSfx != null)
+                audioSource.PlayOneShot(correctSfx);
+
+            selectedButtons.Clear();
+            selectedLetters.Clear();
+
+            if (heroThinkText != null)
+                heroThinkText.text = "";
+
+            // 평소 생각 말풍선 숨기기
+            if (heroThinkBubble != null)
+                heroThinkBubble.SetActive(false);
+
+            // 정답 말풍선 표시
+            if (heroText != null)
+                heroText.SetActive(true);
+
+            if (heroTextText != null)
+                heroTextText.text = ProblemManager.Instance.currentProblem.answer;
+
+            if (Game3Manager.Instance != null &&
+                Game3Manager.Instance.enemy != null)
+            {
+                Game3Manager.Instance.enemy.Damage(20);
+            }
+
+            // 게임이 끝났으면
+            if (Game3Manager.Instance != null &&
+            Game3Manager.Instance.IsGameEnded)
+            {
+                if (heroText != null)
+                    heroText.SetActive(false);
+
+                isChecking = false;
+                yield break;
+            }
+
+            // 1초 동안 정답 말풍선
+            yield return new WaitForSeconds(1f);
+
+            // 정답 말풍선 숨김
+            if (heroText != null)
+                heroText.SetActive(false);
+
+            // 평소 생각 말풍선 다시 표시
+            if (heroThinkBubble != null)
+                heroThinkBubble.SetActive(true);
+
             ProblemManager.Instance.NextProblem();
-
-            ResetBubble();
         }
+
+        // =====================
+        // 오답
+        // =====================
+        else
+        {
+            Debug.Log("오답!");
+
+            if (audioSource != null && wrongSfx != null)
+                audioSource.PlayOneShot(wrongSfx);
+
+            // 힌트 이미지 켜기
+            if (hintText != null)
+                hintText.SetActive(true);
+
+            // 실제 정답 글자 표시
+            if (answerText != null)
+            {
+                answerText.gameObject.SetActive(true);
+                answerText.text = ProblemManager.Instance.currentProblem.answer;
+            }
+
+            yield return new WaitForSeconds(3f);
+
+            // 3초 후 힌트와 정답 숨기기
+            if (answerText != null)
+            {
+                answerText.text = "";
+                answerText.gameObject.SetActive(false);
+            }
+
+            if (hintText != null)
+                hintText.SetActive(false);
+
+            selectedButtons.Clear();
+            selectedLetters.Clear();
+
+            if (heroThinkText != null)
+                heroThinkText.text = "";
+
+            if (Game3Manager.Instance != null &&
+            !Game3Manager.Instance.IsGameEnded)
+            {
+                ProblemManager.Instance.NextProblem();
+            }
+        }
+            isChecking = false;
     }
-
-    IEnumerator Penalty()
-{
-    if (isPenalty)
-        yield break;
-
-    isPenalty = true;
-
-    if(hintText != null)
-        hintText.SetActive(true);
-
-    answerText.text =
-        "정답 : " + ProblemManager.Instance.currentProblem.answer;
-
-    yield return new WaitForSeconds(3f);
-
-    if (hintText != null)
-        hintText.SetActive(false);
-
-
-    Clear();
-
-    if (Game3Manager.Instance != null &&
-        !Game3Manager.Instance.IsGameEnded)
-    {
-        ProblemManager.Instance.NextProblem();
-
-        ResetBubble();
-    }
-
-    isPenalty = false;
-}
 }

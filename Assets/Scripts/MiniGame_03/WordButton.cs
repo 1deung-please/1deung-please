@@ -4,71 +4,75 @@ using UnityEngine.UI;
 
 public class WordButton : MonoBehaviour
 {
-    public TMP_Text text;
+    [Header("UI")]
+    public Image buttonImage;
+    public TMP_Text wordText;
 
-    private string letter;
-    private Transform originalParent;
-    private int originalSiblingIndex;
-    private GameObject placeholder;
+    [Header("Button Sprite")]
+    public Sprite normalSprite;
+    public Sprite blankSprite;
 
-    public void Initialize(string value)
+    private char letter;
+    private bool isSelected = false;
+
+    public char Letter => letter;
+
+    private void Awake()
     {
-        letter = value;
-        text.text = value;
-
-        originalParent = transform.parent;
-        originalSiblingIndex = transform.GetSiblingIndex();
+        if (buttonImage != null)
+        {
+            buttonImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
     }
 
-    public void Click()
+    public void Initialize(char newLetter)
     {
-        if (AnswerManager.Instance != null)
-            AnswerManager.Instance.SelectWord(this);
+        letter = newLetter;
+        isSelected = false;
+
+        buttonImage.sprite = normalSprite;
+
+        wordText.gameObject.SetActive(true);
+        wordText.text = newLetter.ToString();
     }
 
-    public string GetWord()
+    public void SetEmpty()
     {
-        return letter;
+        letter = '\0';
+        isSelected = true;
+
+        buttonImage.sprite = blankSprite;
+
+        wordText.text = "";
+        wordText.gameObject.SetActive(false);
     }
 
     public void Select()
     {
-        if (placeholder != null)
+        if (isSelected)
             return;
 
-        originalParent = transform.parent;
-        originalSiblingIndex = transform.GetSiblingIndex();
+        isSelected = true;
 
-        placeholder = new GameObject(
-            "WordPlaceholder",
-            typeof(RectTransform),
-            typeof(LayoutElement)
-        );
-
-        placeholder.transform.SetParent(originalParent, false);
-        placeholder.transform.SetSiblingIndex(originalSiblingIndex);
-
-        RectTransform myRect = GetComponent<RectTransform>();
-        LayoutElement layout = placeholder.GetComponent<LayoutElement>();
-
-        layout.preferredWidth = myRect.rect.width;
-        layout.preferredHeight = myRect.rect.height;
-        layout.minWidth = myRect.rect.width;
-        layout.minHeight = myRect.rect.height;
-        layout.flexibleWidth = 0;
-        layout.flexibleHeight = 0;
-
-        gameObject.SetActive(false);
-    }
-
-    public void ResetWord()
-    {
-        if (placeholder != null)
+        if (AnswerManager.Instance != null)
         {
-            Destroy(placeholder);
-            placeholder = null;
+            AnswerManager.Instance.SelectWord(this, letter);
         }
 
-        gameObject.SetActive(true);
+        buttonImage.sprite = blankSprite;
+        wordText.gameObject.SetActive(false);
+    }
+
+    public void Restore()
+    {
+        if (letter == '\0')
+            return;
+
+        isSelected = false;
+
+        buttonImage.sprite = normalSprite;
+
+        wordText.gameObject.SetActive(true);
+        wordText.text = letter.ToString();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BagManager : MonoBehaviour
 {
@@ -12,6 +13,11 @@ public class BagManager : MonoBehaviour
     [Header("다시 시작 후 이동할 씬")]
     [SerializeField] private string startSceneName = "Lobby";
 
+    [Header("가방 버튼")]
+    [SerializeField] private Button bagButton;
+    [SerializeField] private Button closeButton;
+    [SerializeField] private Button restartButton;
+
     private void Start()
     {
         bagPanel.SetActive(false);
@@ -19,6 +25,30 @@ public class BagManager : MonoBehaviour
         restartConfirmPanel.SetActive(false);
         endingBookPanel.SetActive(false);
         achievementBookPanel.SetActive(false);
+
+        if (bagButton != null)
+        {
+            Image bagImage = bagButton.GetComponent<Image>();
+
+            if (bagImage != null)
+                bagImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
+
+        if (closeButton != null)
+        {
+            Image closeImage = closeButton.GetComponent<Image>();
+
+            if (closeImage != null)
+                closeImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
+
+        if (restartButton != null)
+        {
+            Image restartImage = restartButton.GetComponent<Image>();
+
+            if (restartImage != null)
+                restartImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
     }
 
     public void OpenBag()
