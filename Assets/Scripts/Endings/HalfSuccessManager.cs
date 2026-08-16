@@ -10,8 +10,6 @@ public class HalfSuccessManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private GameObject scoreBoard;
     [SerializeField] private TextMeshProUGUI nameText;
 
     [Header("Portrait")]
@@ -27,8 +25,6 @@ public class HalfSuccessManager : MonoBehaviour
 
     private void Start()
     {
-        scoreBoard.SetActive(false);
-
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(false);
@@ -52,26 +48,29 @@ public class HalfSuccessManager : MonoBehaviour
 
         yield return Dialogue("조상님", "내가 바로 네 조상이다.", ancestorGod);
 
-        yield return Dialogue("조상님", "내가 널 참 오랫동안 지켜보고 있었지...\n" + "갓난아기일 때부터 회사에 치이는 지금까지...", ancestorGod);
-
-        yield return Dialogue("조상님", "얼마나 고생이 많았느냐.\n" + "난 널 도와주러 온 사람이야.", ancestorGod);
-
-        yield return Dialogue("조상님", "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.", ancestorGod);
-
-        // 스코어보드 등장
-        yield return ShowScore();
-
         yield return Dialogue(
             "조상님",
-            "흠... 어디 보자...",
+            "내가 널 참 오랫동안 지켜보고 있었지...\n" +
+            "갓난아기일 때부터 회사에 치이는 지금까지...",
             ancestorGod
         );
 
         yield return Dialogue(
             "조상님",
-            "참으로 애~매하구나!",
+            "얼마나 고생이 많았느냐.\n" +
+            "난 널 도와주러 온 사람이야.",
             ancestorGod
         );
+
+        yield return Dialogue(
+            "조상님",
+            "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.",
+            ancestorGod
+        );
+
+        yield return Dialogue("조상님", "흠... 어디 보자...", ancestorGod);
+
+        yield return Dialogue("조상님", "참으로 애~매하구나!", ancestorGod);
 
         yield return Dialogue(
             "조상님",
@@ -103,11 +102,7 @@ public class HalfSuccessManager : MonoBehaviour
             ancestorGod
         );
 
-        yield return Dialogue(
-            "조상님",
-            "자, 리스폰 고고!",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "자, 리스폰 고고!", ancestorGod);
     }
 
     IEnumerator Dialogue(string speaker, string text, Sprite portrait)
@@ -170,22 +165,5 @@ public class HalfSuccessManager : MonoBehaviour
 
         // 이 클릭은 다음 대사로 넘어가는 데 사용
         clickRequested = false;
-    }
-
-    IEnumerator ShowScore()
-    {
-        // 스코어보드 표시
-        scoreBoard.SetActive(true);
-        scoreText.text = "공덕 점수: " + gameData.meritPoint;
-
-        // 이전 클릭 제거
-        clickRequested = false;
-
-        // 새로운 클릭을 기다림
-        yield return new WaitUntil(() => clickRequested);
-
-        // 클릭하면 스코어보드 숨김
-        clickRequested = false;
-        scoreBoard.SetActive(false);
     }
 }
