@@ -44,4 +44,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Endings/LotteryRoom.unity
     guid: 31c8e015bbd22de448abb42b34c058ac
+  - enabled: 1
+    path: Assets/Scenes/Endings/Ending_Common.unity
+    guid: d79d2496da5061943aa506d249c79e8e
   m_configObjects: {}
