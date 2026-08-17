@@ -160,29 +160,10 @@ MonoBehaviour:
     dialogueEvent: 0
     isChoice: 0
     maxNoCount: 10
-  - speaker: Narration
-    text: "[\uC2DC\uB098\uB9AC\uC624: \uB85C\uB610\uC640 \uC6B4\uBA85]"
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
-    dialogueEvent: 6
-    isChoice: 0
-    maxNoCount: 10
-  - speaker: Narration
-    text: "(\uCEE4\uD53C\uC20D)"
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
-    dialogueEvent: 0
-    isChoice: 0
-    maxNoCount: 10
-  - speaker: Narration
-    text: "(\uB3C4\uBBFF\uAC78\uC758 \uD14C\uC774\uBE14 \uC55E\uC5D0 \uC5C4\uCCAD\uB09C
-      \uC591\uC758 \uB514\uC800\uD2B8\uC640 \uC74C\uB8CC\uAC00 \uC313\uC5EC\uC788\uB2E4.)"
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
-    dialogueEvent: 0
-    isChoice: 0
-    maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uB059...)"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
-    dialogueEvent: 0
+    dialogueEvent: 6
     isChoice: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
@@ -208,13 +189,6 @@ MonoBehaviour:
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD558\uC9C0\uB9CC \uC798 \uC0DD\uAC01\uD574\uBCF4\uC138\uC694."
-    portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 0
-    isChoice: 0
-    maxNoCount: 10
-  - speaker: "\uB3C4\uBBFF\uAC78"
-    text: "\uC65C \uC138\uC0C1 \uBAA8\uB4E0 \uB3C4\uBBFF\uAC78\uB4E4\uC774 \uADF8
-      '\uBED4\uD55C' \uB85C\uB610 \uC774\uC57C\uAE30\uB97C\uD558\uACA0\uC5B4\uC694?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
     isChoice: 0
@@ -291,12 +265,6 @@ MonoBehaviour:
     text: "\uC790, \uC5B4\uB5BB\uAC8C... \uB85C\uB610 \uB2F9\uCCA8\uC5D0 \uC778\uC0DD\uC744,
       \uC544\uB2C8 \uC774 \uC6B4\uBA85\uC744 \uD55C \uBC88 \uB9E1\uACA8\uBCF4\uC2DC\uACA0\uC5B4\uC694?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 0
-    isChoice: 0
-    maxNoCount: 10
-  - speaker: Narration
-    text: "[\uC2DC\uC2A4\uD15C: \uC6B4\uBA85\uC758 \uC120\uD0DD\uC9C0]"
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
     dialogueEvent: 0
     isChoice: 0
     maxNoCount: 10
@@ -510,7 +478,7 @@ MonoBehaviour:
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "1\uB4F1 \uB2F9\uCCA8\uB420 \uC900\uBE44 \uB418\uC5C8\uC8E0?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 7
+    dialogueEvent: 0
     isChoice: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
