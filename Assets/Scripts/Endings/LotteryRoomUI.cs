@@ -8,9 +8,16 @@ public class LotteryRoomUI : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance == null)
+            return;
+
+        if (GameManager.Instance.gameData == null)
+            return;
+
         bool unlocked = GameManager.Instance.gameData.lotteryRoomUnlocked;
 
-        lotteryRoomButton.SetActive(unlocked);
+        if (lotteryRoomButton != null)
+            lotteryRoomButton.SetActive(unlocked);
 
         foreach (var btn in normalLobbyButtons)
         {
@@ -20,6 +27,9 @@ public class LotteryRoomUI : MonoBehaviour
 
     public void OnClickLotteryRoom()
     {
+        if (GameManager.Instance == null)
+            return;
+
         GameManager.Instance.OnLotteryRoomClicked();
     }
 }

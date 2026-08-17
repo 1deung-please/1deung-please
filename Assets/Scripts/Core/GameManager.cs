@@ -30,17 +30,21 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (gameData.isTimerFrozen) return;
+        if (gameData == null)
+            return;
 
-        if (gameData.globalTimeRemaining > 0)
+        if (gameData.isTimerFrozen)
+            return;
+
+        if (gameData.globalTimeRemaining <= 0)
+            return;
+
+        gameData.globalTimeRemaining -= Time.deltaTime;
+        
+        if (gameData.globalTimeRemaining <= 0)
         {
-            gameData.globalTimeRemaining -= Time.deltaTime;
-
-            if (gameData.globalTimeRemaining <= 0)
-            {
-                gameData.globalTimeRemaining = 0;
-                OnGlobalTimerEnd();
-            }
+            gameData.globalTimeRemaining = 0;
+            OnGlobalTimerEnd();
         }
     }
 
@@ -64,6 +68,7 @@ public class GameManager : MonoBehaviour
     {
         gameData.tutorialDone = true;
         gameData.isTimerFrozen = false;
+     
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
