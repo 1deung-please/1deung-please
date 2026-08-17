@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -100,8 +100,11 @@ public class TutorialManager : MonoBehaviour
 
     public void MoveLobbyAndStartTimer()
     {
+        Debug.Log("MoveLobbyAndStartTimer 실행됨");
+
         if (GameManager.Instance != null)
         {
+            Debug.Log("GameManager 발견 → 타이머 시작");
             GameManager.Instance.OnTutorialComplete();
         }
         else

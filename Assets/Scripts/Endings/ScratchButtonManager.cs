@@ -1,12 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class ScratchButtonManager : MonoBehaviour
 {
     [SerializeField] private Image fadeImage;
     [SerializeField] private EndingManager endingManager;
     [SerializeField] private GameObject scratchButton;
+    [SerializeField] private GameObject scratchPanel;
+
+    private bool scratchStarted = false;
 
     private bool isClicked = false;
 
@@ -73,5 +77,10 @@ public class ScratchButtonManager : MonoBehaviour
         {
             Debug.LogError("EndingManager가 연결되지 않았습니다.");
         }
+    }
+
+    public void StartEndingFade()
+    {
+        StartCoroutine(FadeRoutine());
     }
 }
