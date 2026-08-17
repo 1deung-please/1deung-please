@@ -314,7 +314,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b6afa3b1a0eca324c83e9c0f61cf7804, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 261613ff2bca27c4191204e27364a408, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -420,13 +420,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameData: {fileID: 11400000, guid: 5e04b0731a56a9e4bb6fe24675231b40, type: 2}
   dialogueText: {fileID: 1238074831}
-  scoreText: {fileID: 748061735}
-  scoreBoard: {fileID: 1532405992}
   nameText: {fileID: 1881482599}
   portraitImage: {fileID: 1753886954}
   ancestorGod: {fileID: 21300000, guid: 021a5c4ecef95eb419703edd8400ebdc, type: 3}
-  player: {fileID: 21300000, guid: 9bed1fcc48d17dd44872b17fffb02460, type: 3}
+  player: {fileID: 21300000, guid: 2203a8ed737abd14aa471e46386b79e7, type: 3}
   dobmitgirl: {fileID: 21300000, guid: 9bed1fcc48d17dd44872b17fffb02460, type: 3}
+  backgroundImage: {fileID: 319147017}
+  originalBackground: {fileID: 21300000, guid: 261613ff2bca27c4191204e27364a408, type: 3}
+  endingStory1: {fileID: 21300000, guid: 8bffe8d7ac0f79a44a9ac80339c9d227, type: 3}
+  endingStory2: {fileID: 21300000, guid: fe745a428ac70d443a89f0288fbacd35, type: 3}
+  endingStory3: {fileID: 21300000, guid: cac27a302f3fe754baf1912665f1dacc, type: 3}
 --- !u!4 &669220189
 Transform:
   m_ObjectHideFlags: 0

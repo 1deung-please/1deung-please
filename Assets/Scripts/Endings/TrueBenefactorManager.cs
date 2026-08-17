@@ -10,15 +10,20 @@ public class TrueBenefactorManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private GameObject scoreBoard;
-    [SerializeField] private TextMeshProUGUI nameText; 
+    [SerializeField] private TextMeshProUGUI nameText;
 
     [Header("Portrait")]
     [SerializeField] private Image portraitImage;
     [SerializeField] private Sprite ancestorGod;
     [SerializeField] private Sprite player;
     [SerializeField] private Sprite dobmitgirl;
+
+    [Header("Ending Story Background")]
+    [SerializeField] private Image backgroundImage;
+    [SerializeField] private Sprite originalBackground;
+    [SerializeField] private Sprite endingStory1;
+    [SerializeField] private Sprite endingStory2;
+    [SerializeField] private Sprite endingStory3;
 
     private bool isTyping = false;
     private bool skipTyping = false;
@@ -28,8 +33,6 @@ public class TrueBenefactorManager : MonoBehaviour
 
     private void Start()
     {
-        scoreBoard.SetActive(false);
-
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(false);
@@ -59,9 +62,6 @@ public class TrueBenefactorManager : MonoBehaviour
 
         yield return Dialogue("조상님", "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.", ancestorGod);
 
-        // 스코어보드 등장
-        yield return ShowScore();
-
         yield return Dialogue("조상님", "어이쿠야!!!", ancestorGod);
 
         yield return Dialogue("조상님", "매, 맵다 매워! 점수판에서 불이 나는구나!!!", ancestorGod);
@@ -78,12 +78,16 @@ public class TrueBenefactorManager : MonoBehaviour
 
         yield return Dialogue("조상님", "당연하다마다. 내가 누구냐, 네 조상 아니더냐...", ancestorGod);
 
+        ChangeBackground(endingStory1);
         yield return Dialogue("주인공", "...", player);
 
+        ChangeBackground(endingStory2);
         yield return Dialogue("주인공", "....", player);
 
+        ChangeBackground(endingStory3);
         yield return Dialogue("주인공", "끙...", player);
 
+        ChangeBackground(originalBackground);
         yield return Dialogue("조상님", "어린 나이에 집안에 빨간 딱지가 붙어 펑펑 울 때도,", ancestorGod);
 
         yield return Dialogue("조상님", "돈이 없어 삼각김밥 하나로 하루를 버틸 때도...", ancestorGod);
@@ -184,20 +188,12 @@ public class TrueBenefactorManager : MonoBehaviour
         // 이 클릭은 다음 대사로 넘어가는 데 사용
         clickRequested = false;
     }
-    IEnumerator ShowScore()
+
+    private void ChangeBackground(Sprite background)
     {
-        // 스코어보드 표시
-        scoreBoard.SetActive(true);
-        scoreText.text = "공덕 점수: " + gameData.meritPoint;
-
-        // 이전 클릭 제거
-        clickRequested = false;
-
-        // 새로운 클릭을 기다림
-        yield return new WaitUntil(() => clickRequested);
-
-        // 클릭하면 스코어보드 숨김
-        clickRequested = false;
-        scoreBoard.SetActive(false);
+        if (backgroundImage != null && background != null)
+        {
+            backgroundImage.sprite = background;
+        }
     }
 }

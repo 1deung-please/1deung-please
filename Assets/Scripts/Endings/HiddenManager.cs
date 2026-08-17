@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class ShallowManager : MonoBehaviour
+public class HiddenManager : MonoBehaviour
 {
     [Header("Game Data")]
     [SerializeField] private GameData gameData;
@@ -16,6 +16,8 @@ public class ShallowManager : MonoBehaviour
     [SerializeField] private Image portraitImage;
     [SerializeField] private Sprite ancestorGod;
     [SerializeField] private Sprite player;
+    [SerializeField] private Sprite dobmitgirl;
+    [SerializeField] private Sprite narration;
 
     private bool isTyping = false;
     private bool skipTyping = false;
@@ -44,29 +46,31 @@ public class ShallowManager : MonoBehaviour
 
     IEnumerator EndingStart()
     {
-        yield return Dialogue("조상님", "그래... 처음 보는구나.", ancestorGod);
+        yield return Dialogue("???", "엔딩 4개를 다 보셨군요!", narration);
 
-        yield return Dialogue("조상님", "내가 바로 네 조상이다.", ancestorGod);
+        yield return Dialogue("주인공", "플레이 해주셔서 진심으로 감사합니다!", player);
 
-        yield return Dialogue("조상님", "내가 널 참 오랫동안 지켜보고 있었지... 갓난아기일 때부터 회사에 치이는 지금까지...", ancestorGod);
+        yield return Dialogue("주인공", "플레이어님은 게임에서 뿐만 아니라, 진정한 귀인이세요!", player);
 
-        yield return Dialogue("조상님", "얼마나 고생이 많았느냐. 난 널 도와주러 온 사람이야.", ancestorGod);
+        yield return Dialogue("주인공", "여기, 열심히 플레이 해주신 당신께 주는 선물입니다.", player);
 
-        yield return Dialogue("조상님", "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.", ancestorGod);
+        yield return Dialogue("조상님", "사실 이 게임에서 가장 얻기 어려운 건 1등 당첨이 아니라...", ancestorGod);
 
-        yield return Dialogue("조상님", "흠... 점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래", ancestorGod);
+        yield return Dialogue("조상님", "엔딩 4개를 모두 보는 것이었답니다!", ancestorGod);
 
-        yield return Dialogue("조상님", "뭐얏!!!!", ancestorGod);
+        yield return Dialogue("주인공", "그러니 오늘만큼은 당당하게 말하세요.", player);
 
-        string mostPlayedGame = GetMostPlayedGame();
+        yield return Dialogue("주인공", "나는 운 좋은 사람이다!", player);
 
-        yield return Dialogue("조상님", "네 이녀석! 지금까지 진심으로 공덕을 쌓은 것이 아니라 오로지 돈만 바라보며 공덕을 쌓은 것이구나!!!", ancestorGod);
+        yield return Dialogue("조상님", "언젠가 현실에서도 좋은 일이 찾아오길 바랍니다.", ancestorGod);
 
-        yield return Dialogue("조상님", "가장 공덕 쌓기 쉬운 " + mostPlayedGame + "로 공덕 쌓기만 했어!!!!!!", ancestorGod);
+        yield return Dialogue("도믿걸", "그리고...", dobmitgirl);
 
-        yield return Dialogue("조상님", "너는 선행을 위한 선행을 한 것이 아니라 오로지 돈만 보고 일을 한 것이로구나!", ancestorGod);
+        yield return Dialogue("도믿걸", "다음에 복권을 긁게 된다면,", dobmitgirl);
 
-        yield return Dialogue("조상님", "썩 꺼지거라! 그리고 다시 진심을 다해 공덕을 쌓아오거라!!!", ancestorGod);
+        yield return Dialogue("주인공", "조상님 대신 저희가 응원하고 있을게요!", player);
+
+        yield return Dialogue("전원", " 1등 되게 해주세요!!", narration);
     }
 
     IEnumerator Dialogue(string speaker, string text, Sprite portrait)
@@ -129,34 +133,5 @@ public class ShallowManager : MonoBehaviour
 
         // 이 클릭은 다음 대사로 넘어가는 데 사용
         clickRequested = false;
-    }
-
-    string GetMostPlayedGame()
-    {
-        int max = gameData.playCount[0];
-        int index = 0;
-
-        for (int i = 1; i < gameData.playCount.Length; i++)
-        {
-            if (gameData.playCount[i] > max)
-            {
-                max = gameData.playCount[i];
-                index = i;
-            }
-        }
-
-        switch (index)
-        {
-            case 0:
-                return "<이걸 안 비켜?>";
-
-            case 1:
-                return "<출격! 논리요새>";
-
-            case 2:
-                return "<주워줘, 쓰레기>";
-        }
-
-        return "";
     }
 }

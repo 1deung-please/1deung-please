@@ -184,11 +184,18 @@ public class GameManager : MonoBehaviour
 
     public void DetermineEnding()
     {
+        if (gameData == null)
+        {
+            Debug.LogError("gameData가 null입니다. Test GameData를 연결하세요.");
+            return;
+        }
+
         string endingId;
         string sceneName;
 
         bool allPlayed = gameData.playedGames[0] && gameData.playedGames[1] && gameData.playedGames[2];
 
+        // 기본 엔딩 결정
         if (!allPlayed)
         {
             endingId = "얄팍한속셈";
@@ -215,15 +222,31 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15)
-            && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
+        // 히든 엔딩 조건
+        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15) && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
         {
             endingId = "히든";
             sceneName = "Ending_Hidden";
+
+            Debug.Log("히든 엔딩 조건 달성!");
         }
 
-        AchievementManager.Instance.OnEndingConfirmed(endingId);
+        Debug.Log("선택된 엔딩: " + endingId);
+        Debug.Log("이동할 씬: " + sceneName);
+
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnEndingConfirmed(endingId);
+        }
+
         EndingStorage.Unlock(endingId);
+
+        if (SceneLoader.Instance == null)
+        {
+            Debug.LogError("SceneLoader.Instance가 null입니다!");
+            return;
+        }
+
         SceneLoader.Instance.LoadScene(sceneName);
     }
 

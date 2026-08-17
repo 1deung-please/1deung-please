@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
@@ -12,12 +12,12 @@ public class ScratchButtonManager : MonoBehaviour
 
     private bool scratchStarted = false;
 
+    private bool isClicked = false;
+
     private void Start()
     {
-        scratchButton.SetActive(false);
-
-        if (scratchPanel != null)
-            scratchPanel.SetActive(false);
+        if (scratchButton != null)
+            scratchButton.SetActive(false);
 
         if (fadeImage != null)
             fadeImage.color = new Color(1, 1, 1, 0);
@@ -25,41 +25,57 @@ public class ScratchButtonManager : MonoBehaviour
 
     public void ShowButton()
     {
-        if (scratchStarted)
+        // 이미 클릭했다면 절대 다시 띄우지 않음
+        if (isClicked)
             return;
 
-        scratchButton.SetActive(true);
+        if (scratchButton != null)
+            scratchButton.SetActive(true);
     }
 
     public void OnScratchButtonClick()
     {
-        if (scratchStarted)
+        // 중복 클릭 방지
+        if (isClicked)
             return;
 
-        scratchStarted = true;
+        isClicked = true;
 
-        scratchButton.SetActive(false);
+        if (scratchButton != null)
+            scratchButton.SetActive(false);
 
-        if (scratchPanel != null)
-            scratchPanel.SetActive(true);
+        StartCoroutine(FadeRoutine());
     }
 
-    public void StartEndingFade()
+    private IEnumerator FadeRoutine()
     {
-        StartCoroutine(FadeToEnding());
-    }
+        float duration = 1.0f;
+        float timer = 0f;
 
-    IEnumerator FadeToEnding()
-    {
-        // 흰색으로 점점 밝아짐
-        for (float a = 0; a <= 1; a += Time.deltaTime)
+        while (timer < duration)
         {
-            fadeImage.color = new Color(1, 1, 1, a);
+            timer += Time.deltaTime;
+
+            float alpha = Mathf.Clamp01(timer / duration);
+
+            if (fadeImage != null)
+                fadeImage.color = new Color(1, 1, 1, alpha);
+
             yield return null;
         }
 
-        fadeImage.color = new Color(1, 1, 1, 1);
+        if (fadeImage != null)
+            fadeImage.color = new Color(1, 1, 1, 1);
 
-        SceneLoader.Instance.LoadScene("Ending_Common");
+        Debug.Log("흰색 페이드 완료 → 엔딩 결정");
+
+        if (endingManager != null)
+        {
+            endingManager.DetermineEnding();
+        }
+        else
+        {
+            Debug.LogError("EndingManager가 연결되지 않았습니다.");
+        }
     }
 }
