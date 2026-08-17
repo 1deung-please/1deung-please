@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
@@ -77,5 +77,10 @@ public class ScratchButtonManager : MonoBehaviour
         {
             Debug.LogError("EndingManager가 연결되지 않았습니다.");
         }
+    }
+
+    public void StartEndingFade()
+    {
+        StartCoroutine(FadeRoutine());
     }
 }
