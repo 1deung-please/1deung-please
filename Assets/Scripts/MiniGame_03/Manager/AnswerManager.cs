@@ -113,6 +113,8 @@ public class AnswerManager : MonoBehaviour
     // Attack 버튼
     public void CheckAnswer()
     {
+        Debug.Log("Attack 클릭됨");
+        
         if (isChecking)
             return;
 
