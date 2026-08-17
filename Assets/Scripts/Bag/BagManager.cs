@@ -17,6 +17,19 @@ public class BagManager : MonoBehaviour
     [SerializeField] private Button bagButton;
     [SerializeField] private Button closeButton;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button xButton;
+
+    [Header("가방 효과음")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip openSfx;
+    [SerializeField] private AudioClip closeSfx;
+    [SerializeField] private AudioClip buttonSfx;
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+            audioSource.PlayOneShot(clip);
+    }
 
     private void Start()
     {
@@ -49,10 +62,20 @@ public class BagManager : MonoBehaviour
             if (restartImage != null)
                 restartImage.alphaHitTestMinimumThreshold = 0.1f;
         }
+
+        if (xButton != null)
+        {
+            Image xImage = xButton.GetComponent<Image>();
+
+            if (xImage != null)
+            xImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
     }
 
     public void OpenBag()
     {
+        PlaySfx(openSfx); 
+
         bagPanel.SetActive(true);
         menuPanel.SetActive(true);
         restartConfirmPanel.SetActive(false);
@@ -63,18 +86,24 @@ public class BagManager : MonoBehaviour
 
     public void CloseBag()
     {
+        PlaySfx(closeSfx); 
+
         bagPanel.SetActive(false);
         Time.timeScale = 1f;
     }
 
     public void OpenRestartConfirm()
     {
+        PlaySfx(buttonSfx);
+
         menuPanel.SetActive(false);
         restartConfirmPanel.SetActive(true);
     }
 
     public void CancelRestart()
     {
+        PlaySfx(buttonSfx);
+
         restartConfirmPanel.SetActive(false);
         menuPanel.SetActive(true);
     }
@@ -94,24 +123,32 @@ public class BagManager : MonoBehaviour
 
 public void OpenEndingBook()
 {
+    PlaySfx(buttonSfx);
+
     menuPanel.SetActive(false);
     endingBookPanel.SetActive(true);
 }
 
 public void CloseEndingBook()
 {
+    PlaySfx(buttonSfx);
+
     endingBookPanel.SetActive(false);
     menuPanel.SetActive(true);
 }
 
 public void OpenAchievementBook()
 {
+    PlaySfx(buttonSfx);
+
     menuPanel.SetActive(false);
     achievementBookPanel.SetActive(true);
 }
 
 public void CloseAchievementBook()
 {
+    PlaySfx(buttonSfx);
+    
     achievementBookPanel.SetActive(false);
     menuPanel.SetActive(true);
 }

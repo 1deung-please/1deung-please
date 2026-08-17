@@ -19,7 +19,7 @@ public class Game3Manager : MonoBehaviour
     [Header("시작 화면")]
     public GameObject ReadyPanel;
     public Button readyButton;
-    public Image touchToStartImage;
+    public TMP_Text touchToStart;
 
     private Coroutine blinkCoroutine;
 
@@ -45,20 +45,6 @@ public class Game3Manager : MonoBehaviour
     private List<char> selectedChars = new List<char>();
     private bool gameEnded = false;
     public bool IsGameEnded => gameEnded;
-    
-    IEnumerator BlinkImage()
-{
-    while (true)
-    {
-        float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
-
-        Color c = touchToStartImage.color;
-        c.a = alpha;
-        touchToStartImage.color = c;
-
-        yield return null;
-    }
-}
 
     private void Awake()
     {
@@ -102,8 +88,20 @@ public class Game3Manager : MonoBehaviour
                 returnImage.alphaHitTestMinimumThreshold = 0.1f;
         }
 
-        if (touchToStartImage != null)
-            blinkCoroutine = StartCoroutine(BlinkImage());
+        if (touchToStart != null)
+            blinkCoroutine = StartCoroutine(BlinkText());
+    }
+
+    IEnumerator BlinkText()
+    {
+        while (true)
+        {
+            float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
+            Color c = touchToStart.color;
+            c.a = alpha;
+            touchToStart.color = c;
+            yield return null;
+        }
     }
 
     // 글자 선택
