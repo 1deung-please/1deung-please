@@ -10,13 +10,9 @@ public class DialogueData : ScriptableObject
 public enum DialogueEvent
 {
     None,
-    MoveLobby,
-    StartTimer,
-    FadeOut,
-    Achievement,
     ChangeStreet,
     ChangeCafe,
-    ChangeToTimer
+    ChangeToBackground
 }
 
 [System.Serializable]

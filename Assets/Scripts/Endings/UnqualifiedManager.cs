@@ -8,11 +8,16 @@ public class UnqualifiedManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject TryagainButton;
 
     [Header("Portrait")]
     [SerializeField] private Image portraitImage;
     [SerializeField] private Sprite ancestorGod;
     [SerializeField] private Sprite player;
+
+    [Header("BGM")]
+    [SerializeField] private AudioSource bgmAudioSource;
+    [SerializeField] private AudioClip UnqualifiedBGM;
 
     private bool isTyping = false;
     private bool skipTyping = false;
@@ -25,6 +30,11 @@ public class UnqualifiedManager : MonoBehaviour
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(false);
+        }
+
+        if (TryagainButton != null)
+        {
+            TryagainButton.SetActive(false);
         }
 
         StartCoroutine(EndingStart());
@@ -45,55 +55,29 @@ public class UnqualifiedManager : MonoBehaviour
 
         yield return Dialogue("조상님", "내가 바로 네 조상이다.", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "내가 널 참 오랫동안 지켜보고 있었지...\n" +
-            "갓난아기일 때부터 회사에 치이는 지금까지...",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "내가 널 참 오랫동안 지켜보고 있었지... 갓난아기일 때부터 회사에 치이는 지금까지...", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "얼마나 고생이 많았느냐.\n" +
-            "난 널 도와주러 온 사람이야.",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "얼마나 고생이 많았느냐. 난 널 도와주러 온 사람이야.", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.", ancestorGod);
+
+        PlayUnqualifiedBGM();
 
         yield return Dialogue("조상님", ".....", ancestorGod);
 
         yield return Dialogue("조상님", "...............", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "................................................",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "................................................", ancestorGod);
 
         yield return Dialogue("조상님", "정말 보잘 것 없구나..", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "오랫동안 봐 왔지만, 학생 때부터 지금까지 참 한결같이 성적이 안 좋구나. 꾸준하네...",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "오랫동안 봐 왔지만, 학생 때부터 지금까지 참 한결같이 성적이 안 좋구나. 꾸준하네...", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "플레이를 한 건 맞느냐? 혹, 회사나 학교에서 몰폰 중이라 플레이를 제대로 못 하였던 것이냐?",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "플레이를 한 건 맞느냐? 혹, 회사나 학교에서 몰폰 중이라 플레이를 제대로 못 하였던 것이냐?", ancestorGod);
 
-        yield return Dialogue(
-            "조상님",
-            "흠..... 볼 것도 없구나. 돌아가서 다시 공덕을 쌓고 오거라!",
-            ancestorGod
-        );
+        yield return Dialogue("조상님", "흠..... 볼 것도 없구나. 돌아가서 다시 공덕을 쌓고 오거라!", ancestorGod);
+
+        ShowTryagainButton();
     }
 
     IEnumerator Dialogue(string speaker, string text, Sprite portrait)
@@ -156,5 +140,26 @@ public class UnqualifiedManager : MonoBehaviour
 
         // 이 클릭은 다음 대사로 넘어가는 데 사용
         clickRequested = false;
+    }
+
+    private void PlayUnqualifiedBGM()
+    {
+        if (bgmAudioSource != null && UnqualifiedBGM != null)
+        {
+            bgmAudioSource.clip = UnqualifiedBGM;
+            bgmAudioSource.Play();
+        }
+    }
+
+    private void ShowTryagainButton()
+    {
+        if (TryagainButton != null)
+        {
+            TryagainButton.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Tryagain Button이 연결되지 않았습니다!");
+        }
     }
 }
