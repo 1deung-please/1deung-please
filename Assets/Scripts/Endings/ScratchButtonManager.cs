@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class ScratchButtonManager : MonoBehaviour
 {
     [SerializeField] private Image fadeImage;
+    [SerializeField] private EndingManager endingManager;
     [SerializeField] private GameObject scratchButton;
     [SerializeField] private GameObject scratchPanel;
+
+    private bool scratchStarted = false;
 
     private bool isClicked = false;
 
@@ -40,20 +44,11 @@ public class ScratchButtonManager : MonoBehaviour
         if (scratchButton != null)
             scratchButton.SetActive(false);
 
-        if (scratchPanel != null)
-            scratchPanel.SetActive(true);
-    }
-
-    public void StartEndingFade()
-    {
-        Debug.Log("ScratchButtonManager → StartEndingFade 실행");
-
         StartCoroutine(FadeRoutine());
     }
 
     private IEnumerator FadeRoutine()
     {
-        Debug.Log("FadeRoutine 시작");
         float duration = 1.0f;
         float timer = 0f;
 
@@ -70,20 +65,22 @@ public class ScratchButtonManager : MonoBehaviour
         }
 
         if (fadeImage != null)
-        {
             fadeImage.color = new Color(1, 1, 1, 1);
-            fadeImage.raycastTarget = false;
-        }
 
-        Debug.Log("FadeRoutine 완료");
+        Debug.Log("흰색 페이드 완료 → 엔딩 결정");
 
-        if (SceneLoader.Instance != null)
+        if (endingManager != null)
         {
-            SceneLoader.Instance.LoadScene("Ending_Common");
+            endingManager.DetermineEnding();
         }
         else
         {
-            Debug.LogError("SceneLoader.Instance가 없습니다.");
+            Debug.LogError("EndingManager가 연결되지 않았습니다.");
         }
+    }
+
+    public void StartEndingFade()
+    {
+        StartCoroutine(FadeRoutine());
     }
 }

@@ -157,7 +157,7 @@ public class GameManager : MonoBehaviour
             ResumeTimer();
         }
 
-        SceneLoader.Instance.LoadScene("NightLobby");
+        SceneLoader.Instance.LoadScene("Lobby");
     }
 
     void OnGlobalTimerEnd()
@@ -173,7 +173,7 @@ public class GameManager : MonoBehaviour
         {
             gameData.lotteryRoomUnlocked = true;
             AchievementManager.Instance.OnGlobalTimerEnd();
-            SceneLoader.Instance.LoadScene("NightLobby");
+            SceneLoader.Instance.LoadScene("Lobby");
         }
     }
 

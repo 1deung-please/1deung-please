@@ -229,12 +229,11 @@ public class ScratchTicket : MonoBehaviour
 
             if (scratchButtonManager != null)
             {
-                Debug.Log("ScratchTicket → StartEndingFade 호출");
                 scratchButtonManager.StartEndingFade();
             }
             else
             {
-                Debug.LogError("ScratchTicket의 ScratchButtonManager가 연결되지 않았습니다.");
+                Debug.LogError("EndingManager이 연결되지 않았습니다.");
             }
         }
     }
