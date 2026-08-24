@@ -6,18 +6,22 @@ public class BagManager : MonoBehaviour
     [SerializeField] private GameObject bagPanel;
     [SerializeField] private GameObject restartConfirmPanel;
     [SerializeField] private GameObject recordBookPanel; // 엔딩+업적 통합 도감 패널 
+
     [Header("다시 시작 후 이동할 씬")]
     [SerializeField] private string startSceneName = "Lobby";
+
     [Header("가방 버튼")]
     [SerializeField] private Button bagButton;
     [SerializeField] private Button closeButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button xButton;
+
     [Header("가방 효과음")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip openSfx;
     [SerializeField] private AudioClip closeSfx;
     [SerializeField] private AudioClip buttonSfx;
+
     private void PlaySfx(AudioClip clip)
     {
         if (audioSource != null && clip != null)
