@@ -449,7 +449,7 @@ MonoBehaviour:
   scratchBefore: {fileID: 206739775}
   scratchAfter: {fileID: 420896968}
   endingManager: {fileID: 1139072340}
-  scratchButtonManager: {fileID: 0}
+  scratchButtonManager: {fileID: 593254008}
   brushSize: 0.04
   clearPercent: 0.6
   ticketArea:
@@ -852,7 +852,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &551119539
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1024,7 +1024,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeImage: {fileID: 1269445448}
-  endingManager: {fileID: 1139072340}
   scratchButton: {fileID: 62116293}
   scratchPanel: {fileID: 551119538}
 --- !u!4 &593254009
