@@ -42,7 +42,7 @@ MonoBehaviour:
   - speaker: ???
     text: "\uC800\uAE30\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 0
+    dialogueEvent: 3
     isChoice: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
@@ -163,7 +163,7 @@ MonoBehaviour:
   - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uB059...)"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
-    dialogueEvent: 6
+    dialogueEvent: 2
     isChoice: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
@@ -189,6 +189,13 @@ MonoBehaviour:
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD558\uC9C0\uB9CC \uC798 \uC0DD\uAC01\uD574\uBCF4\uC138\uC694."
+    portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
+    dialogueEvent: 0
+    isChoice: 0
+    maxNoCount: 10
+  - speaker: "\uB3C4\uBBFF\uAC78"
+    text: "\uC65C \uC138\uC0C1 \uBAA8\uB4E0 \uB3C4\uBBFF\uAC78\uB4E4\uC774 \uADF8
+      '\uBED4\uD55C' \uB85C\uB610 \uC774\uC57C\uAE30\uB97C\uD558\uACA0\uC5B4\uC694?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
     isChoice: 0
@@ -378,7 +385,7 @@ MonoBehaviour:
       \uD560\uC9C0 \uB9D0\uC9C0 \uC120\uD0DD\uD558\uB294 \u2018\uC774\uAC78 \uC591\uBCF4
       \uC548\uD574?\u2019"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 5
+    dialogueEvent: 1
     isChoice: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"

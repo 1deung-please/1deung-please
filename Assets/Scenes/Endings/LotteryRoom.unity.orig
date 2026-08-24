@@ -458,6 +458,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 374094780}
   m_CullTransparentMesh: 1
+<<<<<<< HEAD
 --- !u!82 &374094784
 AudioSource:
   m_ObjectHideFlags: 0
@@ -555,6 +556,9 @@ AudioSource:
     m_PostInfinity: 2
     m_RotationOrder: 4
 --- !u!1 &420896966
+=======
+--- !u!1 &523326679
+>>>>>>> origin/feature/detail
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -562,42 +566,70 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+<<<<<<< HEAD
   - component: {fileID: 420896967}
   - component: {fileID: 420896969}
   - component: {fileID: 420896968}
   m_Layer: 5
   m_Name: ScratchAfter
+=======
+  - component: {fileID: 523326680}
+  - component: {fileID: 523326682}
+  - component: {fileID: 523326681}
+  m_Layer: 5
+  m_Name: PrizeImage
+>>>>>>> origin/feature/detail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+<<<<<<< HEAD
 --- !u!224 &420896967
+=======
+--- !u!224 &523326680
+>>>>>>> origin/feature/detail
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
   m_GameObject: {fileID: 420896966}
+=======
+  m_GameObject: {fileID: 523326679}
+>>>>>>> origin/feature/detail
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
+<<<<<<< HEAD
   m_Father: {fileID: 551119539}
+=======
+  m_Father: {fileID: 1406318200}
+>>>>>>> origin/feature/detail
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+<<<<<<< HEAD
 --- !u!114 &420896968
+=======
+--- !u!114 &523326681
+>>>>>>> origin/feature/detail
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
   m_GameObject: {fileID: 420896966}
+=======
+  m_GameObject: {fileID: 523326679}
+>>>>>>> origin/feature/detail
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
@@ -611,19 +643,28 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+<<<<<<< HEAD
   m_Texture: {fileID: 2800000, guid: daf3099694b15d74e8062c298ddba4a2, type: 3}
+=======
+  m_Texture: {fileID: 2800000, guid: 32d79afc6d7917d4687b31853522c5ac, type: 3}
+>>>>>>> origin/feature/detail
   m_UVRect:
     serializedVersion: 2
     x: 0
     y: 0
     width: 1
     height: 1
+<<<<<<< HEAD
 --- !u!222 &420896969
+=======
+--- !u!222 &523326682
+>>>>>>> origin/feature/detail
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
   m_GameObject: {fileID: 420896966}
   m_CullTransparentMesh: 1
 --- !u!1 &478666020
@@ -804,6 +845,10 @@ MonoBehaviour:
     y: 0.34
     width: 0.4
     height: 0.22
+=======
+  m_GameObject: {fileID: 523326679}
+  m_CullTransparentMesh: 1
+>>>>>>> origin/feature/detail
 --- !u!1001 &580629792
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -890,10 +935,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bf49e2e460f00241a3fb0eb4ec23f7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
   fadeImage: {fileID: 1269445448}
   scratchButton: {fileID: 62116293}
   scratchPanel: {fileID: 551119538}
 --- !u!4 &593254009
+=======
+  lotteryPanel: {fileID: 1406318197}
+  scratchArea: {fileID: 1487777643}
+  scratchTexture: {fileID: 2800000, guid: 34c44fab697e62647b8f566650164a7b, type: 3}
+  coinCursor: {fileID: 2800000, guid: 6f741712d107c4e4e8d2329781ccdf62, type: 3}
+  brushSize: 35
+  requiredPercent: 60
+  endingManager: {fileID: 1139072340}
+  fadePanel: {fileID: 1269445449}
+--- !u!4 &608074661
+>>>>>>> origin/feature/detail
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
