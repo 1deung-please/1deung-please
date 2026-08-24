@@ -15,61 +15,92 @@ MonoBehaviour:
   achievements:
   - id: 1
     title: "\uC0AC\uC774\uBE44 \uD1F4\uCE58!"
-    badge: {fileID: 0}
+    description: "[\uD29C\uD1A0\uB9AC\uC5BC\uC5D0\uC11C No \uBC84\uD2BC 10\uD68C
+      \uC774\uC0C1 \uC120\uD0DD]"
+    badge: {fileID: 21300000, guid: 7eaa4f25bd9cb1844b2b55ecf8ce0342, type: 3}
   - id: 2
     title: "\uB208\uCE58\uBCF4\uC5EC\u2026"
-    badge: {fileID: 0}
+    description: "[\uC774\uAC78 \uC548 \uBE44\uCF1C? 5\uD68C \uC774\uC0C1 \uC5F0\uC18D
+      \uC2E4\uD328]"
+    badge: {fileID: 21300000, guid: 16c7c95eb4d6e2f4caa7b91eec3c16f9, type: 3}
   - id: 3
     title: "\uB354\uB7EC\uC6B4 \uAE38\uAC70\uB9AC"
-    badge: {fileID: 0}
+    description: "[\uC8FC\uC6CC\uC918, \uC4F0\uB808\uAE30! 5\uD68C \uC774\uC0C1 \uC5F0\uC18D
+      \uC2E4\uD328]"
+    badge: {fileID: 21300000, guid: 2c38c3a3a2c3881438b403c263d48f8a, type: 3}
   - id: 4
     title: "\uD6C4\uD6C4... \uC778\uC0C1\uC774 \uC88B\uC73C\uC2DC\uB124\uC694"
-    badge: {fileID: 0}
+    description: "[\uCD9C\uACA9! \uB17C\uB9AC\uC694\uC0C8 5\uD68C \uC774\uC0C1 \uC5F0\uC18D
+      \uC2E4\uD328]"
+    badge: {fileID: 21300000, guid: c9fd651e81f28db4cbb5d37538b09d54, type: 3}
   - id: 5
     title: "\uC6B0\uB9AC \uC78A\uC73C\uC2E0\uAC70 \uC544\uB2C8\uC8E0?"
-    badge: {fileID: 0}
+    description: "[\uC81C\uD55C\uC2DC\uAC04 \uB3D9\uC548 \uC544\uBB34 \uBBF8\uB2C8\uAC8C\uC784\uB3C4
+      \uD50C\uB808\uC774\uD558\uC9C0 \uC54A\uC74C]"
+    badge: {fileID: 21300000, guid: 22012783160f5b24d9b22394447ec9c6, type: 3}
   - id: 6
     title: "\uC774 \uB3D9\uB124 \uD658\uACBD\uBBF8\uD654\uC6D0"
-    badge: {fileID: 0}
+    description: "[\uC81C\uD55C \uC2DC\uAC04 \uB3D9\uC548 \uC8FC\uC6CC\uC918, \uC4F0\uB808\uAE30!
+      \uAC8C\uC784\uB9CC \uD50C\uB808\uC774]"
+    badge: {fileID: 21300000, guid: 48956c708b419c34fb394de2c2e1cf3f, type: 3}
   - id: 7
     title: "\uB3C4\uBBFF\uAC78 \uB2F4\uB2F9\uC77C\uC9C4"
-    badge: {fileID: 0}
+    description: "[\uC81C\uD55C \uC2DC\uAC04 \uB3D9\uC548 \uCD9C\uACA9! \uB17C\uB9AC\uC694\uC0C8
+      \uAC8C\uC784\uB9CC \uD50C\uB808\uC774]"
+    badge: {fileID: 21300000, guid: a480286083e2caf4bbd42da326859f45, type: 3}
   - id: 8
     title: "\uC5EC\uAE30 \uC549\uC73C\uC138\uC694!!"
-    badge: {fileID: 0}
+    description: "[\uC81C\uD55C \uC2DC\uAC04 \uB3D9\uC548 \uC774\uAC78 \uC548 \uBE44\uCF1C\uC918?
+      \uAC8C\uC784\uB9CC \uD50C\uB808\uC774]"
+    badge: {fileID: 21300000, guid: 1d0256febafbca344add224e4c9f36c5, type: 3}
   - id: 9
     title: "\uC4F0\uB808\uAE30\uC655"
-    badge: {fileID: 0}
+    description: "[\uC8FC\uC6CC\uC918 \uC4F0\uB808\uAE30 10\uBC88 \uC5F0\uC18D \uC131\uACF5
+      ]"
+    badge: {fileID: 21300000, guid: d86c385b8fb19b649b575aa3d7b872e6, type: 3}
   - id: 10
     title: "\uC591\uC2EC\uC788\uB294 \uCCAD\uB144"
-    badge: {fileID: 0}
+    description: "[\uC774\uAC78 \uC548 \uBE44\uCF1C? 10\uBC88 \uC5F0\uC18D \uC131\uACF5]"
+    badge: {fileID: 21300000, guid: 3e5262db986d6ad4aa2372db5bddc5a4, type: 3}
   - id: 11
     title: "\uC544\uAC00\uB9AC \uD30C\uC774\uD130"
-    badge: {fileID: 0}
+    description: "[\uCD9C\uACA9! \uB17C\uB9AC\uC694\uC0C8 10\uBC88 \uC5F0\uC18D \uC131\uACF5]"
+    badge: {fileID: 21300000, guid: 4f4d0339156a0024ca1550ee3d526510, type: 3}
   - id: 12
     title: "\uB85C\uB610 \uC911\uB3C5\uC790"
-    badge: {fileID: 0}
+    description: "[\uD788\uB4E0 \uC5D4\uB529 \uC81C\uC678\uD55C 4\uAC00\uC9C0 \uC5D4\uB529
+      \uC218\uC9D1 \uC644\uB8CC]"
+    badge: {fileID: 21300000, guid: cd4a3f37823a3d54fb3f4b34588e6b54, type: 3}
   - id: 13
     title: "\uD658\uC0DD\uD558\uAE30"
-    badge: {fileID: 0}
+    description: "[\uCD5C\uCD08 1\uD68C, \uC5B4\uB5A4 \uC5D4\uB529\uC774\uB4E0 \uB2EC\uC131]"
+    badge: {fileID: 21300000, guid: 370bd0566c5eed14aa0a4464316c3dc2, type: 3}
   - id: 14
     title: "\uD3B8\uC2DD\uC7C1\uC774"
-    badge: {fileID: 0}
+    description: "[\uC584\uD30D\uD55C \uC18D\uC148 \uC5D4\uB529 \uB2EC\uC131]"
+    badge: {fileID: 21300000, guid: 2f012e49dbafe1049a92ff77e729c55b, type: 3}
   - id: 15
     title: "\uC5F4\uC2EC\uD788 \uD574\uC8FC\uC138\uC694"
-    badge: {fileID: 0}
+    description: "[\uC790\uACA9 \uBBF8\uB2EC \uC5D4\uB529 \uB2EC\uC131]"
+    badge: {fileID: 21300000, guid: 6dcf1e1d37cf1a349ad66c43971988e7, type: 3}
   - id: 16
     title: "\uC778\uC0DD \uC5ED\uC804? \uC778\uC0DD \uC5EC\uC804!"
-    badge: {fileID: 0}
+    description: "[\uC808\uBC18\uC758 \uC131\uACF5 \uC5D4\uB529 \uB2EC\uC131]"
+    badge: {fileID: 21300000, guid: 391fe64cb8b3ec248a7bf9d32e657dae, type: 3}
   - id: 17
     title: "\uC6F0\uCEF4 \uD22C \uB9AC\uCE58 \uB77C\uC774\uD504!"
-    badge: {fileID: 0}
+    description: "[\uC9C4\uC815\uD55C \uADC0\uC778 \uC5D4\uB529 \uB2EC\uC131]"
+    badge: {fileID: 21300000, guid: 3965803eb4b286e45bf09388b76f20a9, type: 3}
   - id: 18
     title: "1\uB4F1 \uB418\uAC8C \uD574\uC8FC\uC138\uC694!"
-    badge: {fileID: 0}
+    description: "[\uD788\uB4E0 \uC5D4\uB529 \uC218\uC9D1 \uC131\uACF5]"
+    badge: {fileID: 21300000, guid: a0ddc87d58668944495c7c6e51b85eaa, type: 3}
   - id: 19
     title: "\uB9AC\uD50C\uB808\uC774!"
-    badge: {fileID: 0}
+    description: "[3\uBD84 \uC774\uC0C1 \uD50C\uB808\uC774\uD55C \uAC8C\uC784 \uCD08\uAE30\uD654
+      5\uBC88\uD558\uAE30]"
+    badge: {fileID: 21300000, guid: 7c9edc0f6008a054998e79fce6186093, type: 3}
   - id: 20
     title: "\uC5C5\uC801\uC655"
-    badge: {fileID: 0}
+    description: "[1\uBD80\uD130 19\uAE4C\uC9C0\uC758 \uBAA8\uB4E0 \uC5C5\uC801 \uB2EC\uC131]"
+    badge: {fileID: 21300000, guid: 8d9384879d5294941942fcae01209603, type: 3}
