@@ -19,10 +19,6 @@ public class HiddenManager : MonoBehaviour
     [SerializeField] private Sprite dobmitgirl;
     [SerializeField] private Sprite narration;
 
-    [Header("BGM")]
-    [SerializeField] private AudioSource bgmAudioSource;
-    [SerializeField] private AudioClip HiddenBGM;
-
     private bool isTyping = false;
     private bool skipTyping = false;
 
@@ -51,8 +47,6 @@ public class HiddenManager : MonoBehaviour
     IEnumerator EndingStart()
     {
         yield return Dialogue("???", "엔딩 4개를 다 보셨군요!", narration);
-
-        PlayHiddenBGM();
 
         yield return Dialogue("주인공", "플레이 해주셔서 진심으로 감사합니다!", player);
 
@@ -139,14 +133,5 @@ public class HiddenManager : MonoBehaviour
 
         // 이 클릭은 다음 대사로 넘어가는 데 사용
         clickRequested = false;
-    }
-
-    private void PlayHiddenBGM()
-    {
-        if (bgmAudioSource != null && HiddenBGM != null)
-        {
-            bgmAudioSource.clip = HiddenBGM;
-            bgmAudioSource.Play();
-        }
     }
 }

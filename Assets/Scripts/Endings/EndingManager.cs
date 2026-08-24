@@ -13,8 +13,8 @@ public class EndingManager : MonoBehaviour
     [SerializeField] private bool useTestData = false;
     [SerializeField] private GameData testGameData;
 
-    [Header("Scratch Lottery")]
-    [SerializeField] private ScratchLotteryManager scratchLotteryManager;
+    [Header("Scratch Button")]
+    [SerializeField] private ScratchButtonManager scratchButtonManager;
 
     public enum EndingType
     {
@@ -49,7 +49,7 @@ public class EndingManager : MonoBehaviour
     {
         if (dialogueManager != null)
         {
-            dialogueManager.OnDialogueFinished += ShowScratchLottery;
+            dialogueManager.OnDialogueFinished += ShowScratchButton;
         }
     }
 
@@ -158,22 +158,18 @@ public class EndingManager : MonoBehaviour
 
     private bool scratchShown = false;
 
-    private void ShowScratchLottery()
+    private void ShowScratchButton()
     {
         if (scratchShown)
             return;
 
         scratchShown = true;
 
-        Debug.Log("대화 종료 → 복권 등장");
+        Debug.Log("대화 종료 → 스크래치 버튼 등장");
 
-        if (scratchLotteryManager != null)
+        if (scratchButtonManager != null)
         {
-            scratchLotteryManager.ShowLottery();
-        }
-        else
-        {
-            Debug.LogError("ScratchLotteryManager가 연결되지 않았습니다!");
+            scratchButtonManager.ShowButton();
         }
     }
 
@@ -181,7 +177,7 @@ public class EndingManager : MonoBehaviour
     {
         if (dialogueManager != null)
         {
-            dialogueManager.OnDialogueFinished -= ShowScratchLottery;
+            dialogueManager.OnDialogueFinished -= ShowScratchButton;
         }
     }
 }
