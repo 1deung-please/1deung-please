@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Lobby/BuildingClickHandler.cs.meta
+guid: 7c7d4fa5168639d479a775e104277f36
+========
+guid: 3bf49e2e460f00241a3fb0eb4ec23f7c
+>>>>>>>> develop:Assets/Scripts/Endings/ScratchLotteryManager.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
