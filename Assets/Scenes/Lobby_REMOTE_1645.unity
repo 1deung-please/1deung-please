@@ -5729,7 +5729,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 444830302}
+  - {fileID: 490243585}
   m_Father: {fileID: 662661649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5787,7 +5787,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399b0e91f79bad44b84ba581a393040e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timerText: {fileID: 444830303}
+  timerText: {fileID: 0}
   startY: 1000
   moveDuration: 1
   audioSource: {fileID: 1803841289}
@@ -5969,7 +5969,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00024414062, y: -66.880005}
+  m_AnchoredPosition: {x: -0.00024414062, y: -66.87999}
   m_SizeDelta: {x: 72.89, y: 64.16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1841258240
@@ -6246,7 +6246,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -65}
+  m_AnchoredPosition: {x: 0, y: -64.999985}
   m_SizeDelta: {x: -130.17, y: 96.35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1960820639
