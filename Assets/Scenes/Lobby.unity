@@ -407,7 +407,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &117051775
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1956,6 +1956,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: GlobalPopupCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 9126927369642735378, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 306175723}
+    - target: {fileID: 9126927369642735378, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2220,7 +2228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bagPanel: {fileID: 365658588}
   restartConfirmPanel: {fileID: 2094704557}
-  recordBookPanel: {fileID: 0}
+  recordBookPanel: {fileID: 7238149552908614552}
   startSceneName: Lobby
   bagButton: {fileID: 682131616}
   closeButton: {fileID: 1680512255}
@@ -2692,10 +2700,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timerText: {fileID: 0}
-  startY: 1000
-  moveDuration: 1
-  audioSource: {fileID: 1803841289}
-  timerMoveSound: {fileID: 8300000, guid: 61f3f17d0e7b78746a70acc5e9833e35, type: 3}
 --- !u!82 &1803841289
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2999,12 +3003,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7c029f910645f34ca261fe409f1b90f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lotteryRoomButton: {fileID: 0}
-  normalLobbyButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 1233857831}
+  bagIcon: {fileID: 0}
 --- !u!4 &1914180648
 Transform:
   m_ObjectHideFlags: 0
@@ -4307,18 +4306,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5727541147030486382}
   m_CullTransparentMesh: 1
---- !u!114 &2887539971005286594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7238149552908614552}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &2908262276809101328
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5990,8 +5977,7 @@ GameObject:
   - component: {fileID: 5607993116838530592}
   - component: {fileID: 7674831489882996450}
   - component: {fileID: 130698739833306777}
-  - component: {fileID: 2887539971005286594}
-  - component: {fileID: 7789428954797650483}
+  - component: {fileID: 7674831489882996451}
   m_Layer: 5
   m_Name: RecordBookPanel
   m_TagString: Untagged
@@ -6108,7 +6094,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7238149552908614552}
   m_CullTransparentMesh: 1
---- !u!114 &7789428954797650483
+--- !u!114 &7674831489882996451
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6117,9 +6103,73 @@ MonoBehaviour:
   m_GameObject: {fileID: 7238149552908614552}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 838534da305480149b2003f889e6b22b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  achievementList: {fileID: 11400000, guid: 76c30030d87dc3d42afe562c1957fa82, type: 2}
+  endingList: {fileID: 11400000, guid: 1322291a0c23f274eb53f18fc50fc8cf, type: 2}
+  endingSlotImages:
+  - {fileID: 4798971610667244266}
+  - {fileID: 3581265360454358911}
+  - {fileID: 5533561987028238533}
+  - {fileID: 4973732041831333841}
+  - {fileID: 828983194202735082}
+  endingSlotButtons:
+  - {fileID: 9074259409631362022}
+  - {fileID: 6902012678985637408}
+  - {fileID: 8688018826973442692}
+  - {fileID: 4687327744272464226}
+  - {fileID: 5985219795934355554}
+  endingPopupPanel: {fileID: 0}
+  endingPopupBadgeImage: {fileID: 0}
+  endingPopupTitleText: {fileID: 0}
+  endingPopupReplayButton: {fileID: 0}
+  achievementSlotImages:
+  - {fileID: 8489032745394175101}
+  - {fileID: 1655855976616752636}
+  - {fileID: 6515396891996288058}
+  - {fileID: 8133986218813922168}
+  - {fileID: 937940723092770231}
+  - {fileID: 3484258380813584209}
+  - {fileID: 8714381019661085508}
+  - {fileID: 4962984829966304763}
+  - {fileID: 8400010747733803029}
+  - {fileID: 7056338934450157926}
+  - {fileID: 6924458492689034288}
+  - {fileID: 4966315175898318180}
+  - {fileID: 5761525007569193045}
+  - {fileID: 39445546678787634}
+  - {fileID: 1655689008463525007}
+  - {fileID: 362501274880516345}
+  - {fileID: 2755218314497841980}
+  - {fileID: 1787146724674155253}
+  - {fileID: 6841355570781561486}
+  - {fileID: 5462847994754786599}
+  achievementSlotButtons:
+  - {fileID: 5560152361912928435}
+  - {fileID: 3212485376477740003}
+  - {fileID: 9150996940224933579}
+  - {fileID: 1638753664074510926}
+  - {fileID: 3905781555328976487}
+  - {fileID: 2084367333869030618}
+  - {fileID: 1656257231445108009}
+  - {fileID: 1859283341352356884}
+  - {fileID: 4828583479179623964}
+  - {fileID: 2105664585889430102}
+  - {fileID: 1202528215152858389}
+  - {fileID: 5592330435287206095}
+  - {fileID: 8453308416576212647}
+  - {fileID: 418647347315422262}
+  - {fileID: 5904108953316975273}
+  - {fileID: 4358764681764383477}
+  - {fileID: 903959793102263648}
+  - {fileID: 7930418105267681663}
+  - {fileID: 7491012085002910180}
+  - {fileID: 1462648712376249548}
+  achievementPopupPanel: {fileID: 0}
+  popupBadgeImage: {fileID: 0}
+  popupTitleText: {fileID: 0}
+  popupDescriptionText: {fileID: 0}
 --- !u!114 &7930418105267681663
 MonoBehaviour:
   m_ObjectHideFlags: 0
