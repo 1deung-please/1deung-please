@@ -5,9 +5,9 @@ public class BackgroundManager : MonoBehaviour
 {
     public static BackgroundManager Instance;
     [SerializeField] private Image backgroundImage;
+    [SerializeField] private Sprite Background;
     [SerializeField] private Sprite streetBackground;
     [SerializeField] private Sprite cafeBackground;
-    [SerializeField] private Sprite Background_Timer;
 
     private void Awake()
     {
@@ -23,9 +23,9 @@ public class BackgroundManager : MonoBehaviour
     {
         backgroundImage.sprite = cafeBackground;
     }
-    
-    public void ChangeToTimer()
+
+    public void ChangeToBackground()
     {
-        backgroundImage.sprite = Background_Timer;
+        backgroundImage.sprite = Background;
     }
 }

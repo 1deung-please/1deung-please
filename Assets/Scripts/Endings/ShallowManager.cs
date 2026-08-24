@@ -11,11 +11,16 @@ public class ShallowManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject TryagainButton;
 
     [Header("Portrait")]
     [SerializeField] private Image portraitImage;
     [SerializeField] private Sprite ancestorGod;
     [SerializeField] private Sprite player;
+
+    [Header("BGM")]
+    [SerializeField] private AudioSource bgmAudioSource;
+    [SerializeField] private AudioClip ShallowBGM;
 
     private bool isTyping = false;
     private bool skipTyping = false;
@@ -28,6 +33,11 @@ public class ShallowManager : MonoBehaviour
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(false);
+        }
+
+        if (TryagainButton != null)
+        {
+            TryagainButton.SetActive(false);
         }
 
         StartCoroutine(EndingStart());
@@ -56,6 +66,8 @@ public class ShallowManager : MonoBehaviour
 
         yield return Dialogue("조상님", "흠... 점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래", ancestorGod);
 
+        PlayShallowBGM();
+
         yield return Dialogue("조상님", "뭐얏!!!!", ancestorGod);
 
         string mostPlayedGame = GetMostPlayedGame();
@@ -67,6 +79,8 @@ public class ShallowManager : MonoBehaviour
         yield return Dialogue("조상님", "너는 선행을 위한 선행을 한 것이 아니라 오로지 돈만 보고 일을 한 것이로구나!", ancestorGod);
 
         yield return Dialogue("조상님", "썩 꺼지거라! 그리고 다시 진심을 다해 공덕을 쌓아오거라!!!", ancestorGod);
+
+        ShowTryagainButton();
     }
 
     IEnumerator Dialogue(string speaker, string text, Sprite portrait)
@@ -158,5 +172,26 @@ public class ShallowManager : MonoBehaviour
         }
 
         return "";
+    }
+
+    private void PlayShallowBGM()
+    {
+        if (bgmAudioSource != null && ShallowBGM != null)
+        {
+            bgmAudioSource.clip = ShallowBGM;
+            bgmAudioSource.Play();
+        }
+    }
+
+    private void ShowTryagainButton()
+    {
+        if (TryagainButton != null)
+        {
+            TryagainButton.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Tryagain Button이 연결되지 않았습니다!");
+        }
     }
 }

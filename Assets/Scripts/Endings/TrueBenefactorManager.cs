@@ -11,6 +11,7 @@ public class TrueBenefactorManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject TryagainButton;
 
     [Header("Portrait")]
     [SerializeField] private Image portraitImage;
@@ -25,6 +26,14 @@ public class TrueBenefactorManager : MonoBehaviour
     [SerializeField] private Sprite endingStory2;
     [SerializeField] private Sprite endingStory3;
 
+    [Header("BGM")]
+    [SerializeField] private AudioSource bgmAudioSource;
+    [SerializeField] private AudioClip TrueBenefactorBGM;
+
+    [Header("Fade")]
+    [SerializeField] private CanvasGroup fadePanel;
+    [SerializeField] private float fadeDuration = 1f;
+
     private bool isTyping = false;
     private bool skipTyping = false;
 
@@ -36,6 +45,17 @@ public class TrueBenefactorManager : MonoBehaviour
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(false);
+        }
+
+        if (TryagainButton != null)
+        {
+            TryagainButton.SetActive(false);
+        }
+
+        if (fadePanel != null)
+        {
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false;
         }
 
         StartCoroutine(EndingStart());
@@ -56,11 +76,13 @@ public class TrueBenefactorManager : MonoBehaviour
 
         yield return Dialogue("조상님", "내가 바로 네 조상이다.", ancestorGod);
 
-        yield return Dialogue("조상님", "내가 널 참 오랫동안 지켜보고 있었지...\n" + "갓난아기일 때부터 회사에 치이는 지금까지...", ancestorGod);
+        yield return Dialogue("조상님", "내가 널 참 오랫동안 지켜보고 있었지... 갓난아기일 때부터 회사에 치이는 지금까지...", ancestorGod);
 
-        yield return Dialogue("조상님", "얼마나 고생이 많았느냐.\n" + "난 널 도와주러 온 사람이야.", ancestorGod);
+        yield return Dialogue("조상님", "얼마나 고생이 많았느냐. 난 널 도와주러 온 사람이야.", ancestorGod);
 
         yield return Dialogue("조상님", "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.", ancestorGod);
+
+        PlayTrueBenefactor();
 
         yield return Dialogue("조상님", "어이쿠야!!!", ancestorGod);
 
@@ -78,7 +100,7 @@ public class TrueBenefactorManager : MonoBehaviour
 
         yield return Dialogue("조상님", "당연하다마다. 내가 누구냐, 네 조상 아니더냐...", ancestorGod);
 
-        ChangeBackground(endingStory1);
+        yield return ChangeBackgroundWithFade(endingStory1);
         yield return Dialogue("주인공", "...", player);
 
         ChangeBackground(endingStory2);
@@ -125,6 +147,8 @@ public class TrueBenefactorManager : MonoBehaviour
         yield return Dialogue("조상님", "당당하게 워킹해서 가거라!", ancestorGod);
 
         yield return Dialogue("조상님", "넌 다음 생... 아니, 이번 생의 당당한 주인공이니까! 웰컴 투 리치 라이프!!!", ancestorGod);
+
+        ShowTryagainButton();
     }
 
     IEnumerator Dialogue(string speaker, string text, Sprite portrait)
@@ -194,6 +218,64 @@ public class TrueBenefactorManager : MonoBehaviour
         if (backgroundImage != null && background != null)
         {
             backgroundImage.sprite = background;
+        }
+    }
+
+    private void PlayTrueBenefactor()
+    {
+        if (bgmAudioSource != null && TrueBenefactorBGM != null)
+        {
+            bgmAudioSource.clip = TrueBenefactorBGM;
+            bgmAudioSource.Play();
+        }
+    }
+
+    private void ShowTryagainButton()
+    {
+        if (TryagainButton != null)
+        {
+            TryagainButton.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Tryagain Button이 연결되지 않았습니다!");
+        }
+    }
+
+    private IEnumerator ChangeBackgroundWithFade(Sprite newBackground)
+    {
+        if (fadePanel != null)
+        {
+            fadePanel.blocksRaycasts = true;
+        }
+
+        float time = 0f;
+
+        // 검은색으로 1초 동안 페이드
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+
+            if (fadePanel != null)
+            {
+                fadePanel.alpha = Mathf.Lerp(
+                    0f,
+                    1f,
+                    time / fadeDuration
+                );
+            }
+
+            yield return null;
+        }
+
+        // 화면이 완전히 검어졌을 때 배경 변경
+        ChangeBackground(newBackground);
+
+        // 검은 화면을 바로 제거
+        if (fadePanel != null)
+        {
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false;
         }
     }
 }

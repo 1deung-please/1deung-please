@@ -143,7 +143,13 @@ public class DialogueManager : MonoBehaviour
             );
         }
 
-        if (line.speaker == "Narration")
+        if (line.dialogueEvent == DialogueEvent.ChangeToBackground ||
+            line.dialogueEvent == DialogueEvent.ChangeCafe ||
+            line.dialogueEvent == DialogueEvent.ChangeStreet)
+        {
+            nameText.gameObject.SetActive(false);
+        }
+        else if (line.speaker == "Narration")
         {
             nameText.gameObject.SetActive(false);
         }
@@ -153,16 +159,28 @@ public class DialogueManager : MonoBehaviour
             nameText.text = line.speaker;
         }
 
-        if (portraitImage != null)
+        if (line.dialogueEvent == DialogueEvent.ChangeToBackground ||
+            line.dialogueEvent == DialogueEvent.ChangeCafe ||
+            line.dialogueEvent == DialogueEvent.ChangeStreet)
         {
-            if (line.portrait != null)
-            {
-                portraitImage.sprite = line.portrait;
-                portraitImage.gameObject.SetActive(true);
-            }
-            else
+            if (portraitImage != null)
             {
                 portraitImage.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            if (portraitImage != null)
+            {
+                if (line.portrait != null)
+                {
+                    portraitImage.sprite = line.portrait;
+                    portraitImage.gameObject.SetActive(true);
+                }
+                else
+                {
+                    portraitImage.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -173,11 +191,39 @@ public class DialogueManager : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
 
+        if (line.dialogueEvent == DialogueEvent.ChangeToBackground ||
+            line.dialogueEvent == DialogueEvent.ChangeCafe ||
+            line.dialogueEvent == DialogueEvent.ChangeStreet)
+        {
+            dialogueText.text = "";
+
+            StartCoroutine(
+                ShowDialogueAfterSceneChange(line.dialogueEvent)
+            );
+
+            return;
+        }
+
+        if (line.dialogueEvent == DialogueEvent.ChangeToBackground ||
+            line.dialogueEvent == DialogueEvent.ChangeCafe ||
+            line.dialogueEvent == DialogueEvent.ChangeStreet)
+        {
+            dialogueText.text = "";
+
+            StartCoroutine(
+                ShowDialogueAfterSceneChange(line.dialogueEvent)
+            );
+
+            return;
+        }
+
+        // 일반 이벤트
+        ExecuteEvent(line.dialogueEvent);
+
+        // 일반 대사는 바로 타이핑
         typingCoroutine = StartCoroutine(
             TypeText(currentSentence)
         );
-
-        ExecuteEvent(line.dialogueEvent);
 
         if (choicePanel != null)
         {
@@ -206,6 +252,55 @@ public class DialogueManager : MonoBehaviour
         }
 
         isTyping = false;
+    }
+
+    private IEnumerator ShowDialogueAfterSceneChange(DialogueEvent dialogueEvent)
+    {
+        if (TutorialManager.Instance != null)
+        {
+            if (dialogueEvent == DialogueEvent.ChangeToBackground)
+            {
+                yield return TutorialManager.Instance.ChangeBackgroundWithFade();
+            }
+            else if (dialogueEvent == DialogueEvent.ChangeCafe)
+            {
+                yield return TutorialManager.Instance.ChangeCafeWithFade();
+            }
+            else if (dialogueEvent == DialogueEvent.ChangeStreet)
+            {
+                yield return TutorialManager.Instance.ChangeStreetWithFade();
+            }
+        }
+
+        // 페이드가 끝난 후 사진 표시
+        if (portraitImage != null)
+        {
+            if (currentLine.portrait != null)
+            {
+                portraitImage.sprite = currentLine.portrait;
+                portraitImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                portraitImage.gameObject.SetActive(false);
+            }
+        }
+
+        // 페이드가 끝난 후 이름 창 표시
+        if (currentLine.speaker == "Narration")
+        {
+            nameText.gameObject.SetActive(false);
+        }
+        else
+        {
+            nameText.text = currentLine.speaker;
+            nameText.gameObject.SetActive(true);
+        }
+
+        // 마지막으로 대사 출력
+        typingCoroutine = StartCoroutine(
+            TypeText(currentSentence)
+        );
     }
 
     private void NextDialogue()
@@ -238,23 +333,6 @@ public class DialogueManager : MonoBehaviour
             case DialogueEvent.None:
                 break;
 
-            case DialogueEvent.MoveLobby:
-                TutorialManager.Instance.MoveLobbyAndStartTimer();
-                break;
-
-            case DialogueEvent.StartTimer:
-                break;
-
-            case DialogueEvent.FadeOut:
-                TutorialManager.Instance.FadeOut();
-                break;
-
-            case DialogueEvent.Achievement:
-                TutorialManager.Instance.UnlockAchievement(
-                    "사이비 퇴치!"
-                );
-                break;
-
             case DialogueEvent.ChangeStreet:
                 BackgroundManager.Instance.ChangeToStreet();
                 break;
@@ -263,8 +341,8 @@ public class DialogueManager : MonoBehaviour
                 BackgroundManager.Instance.ChangeToCafe();
                 break;
 
-            case DialogueEvent.ChangeToTimer:
-                BackgroundManager.Instance.ChangeToTimer();
+            case DialogueEvent.ChangeToBackground:
+                BackgroundManager.Instance.ChangeToBackground();
                 break;
         }
     }
