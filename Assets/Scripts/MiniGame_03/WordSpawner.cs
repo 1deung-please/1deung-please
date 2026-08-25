@@ -12,13 +12,13 @@ public class WordSpawner : MonoBehaviour
         Instance = this;
     }
 
+    //글자들을 7개 버튼에 배치
     public void SpawnWords(string shuffledWord)
     {
         for (int i = 0; i < wordButtons.Length; i++)
         {
             if (wordButtons[i] == null)
             {
-                Debug.LogError($"WordButton {i + 1}이 연결되지 않았습니다.");
                 continue;
             }
 
@@ -35,6 +35,7 @@ public class WordSpawner : MonoBehaviour
         }
     }
 
+    //취소 버튼 눌렀을 때 복구 과정
     public void RestoreAll()
     {
         foreach (WordButton button in wordButtons)
