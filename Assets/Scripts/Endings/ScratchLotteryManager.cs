@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -304,13 +304,6 @@ public class ScratchLotteryManager : MonoBehaviour
         // 동전 커서 원래대로
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 
-        if (endingManager != null)
-        {
-            endingManager.DetermineEnding();
-        }
-        else
-        {
-            Debug.LogError("EndingManager가 연결되지 않았습니다!");
-        }
+        SceneLoader.Instance.LoadScene("Ending_Common");
     }
 }

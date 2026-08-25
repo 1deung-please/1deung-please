@@ -1249,12 +1249,6 @@ MonoBehaviour:
   titleText: {fileID: 1203564928}
   meritPointText: {fileID: 1079180663}
   pointText: {fileID: 1137644297}
-  signboard: {fileID: 1733804116}
-  moveDuration: 3
-  startOffsetY: 1000
-  numberDelay: 0.3
-  audioSource: {fileID: 0}
-  numberSound: {fileID: 0}
 --- !u!4 &1868830112
 Transform:
   m_ObjectHideFlags: 0

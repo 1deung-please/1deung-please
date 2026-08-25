@@ -32,4 +32,12 @@ public class CommonEndingManager : MonoBehaviour
             "출격! 논리요새 " + gameData.miniGame3Score + " PT\n" +
             "주워줘, 쓰레기! " + gameData.miniGame1Score + " PT";
     }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            GameManager.Instance.DetermineEnding();
+        }
+    }
 }

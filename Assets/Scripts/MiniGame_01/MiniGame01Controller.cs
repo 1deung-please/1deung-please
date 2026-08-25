@@ -27,7 +27,8 @@ public class MiniGame01Controller : MonoBehaviour
     public TMP_Text countdownText;     // 3,2,1
     public TMP_Text timerText;         // TIME 08:39 (mm:ss)
     public TMP_Text collectCountText;  // "주운 쓰레기 189개"
-    public TMP_Text resultReasonText;  // 성공/실패
+    public GameObject successImage;   // SUCCESS! 이미지 오브젝트
+    public GameObject failImage;       // FAIL 이미지 오브젝트
     public TMP_Text resultRecordText;  // 목표/수집/공덕
     public TMP_Text meritText;         // 공덕
     public Button retryButton; // 다시하기 버튼
@@ -42,9 +43,19 @@ public class MiniGame01Controller : MonoBehaviour
     public Sprite[] trashSprites;           // 쓰레기 1~5 스프라이트 5개 등록
     public RectTransform trashPopupParent;  // 팝업이 생길 부모 RectTransform (Play HUD가 속한 Canvas 하위 권장)
     public Vector2 trashPopupSize = new Vector2(80f, 80f);
-    public float trashPopupDuration = 0.2f; // 튀어나오는 모션 지속시간
+    public float trashPopupDuration = 2f; // TODO: 위치 확인 테스트용으로 임시로 늘림, 확인 끝나면 0.2f로 되돌릴 것
     public float trashPopupOvershootScale = 1.2f; // 튀어나올 때 살짝 커졌다가 원래 크기로 정착
     public int trashPopupSortingOrder = 10; // 다른 UI(박스 등)보다 항상 위에 그려지도록
+
+    [Header("오디오")]
+    public AudioSource bgmSource;         // 미니게임 BGM
+    public AudioSource sfxSource;         // 효과음 공용 소스
+    public AudioClip buttonSfx;           // 버튼 탭 효과음
+    public AudioClip trashSfx;            // 쓰레기 연타 효과음
+
+    [Header("Fade")]
+    public CanvasGroup fadePanel;         // 검은 FadePanel (CanvasGroup 붙인 것)
+    public float fadeDuration = 0.25f;
 
     private MiniGame01Phase currentPhase;
     private int targetCount;
@@ -59,6 +70,10 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (touchToStartText != null)
             blinkCoroutine = StartCoroutine(BlinkText());
+
+        // 씬 진입 페이드인 + BGM 시작
+        StartCoroutine(FadeIn());
+        if (bgmSource != null) bgmSource.Play();
     }
 
     void Update()
@@ -79,6 +94,43 @@ public class MiniGame01Controller : MonoBehaviour
                 UpdatePlaying();
                 break;
         }
+    }
+
+    void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null)
+            sfxSource.PlayOneShot(clip);
+    }
+
+    IEnumerator FadeIn()
+    {
+        if (fadePanel == null) yield break;
+        fadePanel.alpha = 1f;
+        fadePanel.blocksRaycasts = true;
+        float t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            fadePanel.alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
+            yield return null;
+        }
+        fadePanel.alpha = 0f;
+        fadePanel.blocksRaycasts = false;
+    }
+
+    IEnumerator FadeOut()
+    {
+        if (fadePanel == null) yield break;
+        fadePanel.alpha = 0f;
+        fadePanel.blocksRaycasts = true;
+        float t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            fadePanel.alpha = Mathf.Lerp(0f, 1f, t / fadeDuration);
+            yield return null;
+        }
+        fadePanel.alpha = 1f;
     }
 
     IEnumerator BlinkText()
@@ -164,6 +216,7 @@ public class MiniGame01Controller : MonoBehaviour
             currentCount++;
             UpdateCollectUI();
             SpawnTrashPopup(Input.mousePosition);
+            PlaySfx(trashSfx);
         }
 
         if (remainingTime <= 0)
@@ -209,6 +262,11 @@ public class MiniGame01Controller : MonoBehaviour
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             trashPopupParent, screenPosition, GetCanvasCamera(trashPopupParent), out Vector2 localPoint);
         rt.anchoredPosition = localPoint;
+
+        // TODO: 위치 어긋남 원인 확인되면 이 로그는 지워도 됨
+        Debug.Log($"[TrashPopup] screenPos={screenPosition}, Screen={Screen.width}x{Screen.height}, " +
+                  $"localPoint={localPoint}, camera={GetCanvasCamera(trashPopupParent)}, " +
+                  $"camViewportRect={(Camera.main != null ? Camera.main.rect.ToString() : "N/A")}");
 
         Image img = popup.GetComponent<Image>();
         img.sprite = trashSprites[Random.Range(0, trashSprites.Length)];
@@ -282,16 +340,16 @@ public class MiniGame01Controller : MonoBehaviour
 
         ShowPanel(resultPanel);
 
-        if (resultReasonText != null)
-            resultReasonText.text = isSuccess ? "SUCCESS" : "FAIL";
+        if (successImage != null) successImage.SetActive(isSuccess);
+        if (failImage != null) failImage.SetActive(!isSuccess);
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"조상신이 주우라고 한 쓰레기 수: {targetCount}개\n" +
-                $"주인공이 주운 쓰레기 수: {currentCount}개";
+                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
+                $"주운 쓰레기 개수:  <size=130%><color=#FFC756>{currentCount}</color></size> 개";
 
         if (meritText != null)
-            meritText.text = $"획득 공덕: {merit}P";
+            meritText.text = $"얻은 공덕 포인트:  <color=#FF69F3>{merit}</color> <size=50>P</size>";
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
 

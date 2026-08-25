@@ -697,10 +697,10 @@ MonoBehaviour:
   normalPosY: -122
   narrationPosY: -110
   fadePanel: {fileID: 2093140845}
-  backgroundAudioSource: {fileID: 1325166213}
-  backgroundBGM: {fileID: 8300000, guid: 2f53b2c934302a54795033e04171c85a, type: 3}
-  cafeBGM: {fileID: 8300000, guid: 1275790ecbf9b5d4eb6d4052406d096d, type: 3}
   skipButton: {fileID: 705505409}
+  bgmSource: {fileID: 1325166213}
+  bgmFadeInDuration: 4
+  bgmFadeOutDuration: 1
 --- !u!4 &892654159
 Transform:
   m_ObjectHideFlags: 0
@@ -1265,9 +1265,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundImage: {fileID: 1516142688}
-  Background: {fileID: 21300000, guid: 263a8c5d0fd305a4fab83d5c70695927, type: 3}
   streetBackground: {fileID: 21300000, guid: 8415f9eb0e3d8864b9c41de061639715, type: 3}
   cafeBackground: {fileID: 21300000, guid: 25a0258ca0d86b74aaef32dcc99c0d50, type: 3}
+  Background_Timer: {fileID: 21300000, guid: 44d4fbb1d04382448b57bf41ef052660, type: 3}
+  tutorialBackground: {fileID: 21300000, guid: 263a8c5d0fd305a4fab83d5c70695927, type: 3}
 --- !u!4 &1430243048
 Transform:
   m_ObjectHideFlags: 0
@@ -1662,6 +1663,8 @@ MonoBehaviour:
   typingSpeed: 0.05
   choicePanel: {fileID: 583529131}
   choiceManager: {fileID: 2137035995}
+  streetBGM: {fileID: 8300000, guid: 2f53b2c934302a54795033e04171c85a, type: 3}
+  cafeBGM: {fileID: 8300000, guid: 1275790ecbf9b5d4eb6d4052406d096d, type: 3}
 --- !u!4 &1535832441
 Transform:
   m_ObjectHideFlags: 0

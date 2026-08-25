@@ -25,7 +25,7 @@ public class RecordBookPanel : MonoBehaviour
 
     [Header("업적 팝업")]
     public GameObject achievementPopupPanel;
-    public Image popupBadgeImage;
+    public Image popupBackgroundImage; // 업적마다 다른 팝업 배경 이미지
     public TMP_Text popupTitleText;
     public TMP_Text popupDescriptionText;
 
@@ -130,7 +130,7 @@ public class RecordBookPanel : MonoBehaviour
     {
         if (achievementPopupPanel == null) return;
 
-        if (popupBadgeImage != null) popupBadgeImage.sprite = info.badge;
+        if (popupBackgroundImage != null) popupBackgroundImage.sprite = info.popupImage;
         if (popupTitleText != null) popupTitleText.text = info.title;
         if (popupDescriptionText != null) popupDescriptionText.text = info.description;
 

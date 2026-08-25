@@ -313,18 +313,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57e2a99e80376674ab4e01776873da14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scratchBefore: {fileID: 206739775}
-  scratchAfter: {fileID: 420896968}
-  endingManager: {fileID: 1139072340}
-  scratchButtonManager: {fileID: 593254008}
-  brushSize: 0.04
-  clearPercent: 0.6
-  ticketArea:
-    serializedVersion: 2
-    x: 0.3
-    y: 0.34
-    width: 0.4
-    height: 0.22
 --- !u!1001 &286266186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -712,7 +700,6 @@ GameObject:
   - component: {fileID: 551119539}
   - component: {fileID: 551119541}
   - component: {fileID: 551119540}
-  - component: {fileID: 551119542}
   m_Layer: 5
   m_Name: ScratchPanel
   m_TagString: Untagged
@@ -780,30 +767,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 551119538}
   m_CullTransparentMesh: 1
---- !u!114 &551119542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551119538}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57e2a99e80376674ab4e01776873da14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scratchBefore: {fileID: 206739775}
-  scratchAfter: {fileID: 420896968}
-  endingManager: {fileID: 1139072340}
-  scratchButtonManager: {fileID: 593254008}
-  brushSize: 0.04
-  clearPercent: 0.6
-  ticketArea:
-    serializedVersion: 2
-    x: 0.3
-    y: 0.34
-    width: 0.4
-    height: 0.22
 --- !u!1001 &580629792
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -861,6 +824,21 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1317db89209d15849979a96baaaa2ed6, type: 3}
+--- !u!4 &593254009
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 608074659}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 225.69725, y: 287.1158, z: -0.18643795}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &608074659
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,7 +847,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 608074661}
+  - component: {fileID: 593254009}
   - component: {fileID: 608074660}
   m_Layer: 0
   m_Name: ScratchLotteryManager
@@ -887,27 +865,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 608074659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bf49e2e460f00241a3fb0eb4ec23f7c, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ae82b681dd8bf04ca1af05985e1c84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeImage: {fileID: 1269445448}
-  scratchButton: {fileID: 62116293}
-  scratchPanel: {fileID: 551119538}
---- !u!4 &593254009
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 608074659}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 225.69725, y: 287.1158, z: -0.18643795}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  lotteryPanel: {fileID: 1406318197}
+  scratchArea: {fileID: 1487777643}
+  scratchTexture: {fileID: 2800000, guid: 34c44fab697e62647b8f566650164a7b, type: 3}
+  coinCursor: {fileID: 2800000, guid: 6f741712d107c4e4e8d2329781ccdf62, type: 3}
+  brushSize: 40
+  requiredPercent: 60
+  endingManager: {fileID: 1139072340}
+  fadePanel: {fileID: 1269445449}
 --- !u!1 &844672120
 GameObject:
   m_ObjectHideFlags: 0
@@ -1090,6 +1058,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1096950478}
   - component: {fileID: 1096950477}
+  - component: {fileID: 1096950479}
   m_Layer: 0
   m_Name: DialogueManager
   m_TagString: Untagged
@@ -1116,6 +1085,8 @@ MonoBehaviour:
   typingSpeed: 0.05
   choicePanel: {fileID: 0}
   choiceManager: {fileID: 0}
+  streetBGM: {fileID: 0}
+  cafeBGM: {fileID: 0}
 --- !u!4 &1096950478
 Transform:
   m_ObjectHideFlags: 0
@@ -1131,6 +1102,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1096950479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096950476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d65045d7e67d8d24b8070d699e6242e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogueManager: {fileID: 1096950477}
+  scratchLotteryManager: {fileID: 608074660}
 --- !u!1 &1139072339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1164,7 +1149,7 @@ MonoBehaviour:
   endingDialogue: {fileID: 11400000, guid: 6f15209ebac813b42be3383887705989, type: 2}
   useTestData: 1
   testGameData: {fileID: 11400000, guid: 5e04b0731a56a9e4bb6fe24675231b40, type: 2}
-  scratchLotteryManager: {fileID: 608074660}
+  scratchButtonManager: {fileID: 0}
 --- !u!4 &1139072341
 Transform:
   m_ObjectHideFlags: 0
@@ -1336,7 +1321,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 523326680}
   - {fileID: 1487777641}
   m_Father: {fileID: 153285765}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1881,4 +1865,4 @@ SceneRoots:
   - {fileID: 1139072341}
   - {fileID: 1096950478}
   - {fileID: 1566652919}
-  - {fileID: 608074661}
+  - {fileID: 593254009}
