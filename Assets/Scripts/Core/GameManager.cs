@@ -126,6 +126,7 @@ public class GameManager : MonoBehaviour
 
     public void CompleteMiniGame3(bool isSuccess)
     {
+        gameData.miniGame3Score = isSuccess ? 700 : 0;
         if (isSuccess) addMeritPoint(700);
     }
 
@@ -150,6 +151,9 @@ public class GameManager : MonoBehaviour
             pendingEndingTransition = false;
             gameData.lotteryRoomUnlocked = true;
             AchievementManager.Instance.OnGlobalTimerEnd();
+
+            SceneLoader.Instance.LoadScene("NightLobby");
+            return;
         }
 
         if (!gameData.isTimeOver)
@@ -157,7 +161,7 @@ public class GameManager : MonoBehaviour
             ResumeTimer();
         }
 
-        SceneLoader.Instance.LoadScene("NightLobby");
+        SceneLoader.Instance.LoadScene("Lobby");
     }
 
     void OnGlobalTimerEnd()
