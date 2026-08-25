@@ -4,19 +4,18 @@ using UnityEngine;
 public class TimerManager : MonoBehaviour
 {
     public TMP_Text timerText;
-
     private float time = 60f;
     private bool timerEnded = false;
 
     void Start()
-{
-    if (GameManager.Instance != null)
     {
-        GameManager.Instance.RecordMiniGamePlay(3);
-    }
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RecordMiniGamePlay(3);
+        }
 
-    timerText.text = time.ToString("F1");
-}
+        timerText.text = time.ToString("F1");   //소수점 첫째 자리까지 표시
+    }
 
     void Update()
     {
@@ -30,11 +29,10 @@ public class TimerManager : MonoBehaviour
 
         timerText.text = time.ToString("F1");
 
+        //시간이 끝나면
         if (time <= 0)
         {
             timerEnded = true;
-
-            Debug.Log("시간 종료");
 
             if (Game3Manager.Instance != null)
                 Game3Manager.Instance.GameFail();
