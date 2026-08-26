@@ -47,4 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Endings/Ending_Common.unity
     guid: d79d2496da5061943aa506d249c79e8e
+  - enabled: 1
+    path: Assets/Scenes/NightLobby.unity
+    guid: 796477033b4d6554f97094c9c9bcd759
   m_configObjects: {}

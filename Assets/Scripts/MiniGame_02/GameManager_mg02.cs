@@ -143,7 +143,24 @@ public class GameManager_mg02 : MonoBehaviour
 
         currentGameTime -= Time.deltaTime;
 
-        float decreaseSpeed = 10f;
+        float decreaseSpeed;
+
+        if (currentGameTime > 15f)
+        {
+            decreaseSpeed = 10f;
+        }
+        else if (currentGameTime > 10f)
+        {
+            decreaseSpeed = 15f;
+        }
+        else if (currentGameTime > 5f)
+        {
+            decreaseSpeed = 20f;
+        }
+        else
+        {
+            decreaseSpeed = 25f;
+        }
 
         if (currentGameTime <= 14f && currentGameTime > 10f)
         {
@@ -159,6 +176,20 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
+
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth / maxHealth;
+        }
+
+        timerText.text = Mathf.Ceil(currentGameTime) + "s";
+
+        if (decreaseText != null)
+        {
+            decreaseText.text = $"-{decreaseSpeed:F0}/s";
+        }
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
