@@ -6,15 +6,11 @@ public class ProblemManager : MonoBehaviour
 {
     public static ProblemManager Instance;
 
-    public GameObject DomitgirlText;
-    public TMP_Text dialogText;
-
-    public List<Problem> problems = new List<Problem>();
-    public Problem currentProblem;
-
-    // 아직 이번 회차에서 나오지 않은 문제 번호
-    private List<int> remainingProblemIndexes = new List<int>();
-
+    public GameObject DomitgirlText;                                //도믿걸 말풍선
+    public TMP_Text dialogText;                                     //도믿걸 텍스트
+    public List<Problem> problems = new List<Problem>();            //문제 저장 리스트
+    public Problem currentProblem;                                  //현재 출제된 문제
+    private List<int> remainingProblemIndexes = new List<int>();    //이번 회차에서 나오지 문제 번호
 
     private void Awake()
     {
@@ -29,6 +25,7 @@ public class ProblemManager : MonoBehaviour
         //NextProblem();
     }
 
+    //문제 리스트
     private void CreateProblems()
     {
         problems.Clear();
@@ -47,19 +44,19 @@ public class ProblemManager : MonoBehaviour
 
         problems.Add(new Problem()
         {
-            dialogue = "인상이 정말 좋네요.",
+            dialogue = "인상이 정말 좋네요",
             answer = "성형했습니다"
         });
 
         problems.Add(new Problem()
         {
-            dialogue = "잠깐 이야기만…",
+            dialogue = "잠깐 이야기만...",
             answer = "다음에할게요"
         });
 
         problems.Add(new Problem()
         {
-            dialogue = "좋은 기회입니다.",
+            dialogue = "좋은 기회입니다",
             answer = "아돈노코리안"
         });
 
@@ -83,13 +80,13 @@ public class ProblemManager : MonoBehaviour
 
         problems.Add(new Problem()
         {
-            dialogue = "오늘 운세가…",
+            dialogue = "오늘 운세가...",
             answer = "오하아사봤어요"
         });
 
         problems.Add(new Problem()
         {
-            dialogue = "진리를 찾고…",
+            dialogue = "진리를 찾고...",
             answer = "관심없어요"
         });
 
@@ -131,11 +128,12 @@ public class ProblemManager : MonoBehaviour
 
         problems.Add(new Problem()
         {
-            dialogue = "무료로 상담해 드리고 있어요.",
+            dialogue = "무료로 상담해 드리고 있어요",
             answer = "가봐야해요"
         });
     }
 
+    //사용 가능한 문제 번호 초기화
     private void ResetProblemIndexes()
     {
         remainingProblemIndexes.Clear();
@@ -146,35 +144,37 @@ public class ProblemManager : MonoBehaviour
         }
     }
 
+    //다음 문제 출제
     public void NextProblem()
     {
-        // 모든 문제를 한 번씩 사용했으면 다시 전체 문제 사용 가능
+        //모든 문제를 한 번씩 사용했으면 다시 전체 문제 사용 가능
         if (remainingProblemIndexes.Count == 0)
         {
             ResetProblemIndexes();
         }
 
-        // 아직 나오지 않은 문제 중 하나를 랜덤 선택
+        //아직 나오지 않은 문제 중 하나를 랜덤 선택
         int randomPosition = Random.Range(0, remainingProblemIndexes.Count);
         int problemIndex = remainingProblemIndexes[randomPosition];
 
         currentProblem = problems[problemIndex];
 
-        // 이번 회차에서는 다시 나오지 않도록 제거
+        //이번 회차에서는 다시 나오지 않도록 제거
         remainingProblemIndexes.RemoveAt(randomPosition);
 
-        // 대사 표시
         dialogText.text = currentProblem.dialogue;
 
-        // 정답 공백 제거
+        //정답 공백 제거
         string answerWithoutSpaces = currentProblem.answer.Replace(" ", "");
 
         // 정답 글자 순서를 매번 랜덤으로 섞기
         string shuffledAnswer = ShuffleText(answerWithoutSpaces);
 
+        //WordSpanwer에게 전달
         WordSpawner.Instance.SpawnWords(shuffledAnswer);
     }
 
+    //정답 글자 순서 섞기
     private string ShuffleText(string text)
     {
         List<char> characters = new List<char>(text);
@@ -190,7 +190,7 @@ public class ProblemManager : MonoBehaviour
 
         string shuffled = new string(characters.ToArray());
 
-        // 섞었는데 정답과 완전히 같으면 다시 섞기
+        //섞었는데 정답과 완전히 같으면 다시 섞기
         if (shuffled == text && text.Length > 1)
         {
             return ShuffleText(text);
