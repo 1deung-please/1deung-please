@@ -19,19 +19,30 @@ public enum DialogueEvent
     ChangeToTimer
 }
 
+//애니메이션 종류를 고르는 목록
+public enum DialogueAnimEvent
+{
+    None,      
+    PlayerAnim,
+    DobmitgirlAnim,
+    Dobmitgir_angry_dialAnim
+}
+
 [System.Serializable]
 public class DialogueLine
 {
     public string speaker;
 
     [TextArea(3, 5)]
+    
     public string text;
-
     public Sprite portrait;
-
     public DialogueEvent dialogueEvent;
+    public DialogueAnimEvent animEvent; 
 
     public bool isChoice;
 
+    [Header("Position Settings")]
+    public bool isNormalDialogue;
     public int maxNoCount = 10;
 }
