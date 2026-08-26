@@ -10,6 +10,8 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private Button yesButton;
     [SerializeField] private Button noButton;
     [SerializeField] private Sprite domitGirlPortrait;
+    [SerializeField] private Sprite playerPortrait;
+
 
     [Header("Optional")]
     [SerializeField] private TextMeshProUGUI noButtonText;
@@ -17,7 +19,7 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private DialogueManager dialogueManager;
 
     [SerializeField] private RectTransform dialoguePanel;
-    [SerializeField] private float dialogueY = -122f;
+    [SerializeField] private float dialogueX = -39;
 
     private int noCount = 0;
 
@@ -51,7 +53,29 @@ public class ChoiceManager : MonoBehaviour
 
         noCount = 0;
 
-        dialogueManager.OnChoiceResult(true);
+        dialogueManager.StartBranchDialogue(
+            new string[]
+            {
+                "(그래요, 한 번 믿어봅시다.)",
+                "(환하게 웃으며) 탁월한 선택입니다! 역시 귀인님은 그릇부터가 다르시네!",
+                "자, 그럼 지금부터 조상님과 '동기화'되는 법을 알려드릴게요.",
+                "우선 기초적인 덕부터 쌓아볼까요?"
+            },
+            new string[]
+            {
+                "주인공",
+                "도믿걸",
+                "도믿걸",
+                "도믿걸"
+            },
+            new Sprite[]
+            {
+                playerPortrait,
+                domitGirlPortrait,
+                domitGirlPortrait,
+                domitGirlPortrait
+            }
+        );
     }
 
     private void OnNoClicked()
@@ -64,9 +88,10 @@ public class ChoiceManager : MonoBehaviour
 
             TutorialManager.Instance.FadeOut();
 
+            dialogueManager.OnChoiceResult(false, noCount);
+
             return;
         }
-
         string begging = "";
 
         for (int i = 0; i < noCount; i++)
@@ -77,7 +102,7 @@ public class ChoiceManager : MonoBehaviour
         dialogueManager.RepeatCurrentDialogue("도믿걸", domitGirlPortrait, begging + "운명 한 번 맡겨보시겠어요?");
 
         Vector2 pos = dialoguePanel.anchoredPosition;
-        pos.y = dialogueY;
+        pos.x = dialogueX;
         dialoguePanel.anchoredPosition = pos;
     }
 
