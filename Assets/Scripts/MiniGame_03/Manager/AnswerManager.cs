@@ -9,9 +9,9 @@ public class AnswerManager : MonoBehaviour
     public static AnswerManager Instance;
 
     [Header("힌트")]
-    public GameObject hintText;     //오답일 때 나타나는 정답 화면
+    public GameObject hintText;         //오답일 때 나타나는 정답 화면
 
-    [Header("버튼 이미지")]
+    [Header("버튼 이미지")] 
     public Image cancelButtonImage;     //취소 버튼 이미지
     public Image attackButtonImage;     //말하기 버튼 이미지
 
@@ -21,19 +21,19 @@ public class AnswerManager : MonoBehaviour
     public TMP_Text heroTextText;       //정답일 때 표시되는 주인공 기본 말풍선 텍스트
     public TMP_Text heroThinkText;      //주인공 생각 말풍선 텍스트
     public TMP_Text answerText;         //오답일 때 보여주는 정답 텍스트
-
+    
     [Header("효과음")]
-    public AudioSource audioSource; 
-    public AudioClip correctSfx;        //정답 효과음
-    public AudioClip wrongSfx;          //오답 효과음
-    public AudioClip wordButtonSfx;     //단어 버튼 클릭 효과음
-    public AudioClip attackButtonSfx;   //말하기 버튼 클릭 효과음
+    public AudioSource audioSource;
+    public AudioClip correctSfx;
+    public AudioClip wrongSfx;
+    public AudioClip wordButtonSfx;
+    public AudioClip attackButtonSfx;
 
     //선택한 글자들을 순서대로 저장
     private List<WordButton> selectedButtons = new List<WordButton>();
     private List<char> selectedLetters = new List<char>();
 
-    [Header("도믿걸 오답 애니메이션")]
+    [Header("도믿걸 애니메이션")]
     public GameObject domitgirl;
     public GameObject domitgirlAngry;
 
@@ -44,7 +44,6 @@ public class AnswerManager : MonoBehaviour
         Instance = this;
     }
 
-    //게임 시작할 때
     private void Start()
     {
         if (heroBubble != null)
@@ -56,7 +55,7 @@ public class AnswerManager : MonoBehaviour
         if (hintText != null)
             hintText.SetActive(false);
 
-        //버튼 이미지 투명 공백 부분 설정 
+        //버튼 이미지 투명 공백 부분 설정
         if (cancelButtonImage != null)
             cancelButtonImage.alphaHitTestMinimumThreshold = 0.1f;
 
@@ -65,7 +64,7 @@ public class AnswerManager : MonoBehaviour
 
         //주인공 생각 말풍선 텍스트 초기화
         if (heroThinkText != null)
-            heroThinkText.text = "";
+            heroThinkText.text = "";   
 
         //정답 표시 텍스트 초기화
         if (answerText != null)
@@ -116,7 +115,7 @@ public class AnswerManager : MonoBehaviour
             heroThinkText.text = "";
     }
 
-    //말하기 버튼 클릭했을 때
+    //말하기 버튼 눌렀을 때
     public void CheckAnswer()
     {        
         if (isChecking)
@@ -140,7 +139,6 @@ public class AnswerManager : MonoBehaviour
             Game3Manager.Instance.attackButtonText.gameObject.SetActive(false);
 
         string playerAnswer = GetAnswer();
-
         //문제의 정답에서 공백 제거
         string correctAnswer = ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
 
@@ -171,7 +169,7 @@ public class AnswerManager : MonoBehaviour
             if (heroThinkText != null)
                 heroThinkText.text = "";
 
-            //주인공 생각 말풍선 숨김
+            //주인공 생각 말풍선 숨기기
             if (heroThinkBubble != null)
                 heroThinkBubble.SetActive(false);
 
@@ -215,7 +213,6 @@ public class AnswerManager : MonoBehaviour
                 Game3Manager.Instance.attackButtonText.gameObject.SetActive(true);
             }
 
-            //다음 문제 생성
             ProblemManager.Instance.NextProblem();
         }
         else    //오답일 때
@@ -235,7 +232,7 @@ public class AnswerManager : MonoBehaviour
                 answerText.text = "정답 : <color=red>" + ProblemManager.Instance.currentProblem.answer + "</color>";
             }
 
-            // 3초 동안 정답 표시
+            //3초 동안 정답 표시
             yield return new WaitForSeconds(3f);
 
             if (answerText != null)
@@ -257,7 +254,7 @@ public class AnswerManager : MonoBehaviour
             {
                 if (Game3Manager.Instance.attackButtonText != null)
                     Game3Manager.Instance.attackButtonText.gameObject.SetActive(true);
-                
+                    
                 ProblemManager.Instance.NextProblem();
             }
         }

@@ -27,7 +27,8 @@ public class Game3Manager : MonoBehaviour
     
     [Header("결과 화면")]
     public GameObject resultPanel;
-    public TMP_Text resultTitleText;
+    public Image successImage;
+    public Image failImage;
     public TMP_Text pointText;
     public Button retryButton;
     public Button returnButton;
@@ -43,7 +44,7 @@ public class Game3Manager : MonoBehaviour
     public AudioClip buttonSfx;
 
     private List<char> selectedChars = new List<char>();
-
+    
     private bool gameEnded = false;
     public bool IsGameEnded => gameEnded;
 
@@ -121,12 +122,12 @@ public class Game3Manager : MonoBehaviour
         if (!gameStarted || gameEnded)
             return;
 
-        if (attackButtonText != null)
+        if(attackButtonText != null)
             attackButtonText.gameObject.SetActive(false);
 
         string playerAnswer = new string(selectedChars.ToArray());
         string correctAnswer = ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
-
+        
         if (playerAnswer == correctAnswer)
         {
             Debug.Log("정답");
@@ -134,9 +135,7 @@ public class Game3Manager : MonoBehaviour
             enemy.Damage(20);
 
            if (!gameEnded)
-           {
-                ProblemManager.Instance.NextProblem();
-           }
+            ProblemManager.Instance.NextProblem();
         }
         else
         {
@@ -200,15 +199,17 @@ public class Game3Manager : MonoBehaviour
             GameManager.Instance.PauseTimer();
         }
 
-
         if (resultPanel != null)
             resultPanel.SetActive(true);
 
         if (attackButtonText != null)
             attackButtonText.gameObject.SetActive(false);
 
-        if (resultTitleText != null)
-            resultTitleText.text = isSuccess ?  "<color=#7CFF5A>SUCCESS!</color>" : "<color=#FF4D4D>FAIL</color>";
+        if (successImage != null)
+            successImage.gameObject.SetActive(isSuccess);
+
+        if (failImage != null)
+            failImage.gameObject.SetActive(!isSuccess);
 
         if (pointText != null)
             pointText.text = earnedPoint.ToString();;
@@ -220,16 +221,6 @@ public class Game3Manager : MonoBehaviour
         {
             StartCoroutine(AutoReturnToLobbyAfterDelay());
         }
-    }
-
-    //결과창 표시 될 때 단어 버튼 사라짐
-    private void ClearWordButtons()
-    {
-        if (AnswerManager.Instance != null)
-            AnswerManager.Instance.Clear();
-
-        if (wordPanel != null)
-            wordPanel.gameObject.SetActive(false);
     }
 
     //다시 하기 버튼 눌렀을 때
@@ -291,14 +282,14 @@ public class Game3Manager : MonoBehaviour
     //터치하여 시작하기 버튼 눌렀을 때
     IEnumerator FlashThenStart()
     {
-        //터치하여 시작하기 텍스트 깜빡임 멈추기
+        // 터치하여 시작하기 텍스트 깜빡임 멈추기
         if (blinkCoroutine != null)
         {
             StopCoroutine(blinkCoroutine);
             blinkCoroutine = null;
         }
 
-        //화면 Flash 효과
+        // 화면 Flash 효과
         if (flashPanel != null)
         {
             Image flashImage = flashPanel.GetComponent<Image>();

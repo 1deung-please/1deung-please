@@ -5,7 +5,7 @@ public class WordSpawner : MonoBehaviour
     public static WordSpawner Instance;
 
     [Header("고정 Word Buttons")]
-    public WordButton[] wordButtons = new WordButton[7];    //7개 단어 버튼
+    public WordButton[] wordButtons = new WordButton[7];
 
     private void Awake()
     {
@@ -19,7 +19,6 @@ public class WordSpawner : MonoBehaviour
         {
             if (wordButtons[i] == null)
             {
-                Debug.LogError($"WordButton {i + 1}이 연결되지 않았습니다.");
                 continue;
             }
 

@@ -9,13 +9,12 @@ public class WordButton : MonoBehaviour
     public TMP_Text wordText;   //단어 버튼 텍스트
 
     [Header("Button Sprite")]
-    public Sprite normalSprite;     //기본 단어 버튼 이미지
-    public Sprite blankSprite;      //블랭크 단어 버튼 이미지
+    public Sprite normalSprite; //기본 단어 버튼 이미지
+    public Sprite blankSprite;  //블랭크 단어 버튼 이미지
 
-    private char letter;    //단어 버튼 글자
+    private char letter;                //단어 버튼 글자
     public char Letter => letter;
-    private bool isSelected = false;
-
+    private bool isSelected = false;    
 
     private void Awake()
     {
@@ -30,6 +29,7 @@ public class WordButton : MonoBehaviour
     {
         letter = newLetter;
         isSelected = false;
+
         buttonImage.sprite = normalSprite;
 
         wordText.gameObject.SetActive(true);
@@ -41,6 +41,7 @@ public class WordButton : MonoBehaviour
     {
         letter = '\0';
         isSelected = true;
+
         buttonImage.sprite = blankSprite;
 
         wordText.text = "";
@@ -71,7 +72,9 @@ public class WordButton : MonoBehaviour
             return;
 
         isSelected = false;
+
         buttonImage.sprite = normalSprite;
+
         wordText.gameObject.SetActive(true);
         wordText.text = letter.ToString();
     }

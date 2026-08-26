@@ -68,7 +68,6 @@ public class EnemyManager : MonoBehaviour
             yield break;
 
         Vector2 originalPos = heartImage.anchoredPosition;
-        
         float elapsed = 0f;
 
         while (elapsed < shakeDuration)

@@ -162,6 +162,19 @@ public class GameManager_mg02 : MonoBehaviour
             decreaseSpeed = 25f;
         }
 
+        if (currentGameTime <= 14f && currentGameTime > 10f)
+        {
+            decreaseSpeed = 15f;
+        }
+        else if (currentGameTime <= 9f && currentGameTime > 5f)
+        {
+            decreaseSpeed = 20f;
+        }
+        else if (currentGameTime <= 4f)
+        {
+            decreaseSpeed = 25f;
+        }
+
         currentHealth -= decreaseSpeed * Time.deltaTime;
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -196,7 +209,6 @@ public class GameManager_mg02 : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            Debug.LogError("게이지 0! 현재 게이지: " + currentHealth);
             gameOver(false);
         }
         else if (currentGameTime <= 0)
@@ -277,11 +289,8 @@ public class GameManager_mg02 : MonoBehaviour
 
         if (needSeat)
         {
-            Debug.Log("양보 정답 전 게이지: " + currentHealth);
-
             currentHealth += 15f;
             correctCount++;
-            Debug.Log("양보 정답 후 게이지: " + currentHealth);
             audioSource.PlayOneShot(correctSound);
             StartCoroutine(
                 PunchScaleRoutine(
@@ -363,6 +372,7 @@ public class GameManager_mg02 : MonoBehaviour
     {
         isGameOver = true;
 
+        // 전역 공덕 시스템 전달, 결과창에서는 전역 타이머 정지
         if (GameManager.Instance != null)
         {
             GameManager.Instance.PauseTimer();
@@ -443,11 +453,7 @@ public class GameManager_mg02 : MonoBehaviour
     public void returnToLobby()
     {
         Time.timeScale = 1f;
-
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.ReturnToLobby();
-        }
+        SceneManager.LoadScene("Lobby");
     }
 
     IEnumerator AutoReturnToLobbyAfterDelay()

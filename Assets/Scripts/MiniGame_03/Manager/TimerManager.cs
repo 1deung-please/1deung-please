@@ -14,8 +14,7 @@ public class TimerManager : MonoBehaviour
             GameManager.Instance.RecordMiniGamePlay(3);
         }
 
-        //소수점 첫째 자리까지 표시
-        timerText.text = time.ToString("F1");
+        timerText.text = time.ToString("F1");   //소수점 첫째 자리까지 표시
     }
 
     void Update()

@@ -9,27 +9,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b6169b1d1934c94da49b22a6bc174d6, type: 3}
+  m_Script: {fileID: 11500000, guid: 1ad0a8c36e01c9e468f205235ecf72f3, type: 3}
   m_Name: EndingList
   m_EditorClassIdentifier: 
   endings:
-  - id: "\uC584\uD30D\uD55C\uC18D\uC148"
+  - endingId: "\uC584\uD30D\uD55C\uC18D\uC148"
+    linkedAchievementId: 14
     title: "\uC584\uD30D\uD55C \uC18D\uC148"
+    unlockedIcon: {fileID: 21300000, guid: 04e2b9eb2b1200542b55e053f423092d, type: 3}
+    lockedIcon: {fileID: 21300000, guid: 68de9fe220d35a143a535590ccf78442, type: 3}
     sceneName: Ending_Shallow
-    badge: {fileID: 0}
-  - id: "\uC790\uACA9\uBBF8\uB2EC"
+  - endingId: "\uC790\uACA9\uBBF8\uB2EC"
+    linkedAchievementId: 15
     title: "\uC790\uACA9 \uBBF8\uB2EC"
+    unlockedIcon: {fileID: 21300000, guid: efdcb708fa2b30f46811da22a2d6432e, type: 3}
+    lockedIcon: {fileID: 21300000, guid: 9ba986245a18abd4ebc682901cb25ead, type: 3}
     sceneName: Ending_Unqualified
-    badge: {fileID: 0}
-  - id: "\uC808\uBC18\uC758\uC131\uACF5"
+  - endingId: "\uC808\uBC18\uC758\uC131\uACF5"
+    linkedAchievementId: 16
     title: "\uC808\uBC18\uC758 \uC131\uACF5"
+    unlockedIcon: {fileID: 21300000, guid: 651ed013b8e5f734b8e700e952db6a95, type: 3}
+    lockedIcon: {fileID: 21300000, guid: cc7bf69cf278a5d41ae3d5aaf5739d3b, type: 3}
     sceneName: Ending_HalfSuccess
-    badge: {fileID: 0}
-  - id: "\uC9C4\uC815\uD55C\uADC0\uC778"
+  - endingId: "\uC9C4\uC815\uD55C\uADC0\uC778"
+    linkedAchievementId: 17
     title: "\uC9C4\uC815\uD55C \uADC0\uC778"
+    unlockedIcon: {fileID: 21300000, guid: edcd55a0aa3aaef439c8501b53778718, type: 3}
+    lockedIcon: {fileID: 21300000, guid: 9457248de9355d6478e976edd1b77616, type: 3}
     sceneName: Ending_TrueBenefactor
-    badge: {fileID: 0}
-  - id: "\uD788\uB4E0"
-    title: "1\uB4F1 \uB418\uAC8C \uD574\uC8FC\uC138\uC694!"
+  - endingId: "\uD788\uB4E0"
+    linkedAchievementId: 18
+    title: "\uD788\uB4E0"
+    unlockedIcon: {fileID: 21300000, guid: b75673a5b5359e04fb3972ba05c3353f, type: 3}
+    lockedIcon: {fileID: 21300000, guid: 5c6c238825331284eae3d8b44927f81c, type: 3}
     sceneName: Ending_Hidden
-    badge: {fileID: 0}

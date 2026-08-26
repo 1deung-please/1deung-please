@@ -17,18 +17,17 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float typingSpeed = 0.05f;
 
     [SerializeField] private GameObject choicePanel;
-
     [SerializeField] private ChoiceManager choiceManager;
 
+    [Header("BGM (배경 전환 시 Fade)")]
+    [SerializeField] private AudioClip streetBGM;
+    [SerializeField] private AudioClip cafeBGM;
+
     private DialogueLine currentLine;
-
     private int currentIndex = 0;
-
     private bool dialogueStarted = false;
-
     private Coroutine typingCoroutine;
     private bool isTyping = false;
-
     private string currentSentence = "";
 
     public System.Action OnDialogueFinished;
@@ -36,15 +35,12 @@ public class DialogueManager : MonoBehaviour
     private void Awake()
     {
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
     }
 
     public void StartDialogue(DialogueData data)
     {
         dialogueData = data;
-
         currentIndex = 0;
         dialogueStarted = false;
 
@@ -52,47 +48,26 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
 
         if (choicePanel != null)
-        {
             choicePanel.SetActive(false);
-        }
 
         gameObject.SetActive(true);
 
-        if (data != null &&
-            data.lines.Count > 0 &&
-            TutorialManager.Instance != null)
-        {
-            bool isFirstNarration =
-                (data.lines[0].speaker == "Narration");
-
-            TutorialManager.Instance.SetDialoguePosY(isFirstNarration);
-        }
+        if (data != null && data.lines.Count > 0 && TutorialManager.Instance != null)
+            TutorialManager.Instance.SetDialoguePosY(data.lines[0].speaker == "Narration");
     }
 
     private void Update()
     {
         if (TutorialManager.Instance != null)
         {
-            if (TutorialManager.Instance.IsFading())
-            {
-                return;
-            }
-
-            if (TutorialManager.Instance.ConsumeClick())
-            {
-                return;
-            }
+            if (TutorialManager.Instance.IsFading()) return;
+            if (TutorialManager.Instance.ConsumeClick()) return;
         }
 
-        if (choicePanel != null && choicePanel.activeSelf)
-        {
-            return;
-        }
+        if (choicePanel != null && choicePanel.activeSelf) return;
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -105,11 +80,7 @@ public class DialogueManager : MonoBehaviour
 
             if (isTyping)
             {
-                if (typingCoroutine != null)
-                {
-                    StopCoroutine(typingCoroutine);
-                }
-
+                if (typingCoroutine != null) StopCoroutine(typingCoroutine);
                 dialogueText.text = currentSentence;
                 isTyping = false;
             }
@@ -122,31 +93,22 @@ public class DialogueManager : MonoBehaviour
 
     private void ShowDialogue()
     {
-        if (dialogueData == null ||
-            dialogueData.lines == null ||
-            currentIndex >= dialogueData.lines.Count)
+        if (dialogueData == null || dialogueData.lines == null || currentIndex >= dialogueData.lines.Count)
         {
             EndDialogue();
             return;
         }
 
         currentLine = dialogueData.lines[currentIndex];
-
         DialogueLine line = currentLine;
 
         nameText.text = line.speaker;
 
         if (TutorialManager.Instance != null)
-        {
-            TutorialManager.Instance.SetDialoguePosY(
-                line.speaker == "Narration"
-            );
-        }
+            TutorialManager.Instance.SetDialoguePosY(line.speaker == "Narration");
 
         if (line.speaker == "Narration")
-        {
             nameText.gameObject.SetActive(false);
-        }
         else
         {
             nameText.gameObject.SetActive(true);
@@ -161,50 +123,29 @@ public class DialogueManager : MonoBehaviour
                 portraitImage.gameObject.SetActive(true);
             }
             else
-            {
                 portraitImage.gameObject.SetActive(false);
-            }
         }
 
         currentSentence = line.text;
 
-        if (typingCoroutine != null)
-        {
-            StopCoroutine(typingCoroutine);
-        }
-
-        typingCoroutine = StartCoroutine(
-            TypeText(currentSentence)
-        );
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        typingCoroutine = StartCoroutine(TypeText(currentSentence));
 
         ExecuteEvent(line.dialogueEvent);
 
         if (choicePanel != null)
-        {
-            if (line.isChoice)
-            {
-                choicePanel.SetActive(true);
-            }
-            else
-            {
-                choicePanel.SetActive(false);
-            }
-        }
+            choicePanel.SetActive(line.isChoice);
     }
 
     private IEnumerator TypeText(string text)
     {
         isTyping = true;
-
         dialogueText.text = "";
-
         foreach (char c in text)
         {
             dialogueText.text += c;
-
             yield return new WaitForSeconds(typingSpeed);
         }
-
         isTyping = false;
     }
 
@@ -217,16 +158,13 @@ public class DialogueManager : MonoBehaviour
     public void EndDialogue()
     {
         Debug.Log("대화 종료");
-
         OnDialogueFinished?.Invoke();
 
         if (TutorialManager.Instance != null)
         {
             PlayerPrefs.SetInt("TutorialCompleted", 1);
             PlayerPrefs.Save();
-
             Debug.Log("튜토리얼 완료");
-
             TutorialManager.Instance.MoveLobbyAndStartTimer();
         }
     }
@@ -250,17 +188,19 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case DialogueEvent.Achievement:
-                TutorialManager.Instance.UnlockAchievement(
-                    "사이비 퇴치!"
-                );
+                TutorialManager.Instance.UnlockAchievement("사이비 퇴치!");
                 break;
 
             case DialogueEvent.ChangeStreet:
                 BackgroundManager.Instance.ChangeToStreet();
+                if (TutorialManager.Instance != null && streetBGM != null)
+                    TutorialManager.Instance.ChangeBGMWithFade(streetBGM);
                 break;
 
             case DialogueEvent.ChangeCafe:
                 BackgroundManager.Instance.ChangeToCafe();
+                if (TutorialManager.Instance != null && cafeBGM != null)
+                    TutorialManager.Instance.ChangeBGMWithFade(cafeBGM);
                 break;
 
             case DialogueEvent.ChangeToTimer:
@@ -272,59 +212,29 @@ public class DialogueManager : MonoBehaviour
     public void OnChoiceResult(bool yes, int noCount = 0)
     {
         if (yes)
-        {
             NextDialogue();
-        }
         else
-        {
             AchievementManager.Instance.OnTutorialNoButtonClicked();
-        }
     }
 
-    public void RepeatCurrentDialogue(
-        string speaker,
-        Sprite portrait,
-        string newText)
+    public void RepeatCurrentDialogue(string speaker, Sprite portrait, string newText)
     {
         currentSentence = newText;
-
         nameText.gameObject.SetActive(true);
 
-        if (portraitImage != null)
+        if (portraitImage != null && portrait != null)
         {
-            portraitImage.gameObject.SetActive(true);
             portraitImage.sprite = portrait;
+            portraitImage.gameObject.SetActive(true);
         }
 
-        nameText.text = speaker;
-
-        if (typingCoroutine != null)
-        {
-            StopCoroutine(typingCoroutine);
-        }
-
-        typingCoroutine = StartCoroutine(
-            TypeText(currentSentence)
-        );
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        typingCoroutine = StartCoroutine(TypeText(newText));
     }
 
     public void SkipDialogue()
     {
-        // 타이핑 중이면 중지
-        if (typingCoroutine != null)
-        {
-            StopCoroutine(typingCoroutine);
-        }
-
-        isTyping = false;
-
-        // 선택지 숨기기
-        if (choicePanel != null)
-        {
-            choicePanel.SetActive(false);
-        }
-
-        // 대화 UI 숨기기
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         gameObject.SetActive(false);
     }
 }
