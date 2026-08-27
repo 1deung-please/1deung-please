@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class BuildingClickHandler : MonoBehaviour, IPointerClickHandler
+public class NightBuildingClickHandler : MonoBehaviour, IPointerClickHandler
 {
-    public string targetMiniGameScene; // "MiniGame_01" 등
+    public GameObject closedPopup; // 닫혀있다 팝업
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (UIModalState.IsAnyModalOpen) return;
         if (GameManager.Instance == null) return;
 
-        GameManager.Instance.EnterMiniGame(targetMiniGameScene);
+        if (closedPopup != null)
+            closedPopup.SetActive(true);
     }
 }

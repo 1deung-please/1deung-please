@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using TMPro;
+using UnityEngine.UI;
 
 public enum MiniGameKind { PickTrash, DontMove, LogicFortress }
 
@@ -8,13 +9,28 @@ public class AchievementManager : MonoBehaviour
 {
     public static AchievementManager Instance;
 
-    [Header("Popup UI")]
-    public GameObject popupPanel;
-    public TMP_Text popupText;
-    public float popupDuration = 2f;
+    [Header("업적 팝업")]
+    public GameObject achievementPopup;
+    public Image achievementBadgeImage;
+    public TMP_Text achievementTitleText;
+    public TMP_Text achievementDescriptionText;
+    public TMP_Text achievementBodyText;
+    public float popupDuration = 3f;
+
+    [Header("엔딩 팝업")]
+    public GameObject endingPopup;
+    public Image endingBadgeImage;
+    public TMP_Text endingTitleText;
+    public TMP_Text endingBodyText;
+
+    [Header("효과음")]
+    public AudioSource sfxSource;
+    public AudioClip achievementSfx;
+    public AudioClip endingSfx;
 
     [Header("Achievement Data")]
     public AchievementListData achievementList;
+    public EndingListData endingList;
 
     private Coroutine popupCoroutine;
 
@@ -89,11 +105,11 @@ public class AchievementManager : MonoBehaviour
     {
         switch (endingId)
         {
-            case "얄팍한속셈": TryUnlock(14); break;
-            case "자격미달": TryUnlock(15); break;
-            case "절반의성공": TryUnlock(16); break;
-            case "진정한귀인": TryUnlock(17); break;
-            case "히든": TryUnlock(18); break;
+            case "얄팍한속셈": TryUnlock(14); ShowEndingPopup(endingId); break;
+            case "자격미달": TryUnlock(15); ShowEndingPopup(endingId); break;
+            case "절반의성공": TryUnlock(16); ShowEndingPopup(endingId); break;
+            case "진정한귀인": TryUnlock(17); ShowEndingPopup(endingId); break;
+            case "히든": TryUnlock(18); ShowEndingPopup(endingId); break;
         }
 
         TryUnlock(13);
@@ -105,41 +121,86 @@ public class AchievementManager : MonoBehaviour
         }
     }
 
-    public void TryUnlockPublic(int id) => TryUnlock(id); // PersistentStats 등 외부에서 호출용
+    public void TryUnlockPublic(int id) => TryUnlock(id);
 
     void TryUnlock(int id)
     {
         if (AchievementStorage.IsUnlocked(id)) return;
         AchievementStorage.Unlock(id);
-        ShowUnlockPopup(id);
+        ShowAchievementPopup(id);
     }
 
-    void ShowUnlockPopup(int id)
+    void ShowAchievementPopup(int id)
     {
-        if (popupPanel == null || popupText == null) return;
+        return;
 
-        string title = GetAchievementTitle(id);
-        popupText.text = $"업적 달성: {title}";
-        popupPanel.SetActive(true);
+        if (achievementPopup == null) return;
+
+        var info = GetAchievementInfo(id);
+        if (info == null) return;
+
+        if (achievementBadgeImage != null && info.badge != null)
+            achievementBadgeImage.sprite = info.badge;
+
+        if (achievementTitleText != null)
+            achievementTitleText.text = info.title;
+
+        if (achievementDescriptionText != null)
+            achievementDescriptionText.text = info.description;
+
+        if (achievementBodyText != null)
+            achievementBodyText.text = "업적을 달성하셨습니다.";
+
+        if (sfxSource != null && achievementSfx != null)
+            sfxSource.PlayOneShot(achievementSfx);
+
+        achievementPopup.SetActive(true);
 
         if (popupCoroutine != null) StopCoroutine(popupCoroutine);
-        popupCoroutine = StartCoroutine(HidePopupAfterDelay());
+        popupCoroutine = StartCoroutine(HideAchievementAfterDelay());
     }
 
-    string GetAchievementTitle(int id)
+    void ShowEndingPopup(string endingId)
     {
-        if (achievementList == null) return $"업적 {id}";
+        if (endingPopup == null) return;
 
-        foreach (var info in achievementList.achievements)
-        {
-            if (info.id == id) return info.title;
-        }
-        return $"업적 {id}";
+        var info = GetEndingInfo(endingId);
+
+        if (endingBadgeImage != null && info != null && info.unlockedIcon != null)
+            endingBadgeImage.sprite = info.unlockedIcon;
+
+        if (endingTitleText != null)
+            endingTitleText.text = info != null ? info.title : endingId;
+
+        if (endingBodyText != null)
+            endingBodyText.text = "엔딩을 획득하셨습니다.";
+
+        if (sfxSource != null && endingSfx != null)
+            sfxSource.PlayOneShot(endingSfx);
+
+        endingPopup.SetActive(true);
     }
 
-    IEnumerator HidePopupAfterDelay()
+    AchievementInfo GetAchievementInfo(int id)
+    {
+        if (achievementList == null) return null;
+        foreach (var info in achievementList.achievements)
+            if (info.id == id) return info;
+        return null;
+    }
+
+    EndingInfo GetEndingInfo(string endingId)
+    {
+        if (endingList == null) return null;
+        foreach (var info in endingList.endings)
+            if (info.endingId == endingId) return info;
+        return null;
+    }
+
+    IEnumerator HideAchievementAfterDelay()
     {
         yield return new WaitForSeconds(popupDuration);
-        popupPanel.SetActive(false);
+        if (achievementPopup != null)
+            achievementPopup.SetActive(false);
     }
 }
