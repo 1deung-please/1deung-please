@@ -624,14 +624,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 305f02a736faceb4a9b28cfeabd08817, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameData: {fileID: 0}
   dialogueText: {fileID: 1848346717}
   nameText: {fileID: 1840658184}
-  TryagainButton: {fileID: 1948230543}
   portraitImage: {fileID: 1903282672}
   ancestorGod: {fileID: 21300000, guid: 021a5c4ecef95eb419703edd8400ebdc, type: 3}
   player: {fileID: 21300000, guid: 2203a8ed737abd14aa471e46386b79e7, type: 3}
-  bgmAudioSource: {fileID: 1290103376}
-  HalfSuccessBGM: {fileID: 8300000, guid: c4889c290d6280440ad6dd67f5938034, type: 3}
 --- !u!4 &1388654721
 Transform:
   m_ObjectHideFlags: 0
@@ -704,7 +702,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b6afa3b1a0eca324c83e9c0f61cf7804, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e3cacd627278ff94e86b06627c3ddc8a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -739,7 +737,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1518491268
 RectTransform:
   m_ObjectHideFlags: 0
