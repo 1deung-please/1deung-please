@@ -21,7 +21,8 @@ public class GameManager_mg02 : MonoBehaviour
     public TMP_Text decreaseText;
 
     [Header("Result UI Texts")]
-    public TMP_Text titleText;
+    public GameObject successImage;
+    public GameObject failImage;
     public TMP_Text resultReasonText;
     public TMP_Text recordText;
 
@@ -60,8 +61,11 @@ public class GameManager_mg02 : MonoBehaviour
 
     void Start()
     {
-        if (titlePanel != null)
-            titlePanel.SetActive(true);
+        if (successImage != null)
+            successImage.SetActive(false);
+
+        if (failImage != null)
+            failImage.SetActive(false);
 
         if (resultPanel != null)
             resultPanel.SetActive(false);
@@ -397,8 +401,11 @@ public class GameManager_mg02 : MonoBehaviour
             resultPanel.SetActive(true);
             StartCoroutine(ResultPanelRoutine());
 
-            if (titleText != null)
-                titleText.text = isSuccess ? "SUCCESS!" : "FAIL";
+            if (successImage != null)
+                successImage.SetActive(isSuccess);
+
+            if (failImage != null)
+                failImage.SetActive(!isSuccess);
 
             /*float survivedTime =
                 maxGameTime -
