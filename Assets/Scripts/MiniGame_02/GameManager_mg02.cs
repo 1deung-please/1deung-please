@@ -377,7 +377,8 @@ public class GameManager_mg02 : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
+            if (AchievementManager.Instance != null) 
+                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
         }
 
         string reason;
@@ -452,8 +453,17 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void returnToLobby()
     {
+        Debug.Log("MG02 returnToLobby 호출");
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Lobby");
+        if (GameManager.Instance != null)
+        {
+            Debug.Log("GameManager 있음");
+            GameManager.Instance.ReturnToLobby();
+        }
+        else
+        {
+            Debug.LogError("GameManager.Instance NULL");
+        }
     }
 
     IEnumerator AutoReturnToLobbyAfterDelay()
