@@ -4,7 +4,7 @@ using UnityEngine;
 public class TimerManager : MonoBehaviour
 {
     public TMP_Text timerText;
-    private float time = 60f;
+    private float time = 30f;
     private bool timerEnded = false;
 
     void Start()
