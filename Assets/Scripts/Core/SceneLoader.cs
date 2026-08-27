@@ -25,6 +25,7 @@ public class SceneLoader : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         isLoading = false; // 새 씬 로드가 끝나면 다시 로드 가능 상태로
+        Time.timeScale = 1f;
     }
 
     public void LoadScene(string sceneName)
