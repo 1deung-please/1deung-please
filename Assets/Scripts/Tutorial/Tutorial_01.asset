@@ -13,123 +13,161 @@ MonoBehaviour:
   m_Name: Tutorial_01
   m_EditorClassIdentifier: 
   lines:
-  - speaker: Narration
+  - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uC7A0\uAE50 \uC878\uC558\uB098... \uAE34 \uAFC8\uC744 \uAFBC \uAC83
       \uAC19\uC740\uB370...)"
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
+    portrait: {fileID: 21300000, guid: c83515dc9b51c85469ccb702ee0d2041, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
-  - speaker: Narration
+  - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC2DC\uAC04\uC774 \uD758\uB7EC \uC5B4\uB290\uC0C8 40\uB300."
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
+    portrait: {fileID: 21300000, guid: c83515dc9b51c85469ccb702ee0d2041, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
-  - speaker: Narration
+  - speaker: "\uC8FC\uC778\uACF5"
     text: "\uD68C\uC0AC\uC5D0\uC11C\uB294 \uBD80\uC7A5\uB2D8\uD55C\uD14C \uAE68\uC9C0\uACE0
       \uB2E4\uD06C\uC368\uD074\uC740 \uB0B4\uB824\uC62C \uB300\uB85C \uB0B4\uB824\uC624\uACE0..."
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
+    portrait: {fileID: 21300000, guid: 694453803c9c32545bb89550c3674fa7, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
-  - speaker: Narration
+  - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC77C\uC0C1\uC740 \uC815\uB9D0 \uC9C0\uB8E8\uD558\uACE0 \uB610 \uC9C0\uB8E8\uD574.."
-    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
+    portrait: {fileID: 21300000, guid: 694453803c9c32545bb89550c3674fa7, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: ???
     text: "\uC800\uAE30\uC694."
-    portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
+    portrait: {fileID: 21300000, guid: 45d4a9ff3990ec547952735dab6c9d38, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uB124?"
-    portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
+    portrait: {fileID: 0}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC778\uC0C1\uC774 \uC88B\uC73C\uC2DC\uB124\uC694."
-    portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
+    portrait: {fileID: 0}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC6B0\uB9AC \uC544\uC9C1 \uC5BC\uAD74\uB3C4 \uC548 \uBD24\uC5B4\uC694.
       \uC81C \uB4A4\uC5D0 \uACC4\uC2DC\uC796\uC544\uC694."
-    portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
+    portrait: {fileID: 0}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC544..."
-    portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
+    portrait: {fileID: 0}
     dialogueEvent: 0
+    animEvent: 3
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: ...
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: ....
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: ".... \uC660\uC9C0 \uADF8\uB7F0 \uAE30\uC6B4\uC774 \uB290\uAEF4\uC84C\uC2B5\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
-  - speaker: "\uB3C4\uBBFF\uAC78"
+  - speaker: "\uC8FC\uC778\uACF5"
     text: "\uCC38 \uAC10\uC0AC\uD558\uB124\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
-    text: "\uC81C\uAC00 \uC6D0\uB798 \uC774\uB7F0\uB9D0 \uC798 \uC548\uD558\uB294\uB370\uC694,"
+    text: "\uC81C\uAC00\uC6D0\uB798\uC774\uB7F0\uB9D0\uC798\uC548\uD558\uB294\uB370\uC694,"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADC0\uC778\uB2D8 \uC778\uC0C1\uC774 \uCC38 \uC88B\uC73C\uC2ED\uB2C8\uB2E4?
       \uD6C4\uD6C4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uBB50\uC57C, \uC0AC\uC774\uBE44\uC796\uC544.)"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC8C4\uC1A1\uD55C\uB370, \uC800 \uBC14\uBE60\uC11C \uC774\uB9CC \uAC00\uBCF4\uACA0\uC2B5\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC544.... \uC544\uC27D\uB124"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 3
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uBB50\uAC00\uC694."
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC9C1\uC7A5\uC5D0\uC11C\uB294 \uC0C1\uC0AC\uD55C\uD14C \uAE68\uC9C0\uACE0,
@@ -137,7 +175,9 @@ MonoBehaviour:
       \uC54A\uC544\uC694?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC9C0\uAE08 \uC800\uD55C\uD14C \uCEE4\uD53C \uD55C \uC794\uB9CC \uBCA0\uD480\uBA74
@@ -145,33 +185,51 @@ MonoBehaviour:
       \uB3CC\uC544\uC62C\uD150\uB370!"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC9C0\uAE08 \uADC0\uC778\uB2D8\uC758 \uBCA0\uD482\uC774 \uC6B0\uC8FC\uB97C
       \uAC10\uB3D9\uC2DC\uD0A4\uACE0 \uC788\uC5B4\uC694!!!!!"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC6B0\uC8FC"
     text: ....
-    portrait: {fileID: 21300000, guid: b24031c123aa8394eade7b07b0df6a90, type: 3}
+    portrait: {fileID: 21300000, guid: 7959021592909954dae47acee0c06642, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
+    maxNoCount: 10
+  - speaker: 
+    text: 
+    portrait: {fileID: 0}
+    dialogueEvent: 6
+    animEvent: 0
+    isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uB059...)"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
-    dialogueEvent: 6
+    dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD6C4\uD6C4\uD6C4... \uADC0\uC778\uB2D8, \uC0AC\uC2E4 \uC18D\uC73C\uB85C
       \uBE44\uC6C3\uACE0 \uACC4\uC2DC\uC8E0?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "'\uB610 \uC870\uC0C1\uB2D8\uC774 \uAFC8\uC5D0 \uB098\uC640\uC11C \uB85C\uB610
@@ -179,25 +237,42 @@ MonoBehaviour:
       \uD558\uACE0..."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "(\uB728\uB054)"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD558\uC9C0\uB9CC \uC798 \uC0DD\uAC01\uD574\uBCF4\uC138\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
+    maxNoCount: 10
+  - speaker: "\uB3C4\uBBFF\uAC78"
+    text: "\uC65C \uC138\uC0C1 \uBAA8\uB4E0 \uB3C4\uBBFF\uAC78\uB4E4\uC774 \uADF8
+      '\uBED4\uD55C' \uB85C\uB610 \uC774\uC57C\uAE30\uB97C\uD558\uACA0\uC5B4\uC694?"
+    portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
+    dialogueEvent: 0
+    animEvent: 0
+    isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADF8\uAC74 \uBC14\uB85C... \uC9C4\uC9DC\uAE30 \uB54C\uBB38\uC785\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC9C0\uAE08 \uADC0\uC778\uB2D8\uC758 \uC870\uC0C1\uB2D8\uB4E4\uC740 \uB85C\uB610
@@ -205,53 +280,69 @@ MonoBehaviour:
       \uC904\uC744 \uC11C \uACC4\uC138\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADFC\uB370 \uC65C \uADC0\uC778\uB2D8 \uAFC8\uC5D0\uB294 \uC548 \uB098\uD0C0\uB098\uC2DC\uB0D0?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADC0\uC778\uB2D8\uC774 \uC9C0\uAE08 '\uC6B4\uBA85 \uC218\uC2E0 \uAC70\uBD80'\uB97C
       \uD574\uB193\uC73C\uC168\uAC70\uB4E0\uC694!!!"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD6C4\uD6C4\uD6C4..... \uC81C\uAC00 \uD558\uB294 \uC77C\uC740 \uBCF5\uC7A1\uD55C
       \uAC8C \uC544\uB2C8\uC5D0\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADF8 \uC218\uC2E0 \uAC70\uBD80\uB97C \uD574\uC81C\uD558\uACE0, \uC870\uC0C1\uB2D8\uC758
       \uD154\uB808\uD30C\uC2DC\uB97C \uC5F0\uACB0\uD558\uB294"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "'\uC6B4\uBA85 \uC911\uACC4\uC18C' \uC5ED\uD560\uC744 \uD558\uB294 \uAC70\uC8E0."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC5B4\uB54C\uC694, \uC81C \uC774\uC57C\uAE30\uC5D0 \uC870\uAE08..."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC544\uB2C8, \uC544\uC8FC \uAE4A\uAC8C \uD765\uBBF8\uAC00 \uC0DD\uAE30\uC9C0
       \uC54A\uB098\uC694?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC778\uC0DD \uC5ED\uC804, 1\uB4F1 \uB2F9\uCCA8... \uADF8 \uD654\uB824\uD55C
@@ -259,45 +350,59 @@ MonoBehaviour:
       \uB9D0\uC785\uB2C8\uB2E4!"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC790, \uC5B4\uB5BB\uAC8C... \uB85C\uB610 \uB2F9\uCCA8\uC5D0 \uC778\uC0DD\uC744,
       \uC544\uB2C8 \uC774 \uC6B4\uBA85\uC744 \uD55C \uBC88 \uB9E1\uACA8\uBCF4\uC2DC\uACA0\uC5B4\uC694?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
-  - speaker: Narration
-    text: 
-    portrait: {fileID: 0}
+  - speaker: "\uC8FC\uC778\uACF5"
+    text: "\uBB34\uC5C7\uC744 \uACE0\uB97C\uAE4C?"
+    portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 1
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADF8\uB798\uC694. \uC8FC\uC778\uACF5\uB2D8\uC774 \uB85C\uB610 1\uB4F1\uC774
       \uB418\uB824\uBA74..."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\u2018\uACF5\uB355 \uD3EC\uC778\uD2B8\u2019\uB97C \uBAA8\uC544\uC57C \uD569\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "??? \uC644\uC804 \uC0AC\uC774\uBE48\uB370\uC694?"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uB059... \uC544\uB2D9\uB2C8\uB2E4. \uC77C\uB2E8 \uB4E4\uC5B4\uBCF4\uC138\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD639\uC2DC \uC694\uC998\uC5D0 \uB3C4\uB355\uC801\uC774\uAC8C \uC0B4\uC544
@@ -305,32 +410,42 @@ MonoBehaviour:
       \uD55C\uB2E4\uB358\uAC00..."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC5C6\uB294\uB370\uC694."
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD55C \uBC88\uB3C4?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uD55C \uBC88\uB3C4."
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uAC70\uBD10\uC694! \uADF8\uB798\uC11C \uD589\uC6B4\uC774 \uC548 \uB530\uB974\uB294
       \uAC81\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC8FC\uC778\uACF5\uC528\uAC00 \uD589\uC6B4\uC744 \uC5BB\uC73C\uB824\uBA74
@@ -338,7 +453,9 @@ MonoBehaviour:
       \uD55C\uB2E4\uACE0\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC9C0\uAE08\uBD80\uD130\uB77C\uB3C4 \uACF5\uB355\uC744 \uC313\uB294\uB2E4\uBA74
@@ -346,31 +463,49 @@ MonoBehaviour:
       \uB3C4\uC640\uC8FC\uC2E4 \uAC81\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "... \uADF8\uB798\uC11C \uBB58 \uD574\uC57C\uD558\uB294\uB370\uC694."
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uBBF8\uB2C8\uAC8C\uC784\uC744 \uD574\uC57C\uD569\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uC608?"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uAC70\uB9AC\uB97C \uC18C\uAC1C\uD574\uB4DC\uB9AC\uC8E0. \uB530\uB77C\uC624\uC138\uC694."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 0
     isChoice: 0
+    isNormalDialogue: 1
+    maxNoCount: 10
+  - speaker: 
+    text: 
+    portrait: {fileID: 0}
+    dialogueEvent: 5
+    animEvent: 0
+    isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC774 \uAC70\uB9AC\uC5D0\uC11C  \u2018\uC815\uB958\uC7A5\u2019\uC744
@@ -378,8 +513,10 @@ MonoBehaviour:
       \uD560\uC9C0 \uB9D0\uC9C0 \uC120\uD0DD\uD558\uB294 \u2018\uC774\uAC78 \uC591\uBCF4
       \uC548\uD574?\u2019"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 5
+    dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\u2018\uCEE4\uD53C\uC20D\u2019\uC744 \uB204\uB974\uBA74 \uBB38\uC7A5\uC744
@@ -387,7 +524,9 @@ MonoBehaviour:
       \uB17C\uB9AC\uC694\uC0C8."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC9C0\uD558\uC0C1\uAC00\u2019\uB97C \uB204\uB974\uBA74 \uC870\uC0C1\uC2E0\uC774
@@ -395,20 +534,26 @@ MonoBehaviour:
       \uC4F0\uB808\uAE30\uB97C \uC90D\uB294 \uC8FC\uC6CC\uC918, \uC4F0\uB808\uAE30!"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\u2018\uAC00\uBC29\u2019\uC744 \uB204\uB974\uBA74 \uAC8C\uC784 \uC0AC\uC774\uD074
       \uB9AC\uC14B\uC744 \uD560 \uC218 \uC788\uACE0,"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC5C5\uC801\uC744 \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD760, \uD760, \uC544\uBB34\uD2BC \uC774 \uC138 \uAC00\uC9C0 \uAC8C\uC784\uC744
@@ -416,74 +561,98 @@ MonoBehaviour:
       \uB429\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uBB50\uC57C, \uC27D\uC796\uC544\uC694?"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uADF8\uB807\uC8E0, \uC27D\uC2B5\uB2C8\uB2E4. \uB2E4\uB9CC, \uC81C\uD55C\uC2DC\uAC04\uC774
       \uC788\uC2B5\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "5\uBD84. 5\uBD84\uC548\uC5D0 \uCD5C\uB300\uD55C \uB9CE\uC740 \uACF5\uB355
       \uD3EC\uC778\uD2B8\uB97C \uD68D\uB4DD\uD558\uB294 \uAC81\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\uB85C\uB610\uBC29\uC740 \uBB50\uC8E0?"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\u2018\uC8FC\uC5B4\uC9C4 \uC2DC\uAC04\u2019\uC774 \uB05D\uB098\uAC8C \uB41C\uB2E4\uBA74\u2026
       \uC54C\uAC8C \uB420 \uAC81\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
     text: "\u2026?"
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
+    animEvent: 1
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uD760, \uD760"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uBC14\uB85C \uC2DC\uC791\uD558\uC8E0."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC790... \uADF8\uB7FC,"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "1\uB4F1 \uB2F9\uCCA8\uB420 \uC900\uBE44 \uB418\uC5C8\uC8E0?"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
-    dialogueEvent: 0
+    dialogueEvent: 7
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
     text: "\uC2DC\uC791!!"
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
+    animEvent: 2
     isChoice: 0
+    isNormalDialogue: 0
     maxNoCount: 10
