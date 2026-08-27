@@ -255,6 +255,60 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 3352915459776625014, guid: f20f388570f0e104cb66b0b020bf3a20, type: 3}
   m_PrefabInstance: {fileID: 2315055187517046940}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &959096923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 959096925}
+  - component: {fileID: 959096924}
+  m_Layer: 0
+  m_Name: MainMenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &959096924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959096923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbca3afea8d179b40b046e11b63b4588, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  touchToStartText: {fileID: 3238645434084611753}
+  backgroundPanel: {fileID: 1310865374}
+  titleImage: {fileID: 1879012671}
+  bgmSource: {fileID: 236535013}
+  tutorialSceneName: Tutorial
+  blinkSpeed: 0.8
+  slideDuration: 0.8
+  titleDelay: 1
+  flashCount: 3
+  flashInterval: 0.12
+--- !u!4 &959096925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959096923}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.69550455, y: 0.008525822, z: 1.5204161}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1310865373
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,7 +465,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1445228064}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fbca3afea8d179b40b046e11b63b4588, type: 3}
   m_Name: 
@@ -1031,6 +1085,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: GlobalPopupCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 8648559796640124657, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126927369642735378, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1055,3 +1117,4 @@ SceneRoots:
   - {fileID: 333492122915122549}
   - {fileID: 8542079716318277641}
   - {fileID: 236535014}
+  - {fileID: 959096925}
