@@ -265,6 +265,8 @@ public class GameManager : MonoBehaviour
         }
 
         gameData.ResetData(); // 세션 데이터만 리셋 (엔딩/업적 해금 현황은 별도 PlayerPrefs라 영향 없음)
+        
+        gameData.tutorialDone = true;
 
         SceneLoader.Instance.LoadScene("MainMenu"); // 시작화면 → 이후 튜토리얼(스킵 가능)
     }
