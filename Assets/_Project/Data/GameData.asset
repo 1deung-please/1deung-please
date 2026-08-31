@@ -23,8 +23,8 @@ MonoBehaviour:
   consecutiveFail: 000000000000000000000000
   tutorialNoButtonCount: 0
   meritPoint: 0
-  tutorialDone: 1
-  globalTimeRemaining: 0
+  tutorialDone: 0
+  globalTimeRemaining: 300
   isTimerFrozen: 1
-  lotteryRoomUnlocked: 1
-  isTimeOver: 1
+  lotteryRoomUnlocked: 0
+  isTimeOver: 0

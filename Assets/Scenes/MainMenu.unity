@@ -260,7 +260,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -827,7 +827,6 @@ GameObject:
   - component: {fileID: 1445228067}
   - component: {fileID: 1445228066}
   - component: {fileID: 1445228068}
-  - component: {fileID: 1445228069}
   m_Layer: 0
   m_Name: _GameManager
   m_TagString: Untagged
@@ -877,28 +876,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   achievementBookPanel: {fileID: 0}
   endingBookPanel: {fileID: 0}
---- !u!114 &1445228069
+--- !u!114 &1847345247 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 7693802061147093384, guid: 1317db89209d15849979a96baaaa2ed6, type: 3}
+  m_PrefabInstance: {fileID: 333492122915122549}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1445228064}
-  m_Enabled: 0
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbca3afea8d179b40b046e11b63b4588, type: 3}
+  m_Script: {fileID: 11500000, guid: 02cb4ec4d2e8b304888c818840200d60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  touchToStartText: {fileID: 3238645434084611753}
-  backgroundPanel: {fileID: 1310865374}
-  titleImage: {fileID: 1879012671}
-  bgmSource: {fileID: 236535013}
-  tutorialSceneName: Tutorial
-  blinkSpeed: 1.2
-  slideDuration: 0.8
-  titleDelay: 1
-  flashCount: 3
-  flashInterval: 0.12
 --- !u!1 &1879012667
 GameObject:
   m_ObjectHideFlags: 0
@@ -1736,6 +1724,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3285516954295925942, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1847345247}
+    - target: {fileID: 5733165413530803397, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1847345247}
     - target: {fileID: 7165604446736356836, guid: e01b63dc942acd644a19d1a4392efff8, type: 3}
       propertyPath: m_Name
       value: GlobalPopupCanvas

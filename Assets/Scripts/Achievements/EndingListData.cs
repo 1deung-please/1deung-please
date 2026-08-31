@@ -11,6 +11,7 @@ public class EndingInfo
     public Sprite unlockedIcon;     // 해금 시 표시할 지폐 이미지
     public Sprite lockedIcon;       // 잠겼을 때 표시할 이미지 (엔딩마다 다름)
     public string sceneName;        // 다시보기 버튼 클릭 시 SceneLoader로 이동할 씬 이름
+    public Vector2 imageOffset = Vector2.zero; // 각 엔딩 이미지별 UI 위치 보정값 (X, Y)
 }
 
 [CreateAssetMenu(fileName = "EndingList", menuName = "Game/EndingList")]

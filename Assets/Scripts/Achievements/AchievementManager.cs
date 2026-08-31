@@ -174,7 +174,12 @@ public class AchievementManager : MonoBehaviour
         var info = GetEndingInfo(endingId);
 
         if (endingBadgeImage != null && info != null && info.unlockedIcon != null)
+        {
             endingBadgeImage.sprite = info.unlockedIcon;
+
+            // 데이터 에셋에 설정된 offset 값을 RectTransform 위치에 적용
+            endingBadgeImage.rectTransform.anchoredPosition = info.imageOffset;
+        }
 
         string color = endingColors.ContainsKey(endingId) ? endingColors[endingId] : "#FFFFFF";
         string title = info != null ? info.title : endingId;
@@ -210,7 +215,58 @@ public class AchievementManager : MonoBehaviour
     IEnumerator HideAchievementAfterDelay()
     {
         yield return new WaitForSeconds(popupDuration);
+        CloseAchievementPopup();
+    }
+
+    public void CloseAchievementPopup()
+    {
+        if (popupCoroutine != null)
+        {
+            StopCoroutine(popupCoroutine);
+            popupCoroutine = null;
+        }
+
         if (achievementPopup != null)
             achievementPopup.SetActive(false);
+    }
+
+    public void CloseEndingPopup()
+    {
+        if (endingPopup != null)
+            endingPopup.SetActive(false);
+    }
+
+    // ==========================================
+    // [테스트용] 팝업 강제 노출 메서드
+    // ==========================================
+
+    public void ForceShowAchievementPopup(int id)
+    {
+        Debug.Log($"[AchievementManager] 업적 팝업 강제 노출 테스트 (ID: {id})");
+        ShowAchievementPopup(id);
+    }
+
+    public void ForceShowEndingPopup(string endingId)
+    {
+        Debug.Log($"[AchievementManager] 엔딩 팝업 강제 노출 테스트 (ID: {endingId})");
+        ShowEndingPopup(endingId);
+    }
+
+    [ContextMenu("Test - Show Popup (ID: 1)")]
+    private void TestShowPopupID1()
+    {
+        ForceShowAchievementPopup(1);
+    }
+
+    [ContextMenu("Test - Show Ending Popup (진정한귀인)")]
+    private void TestShowEndingPopupTrueBenefactor()
+    {
+        ForceShowEndingPopup("진정한귀인");
+    }
+
+    [ContextMenu("Reset Only Achievements Data")]
+    public void ResetOnlyAchievementsData()
+    {
+        AchievementStorage.ClearAllAchievements();
     }
 }

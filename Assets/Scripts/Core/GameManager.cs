@@ -12,6 +12,13 @@ public class GameManager : MonoBehaviour
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
 
+    // PlayerPrefs 저장용 키 값 정의
+    private const string KEY_TIME_REMAINING = "GlobalTimeRemaining";
+    private const string KEY_TIMER_FROZEN = "IsTimerFrozen";
+    private const string KEY_TIME_OVER = "IsTimeOver";
+    private const string KEY_MERIT_POINT = "MeritPoint";
+    private const string KEY_TUTORIAL_DONE = "TutorialDone";
+
     public bool IsPendingEndingTransition() => pendingEndingTransition;
 
     void Awake()
@@ -20,7 +27,9 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            gameData.ResetData();
+
+            // 최초 실행 시 저장된 플레이 데이터 불러오기 
+            LoadGameData();
         }
         else
         {
@@ -48,6 +57,67 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SaveGameData()
+    {
+        if (gameData == null) return;
+
+        PlayerPrefs.SetFloat(KEY_TIME_REMAINING, gameData.globalTimeRemaining);
+        PlayerPrefs.SetInt(KEY_TIMER_FROZEN, gameData.isTimerFrozen ? 1 : 0);
+        PlayerPrefs.SetInt(KEY_TIME_OVER, gameData.isTimeOver ? 1 : 0);
+        PlayerPrefs.SetInt(KEY_MERIT_POINT, gameData.meritPoint);
+        PlayerPrefs.SetInt(KEY_TUTORIAL_DONE, gameData.tutorialDone ? 1 : 0);
+
+        PlayerPrefs.Save();
+        Debug.Log($"[GameManager] 플레이 데이터 저장 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초, 튜토리얼 완료: {gameData.tutorialDone})");
+    }
+
+    public void LoadGameData()
+    {
+        if (gameData == null) return;
+
+        // 저장된 남은 시간 데이터가 존재하면 불러오기
+        if (PlayerPrefs.HasKey(KEY_TIME_REMAINING))
+        {
+            gameData.globalTimeRemaining = PlayerPrefs.GetFloat(KEY_TIME_REMAINING);
+            gameData.isTimerFrozen = PlayerPrefs.GetInt(KEY_TIMER_FROZEN, 0) == 1;
+            gameData.isTimeOver = PlayerPrefs.GetInt(KEY_TIME_OVER, 0) == 1;
+            gameData.meritPoint = PlayerPrefs.GetInt(KEY_MERIT_POINT, 0);
+            gameData.tutorialDone = PlayerPrefs.GetInt(KEY_TUTORIAL_DONE, 0) == 1;
+
+            Debug.Log($"[GameManager] 저장된 플레이 데이터 불러오기 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초)");
+        }
+        else
+        {
+            // 저장된 기록이 없는 완전 첫 실행일 때만 리셋
+            gameData.ResetData();
+        }
+    }
+
+    private void ClearSavedData()
+    {
+        PlayerPrefs.DeleteKey(KEY_TIME_REMAINING);
+        PlayerPrefs.DeleteKey(KEY_TIMER_FROZEN);
+        PlayerPrefs.DeleteKey(KEY_TIME_OVER);
+        PlayerPrefs.DeleteKey(KEY_MERIT_POINT);
+        PlayerPrefs.DeleteKey(KEY_TUTORIAL_DONE);
+        PlayerPrefs.Save();
+        Debug.Log("[GameManager] 세이브 데이터 삭제 완료");
+    }
+
+    // 게임 종료 및 모바일 백그라운드 전환 이벤트
+    private void OnApplicationQuit()
+    {
+        SaveGameData();
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            SaveGameData();
+        }
+    }
+
     public void PauseTimer()
     {
         gameData.isTimerFrozen = true;
@@ -59,9 +129,27 @@ public class GameManager : MonoBehaviour
             gameData.isTimerFrozen = false;
     }
 
+    // 메인 메뉴 시작 버튼 호출 메서드
     public void OnStartGame()
     {
-        SceneLoader.Instance.LoadScene("Tutorial");
+        // 튜토리얼을 이미 완료했다면 바로 로비로 이동
+        if (gameData != null && gameData.tutorialDone)
+        {
+            if (gameData.isTimeOver)
+            {
+                SceneLoader.Instance.LoadSceneWithLoadingScreen("NightLobby");
+            }
+            else
+            {
+                ResumeTimer();
+                SceneLoader.Instance.LoadScene("Lobby");
+            }
+        }
+        else
+        {
+            // 최초 실행 시에만 튜토리얼 진입
+            SceneLoader.Instance.LoadScene("Tutorial");
+        }
     }
 
     public void OnTutorialComplete()
@@ -69,6 +157,7 @@ public class GameManager : MonoBehaviour
         gameData.tutorialDone = true;
         gameData.isTimerFrozen = false;
 
+        SaveGameData(); // 튜토리얼 완료 시점 저장
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -76,6 +165,7 @@ public class GameManager : MonoBehaviour
     {
         isMiniGamePlaying = true;
         PauseTimer();
+        SaveGameData(); // 미니게임 진입 전 저장
         SceneLoader.Instance.LoadScene(miniGameSceneName);
     }
 
@@ -116,18 +206,22 @@ public class GameManager : MonoBehaviour
             addMeritPoint(collectedCount + 50);
         else
             addMeritPoint(Mathf.RoundToInt(collectedCount * 0.5f));
+
+        SaveGameData();
     }
 
     public void CompleteMiniGame2(int correctCount)
     {
         gameData.miniGame2Score = correctCount;
         addMeritPoint(correctCount * 20);
+        SaveGameData();
     }
 
     public void CompleteMiniGame3(bool isSuccess)
     {
         gameData.miniGame3Score = isSuccess ? 700 : 0;
         if (isSuccess) addMeritPoint(700);
+        SaveGameData();
     }
 
     public void addMeritPoint(int amount)
@@ -152,6 +246,7 @@ public class GameManager : MonoBehaviour
             gameData.lotteryRoomUnlocked = true;
             AchievementManager.Instance.OnGlobalTimerEnd();
 
+            SaveGameData();
             SceneLoader.Instance.LoadSceneWithLoadingScreen("NightLobby");
             return;
         }
@@ -161,6 +256,7 @@ public class GameManager : MonoBehaviour
             ResumeTimer();
         }
 
+        SaveGameData();
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -177,6 +273,7 @@ public class GameManager : MonoBehaviour
         {
             gameData.lotteryRoomUnlocked = true;
             AchievementManager.Instance.OnGlobalTimerEnd();
+            SaveGameData();
             SceneLoader.Instance.LoadSceneWithLoadingScreen("NightLobby");
         }
     }
@@ -260,10 +357,27 @@ public class GameManager : MonoBehaviour
             PersistentStats.IncrementResetCycleCount();
         }
 
-        gameData.ResetData(); // 세션 데이터만 리셋 (엔딩/업적 해금 현황은 별도 PlayerPrefs라 영향 없음)
-        
+        // 새 회차 시작 시 기기 내부 세이브 파일 초기화
+        ClearSavedData();
+
+        gameData.ResetData(); // 세션 데이터 초기화
+
+        // 회차 리셋 시에도 튜토리얼을 스킵하도록 true 처리 후 저장
         gameData.tutorialDone = true;
+        SaveGameData();
 
         SceneLoader.Instance.LoadScene("MainMenu");
+    }
+
+    [ContextMenu("Clear PlayerPrefs Data")]
+    public void ClearSavedDataPublic()
+    {
+        PlayerPrefs.DeleteKey(KEY_TIME_REMAINING);
+        PlayerPrefs.DeleteKey(KEY_TIMER_FROZEN);
+        PlayerPrefs.DeleteKey(KEY_TIME_OVER);
+        PlayerPrefs.DeleteKey(KEY_MERIT_POINT);
+        PlayerPrefs.DeleteKey(KEY_TUTORIAL_DONE);
+        PlayerPrefs.Save();
+        Debug.Log("[GameManager] 세이브 데이터가 완전히 삭제되었습니다.");
     }
 }
