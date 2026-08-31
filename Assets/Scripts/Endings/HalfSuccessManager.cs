@@ -5,165 +5,255 @@ using UnityEngine.UI;
 
 public class HalfSuccessManager : MonoBehaviour
 {
-    [Header("Game Data")]
-    [SerializeField] private GameData gameData;
-
     [Header("UI")]
+    [SerializeField] private Image portraitImage;
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject dialogueUI;
 
     [Header("Portrait")]
-    [SerializeField] private Image portraitImage;
-    [SerializeField] private Sprite ancestorGod;
-    [SerializeField] private Sprite player;
+    [SerializeField] private Sprite Ancestor;
 
-    private bool isTyping = false;
-    private bool skipTyping = false;
+    [Header("Try Again")]
+    [SerializeField] private Button tryAgainButton;
 
-    // 클릭을 한 번만 감지하기 위한 변수
+    [Header("Typing")]
+    [SerializeField] private float typingSpeed = 0.05f;
+
+    [Header("Background Animation")]
+    [SerializeField] private GameObject backgroundAnimObject;
+
+    [Header("BGM")]
+    [SerializeField] private AudioSource bgmSource;
+    [SerializeField] private float bgmFadeInDuration = 4f;
+
     private bool clickRequested = false;
+    private Coroutine typingCoroutine;
 
     private void Start()
     {
-        if (portraitImage != null)
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
+
+        if (dialogueText != null)
         {
-            portraitImage.gameObject.SetActive(false);
+            dialogueText.text = "";
+            dialogueText.gameObject.SetActive(true);
         }
+
+        if (portraitImage != null)
+            portraitImage.gameObject.SetActive(false);
+
+        if (tryAgainButton != null)
+            tryAgainButton.gameObject.SetActive(false);
+
+        if (bgmSource != null)
+        {
+            bgmSource.Stop();
+            bgmSource.volume = 0f;
+        }
+
+        if (backgroundAnimObject != null)
+            backgroundAnimObject.SetActive(true);
 
         StartCoroutine(EndingStart());
     }
 
     private void Update()
     {
-        // 모든 클릭은 여기서만 감지
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;
         }
     }
 
-    IEnumerator EndingStart()
+    private IEnumerator EndingStart()
     {
-        yield return Dialogue("조상님", "그래... 처음 보는구나.", ancestorGod);
+        yield return Dialogue(
+            "조상님",
+            "흠... 어디 보자...",
+            Ancestor
+        );
 
-        yield return Dialogue("조상님", "내가 바로 네 조상이다.", ancestorGod);
+        PlayBGM();
 
         yield return Dialogue(
             "조상님",
-            "내가 널 참 오랫동안 지켜보고 있었지...\n" +
-            "갓난아기일 때부터 회사에 치이는 지금까지...",
-            ancestorGod
+            "참으로 애~매하구나!",
+            Ancestor
         );
-
-        yield return Dialogue(
-            "조상님",
-            "얼마나 고생이 많았느냐.\n" +
-            "난 널 도와주러 온 사람이야.",
-            ancestorGod
-        );
-
-        yield return Dialogue(
-            "조상님",
-            "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.",
-            ancestorGod
-        );
-
-        yield return Dialogue("조상님", "흠... 어디 보자...", ancestorGod);
-
-        yield return Dialogue("조상님", "참으로 애~매하구나!", ancestorGod);
 
         yield return Dialogue(
             "조상님",
             "열심히 안 한 건 아닌데, 그렇다고 눈물겹게 열심히 한 것도 아니고...",
-            ancestorGod
+            Ancestor
         );
 
         yield return Dialogue(
             "조상님",
             "딱 주 5일 턱걸이로 출근 도장만 찍은 느낌이구나...",
-            ancestorGod
+            Ancestor
         );
 
         yield return Dialogue(
             "조상님",
             "그래도 이 팍팍한 세상에 평타라도 친 게 어디냐.",
-            ancestorGod
+            Ancestor
         );
 
         yield return Dialogue(
             "조상님",
             "네 성의를 봐서 대박 복권까지는 아니어도, 로또 3등 당첨권을 내려주마!",
-            ancestorGod
+            Ancestor
         );
 
         yield return Dialogue(
             "조상님",
             "감질나느냐? 억울하면 다음엔 눈 딱 감고 풀악셀로 덕 한번 쌓아보거라!",
-            ancestorGod
+            Ancestor
         );
 
-        yield return Dialogue("조상님", "자, 리스폰 고고!", ancestorGod);
+        yield return Dialogue(
+            "조상님",
+            "자, 리스폰 고고!",
+            Ancestor
+        );
+
+        EndDialogue();
     }
 
-    IEnumerator Dialogue(string speaker, string text, Sprite portrait)
+    private IEnumerator Dialogue(string speaker, string text, Sprite portrait)
     {
-        // 이름 변경
+        clickRequested = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (nameText != null)
         {
-            nameText.text = speaker;
-        }
-
-        // 사진 변경
-        if (portraitImage != null)
-        {
-            if (portrait != null)
+            if (string.IsNullOrEmpty(speaker))
             {
-                portraitImage.sprite = portrait;
-                portraitImage.gameObject.SetActive(true);
+                nameText.gameObject.SetActive(false);
             }
             else
             {
-                portraitImage.gameObject.SetActive(false);
+                nameText.gameObject.SetActive(true);
+                nameText.text = speaker;
             }
         }
 
-        dialogueText.text = "";
+        SetPortrait(portrait);
 
-        isTyping = true;
-        skipTyping = false;
+        if (dialogueText != null)
+            dialogueText.text = "";
 
-        // 이전 클릭 제거
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeText(text));
+
+        yield return typingCoroutine;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
+
         clickRequested = false;
 
-        // 타이핑
+        yield return new WaitUntil(() => clickRequested);
+
+        clickRequested = false;
+    }
+
+    private IEnumerator TypeText(string text)
+    {
+        if (dialogueText == null)
+            yield break;
+
+        dialogueText.text = "";
+
         foreach (char c in text)
         {
-            // 타이핑 중 클릭하면 즉시 전체 대사 표시
             if (clickRequested)
             {
                 dialogueText.text = text;
-
-                // 이 클릭은 "타이핑 스킵"에 사용했으므로 제거
                 clickRequested = false;
-
                 break;
             }
 
             dialogueText.text += c;
 
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(typingSpeed);
+        }
+    }
+
+    private void SetPortrait(Sprite portrait)
+    {
+        if (portraitImage == null)
+            return;
+
+        if (portrait == null)
+        {
+            portraitImage.gameObject.SetActive(false);
+            return;
         }
 
-        isTyping = false;
+        portraitImage.sprite = portrait;
+        portraitImage.gameObject.SetActive(true);
+    }
 
-        // 타이핑이 끝난 뒤 혹시 남아있는 클릭 제거
-        clickRequested = false;
+    private void PlayBGM()
+    {
+        if (bgmSource == null)
+            return;
 
-        // 대사가 모두 나온 후
-        // 새로운 클릭을 기다림
-        yield return new WaitUntil(() => clickRequested);
+        bgmSource.volume = 0f;
+        bgmSource.Play();
 
-        // 이 클릭은 다음 대사로 넘어가는 데 사용
-        clickRequested = false;
+        StartCoroutine(BGMFadeIn());
+    }
+
+    private IEnumerator BGMFadeIn()
+    {
+        float time = 0f;
+
+        while (time < bgmFadeInDuration)
+        {
+            time += Time.deltaTime;
+
+            if (bgmSource != null)
+            {
+                bgmSource.volume = Mathf.Lerp(
+                    0f,
+                    1f,
+                    time / bgmFadeInDuration
+                );
+            }
+
+            yield return null;
+        }
+
+        if (bgmSource != null)
+            bgmSource.volume = 1f;
+    }
+
+    private void EndDialogue()
+    {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
+
+        if (dialogueText != null)
+            dialogueText.gameObject.SetActive(false);
+
+        if (portraitImage != null)
+            portraitImage.gameObject.SetActive(false);
+
+        if (tryAgainButton != null)
+            tryAgainButton.gameObject.SetActive(true);
     }
 }

@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
             return;
 
         gameData.globalTimeRemaining -= Time.deltaTime;
-        
+
         if (gameData.globalTimeRemaining <= 0)
         {
             gameData.globalTimeRemaining = 0;
@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
     {
         gameData.tutorialDone = true;
         gameData.isTimerFrozen = false;
-     
+
         SceneLoader.Instance.LoadScene("Lobby");
     }
 
@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
             gameData.lotteryRoomUnlocked = true;
             AchievementManager.Instance.OnGlobalTimerEnd();
 
-            SceneLoader.Instance.LoadScene("NightLobby");
+            SceneLoader.Instance.LoadSceneWithLoadingScreen("NightLobby");
             return;
         }
 
@@ -177,7 +177,7 @@ public class GameManager : MonoBehaviour
         {
             gameData.lotteryRoomUnlocked = true;
             AchievementManager.Instance.OnGlobalTimerEnd();
-            SceneLoader.Instance.LoadScene("NightLobby");
+            SceneLoader.Instance.LoadSceneWithLoadingScreen("NightLobby");
         }
     }
 
@@ -199,7 +199,6 @@ public class GameManager : MonoBehaviour
 
         bool allPlayed = gameData.playedGames[0] && gameData.playedGames[1] && gameData.playedGames[2];
 
-        // 기본 엔딩 결정
         if (!allPlayed)
         {
             endingId = "얄팍한속셈";
@@ -226,7 +225,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 히든 엔딩 조건
         if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15) && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
         {
             endingId = "히든";
@@ -254,10 +252,8 @@ public class GameManager : MonoBehaviour
         SceneLoader.Instance.LoadScene(sceneName);
     }
 
-    // ---- 사이클 초기화 (F-15) ----
     public void ResetCycle()
     {
-        // 19번 업적 체크: 전역 5분 중 3분(180초) 이상 흘렀는지 = 남은 시간이 120초 이하였는지
         bool playedOver3Min = gameData.globalTimeRemaining <= 120f;
         if (playedOver3Min)
         {
@@ -268,6 +264,6 @@ public class GameManager : MonoBehaviour
         
         gameData.tutorialDone = true;
 
-        SceneLoader.Instance.LoadScene("MainMenu"); // 시작화면 → 이후 튜토리얼(스킵 가능)
+        SceneLoader.Instance.LoadScene("MainMenu");
     }
 }
