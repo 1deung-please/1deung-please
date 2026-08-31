@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -17,6 +17,7 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Dialogue Data")]
     [SerializeField] private DialogueData dialogueData;
+    [SerializeField] private ScratchLotteryManager scratchLotteryManager;
 
     [Header("Typing")]
     [SerializeField] private float typingSpeed = 0.05f;
@@ -227,6 +228,12 @@ public class DialogueManager : MonoBehaviour
     {
         Debug.Log("대화 종료");
         OnDialogueFinished?.Invoke();
+
+        if (scratchLotteryManager != null)
+        {
+            scratchLotteryManager.ShowLottery();
+            return;
+        }
 
         if (TutorialManager.Instance != null)
         {

@@ -428,7 +428,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5258d6ad27f184e4e972e8dbbf6430e3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 787817e2c51f80646b0a9f244ca2cad9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -631,7 +631,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &478666021
 RectTransform:
   m_ObjectHideFlags: 0
@@ -868,7 +868,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ae82b681dd8bf04ca1af05985e1c84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lotteryPanel: {fileID: 1406318197}
+  scratchPanel: {fileID: 551119538}
   scratchArea: {fileID: 1487777643}
   scratchTexture: {fileID: 2800000, guid: 34c44fab697e62647b8f566650164a7b, type: 3}
   coinCursor: {fileID: 2800000, guid: 6f741712d107c4e4e8d2329781ccdf62, type: 3}
@@ -1081,7 +1081,10 @@ MonoBehaviour:
   nameText: {fileID: 1443560891}
   dialogueText: {fileID: 1849246015}
   portraitImage: {fileID: 844672122}
+  dialogueUI: {fileID: 0}
+  characterAnimator: {fileID: 0}
   dialogueData: {fileID: 11400000, guid: 6f15209ebac813b42be3383887705989, type: 2}
+  scratchLotteryManager: {fileID: 608074660}
   typingSpeed: 0.05
   choicePanel: {fileID: 0}
   choiceManager: {fileID: 0}
@@ -1114,8 +1117,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d65045d7e67d8d24b8070d699e6242e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogueManager: {fileID: 1096950477}
-  scratchLotteryManager: {fileID: 608074660}
 --- !u!1 &1139072339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,6 +1565,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1946f5cb75fe1447b1604bf503d9ba0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadingPanel: {fileID: 0}
+  progressBarFill: {fileID: 0}
+  loadingMessageText: {fileID: 0}
+  npcCharacter: {fileID: 0}
+  progressBarRect: {fileID: 0}
+  npcStartX: -501
+  npcEndX: 523
+  loadingMessages:
+  - "\uB85C\uB529 \uC911..."
+  - "\uB85C\uB610 \uC0AC\uB7EC \uAC00\uB294 \uC911..."
+  - "\uB85C\uB610 \uAE01\uB294 \uC911..."
+  messageInterval: 5
+  minLoadingDuration: 3
 --- !u!4 &1566652919
 Transform:
   m_ObjectHideFlags: 0
