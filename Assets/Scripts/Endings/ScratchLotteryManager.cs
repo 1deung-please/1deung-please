@@ -5,7 +5,7 @@ using System.Collections;
 public class ScratchLotteryManager : MonoBehaviour
 {
     [Header("Lottery UI")]
-    [SerializeField] private GameObject lotteryPanel;
+    [SerializeField] private GameObject scratchPanel;
 
     [Header("Scratch")]
     [SerializeField] private RawImage scratchArea;
@@ -36,9 +36,9 @@ public class ScratchLotteryManager : MonoBehaviour
     private void Start()
     {
         // 처음에는 복권 숨김
-        if (lotteryPanel != null)
+        if (scratchPanel != null)
         {
-            lotteryPanel.SetActive(false);
+            scratchPanel.SetActive(false);
         }
 
         if (scratchArea == null)
@@ -101,7 +101,7 @@ public class ScratchLotteryManager : MonoBehaviour
         if (endingStarted)
             return;
 
-        if (lotteryPanel == null || !lotteryPanel.activeSelf)
+        if (scratchPanel == null || !scratchPanel.activeSelf)
             return;
 
         // 마우스 버튼 누르기 시작
@@ -247,13 +247,13 @@ public class ScratchLotteryManager : MonoBehaviour
     // 대화가 끝났을 때 호출
     public void ShowLottery()
     {
-        if (lotteryPanel == null)
+        if (scratchPanel == null)
         {
-            Debug.LogError("LotteryPanel이 연결되지 않았습니다!");
+            Debug.LogError("scratchPanel이 연결되지 않았습니다!");
             return;
         }
 
-        lotteryPanel.SetActive(true);
+        scratchPanel.SetActive(true);
 
         // 복권이 나타나는 순간 동전 커서
         if (coinCursor != null)

@@ -434,8 +434,6 @@ public class GameManager_mg02 : MonoBehaviour
             {
                 int earnedMerit = correctCount * 20;
                 recordText.text = $"획득 공덕 {earnedMerit}p";
-            
-
                 /*recordText.text =
                     $"공덕 {earnedMerit} " +
                     $"생존 {survivedTime:F0}s " +
@@ -446,7 +444,8 @@ public class GameManager_mg02 : MonoBehaviour
             }
         }
 
-        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
+        bool willAutoReturn = GameManager.Instance != null &&
+                      GameManager.Instance.IsPendingEndingTransition();
 
         if (restartButton != null)
             restartButton.gameObject.SetActive(!willAutoReturn);
@@ -460,11 +459,9 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void returnToLobby()
     {
-        Debug.Log("MG02 returnToLobby 호출");
         Time.timeScale = 1f;
         if (GameManager.Instance != null)
         {
-            Debug.Log("GameManager 있음");
             GameManager.Instance.ReturnToLobby();
         }
         else
