@@ -132,8 +132,6 @@ public class AchievementManager : MonoBehaviour
 
     void ShowAchievementPopup(int id)
     {
-        return;
-
         if (achievementPopup == null) return;
 
         var info = GetAchievementInfo(id);
@@ -149,7 +147,7 @@ public class AchievementManager : MonoBehaviour
             achievementDescriptionText.text = info.description;
 
         if (achievementBodyText != null)
-            achievementBodyText.text = "업적을 달성하셨습니다.";
+            achievementBodyText.text = "업적을 달성하였습니다.";
 
         if (sfxSource != null && achievementSfx != null)
             sfxSource.PlayOneShot(achievementSfx);
@@ -160,6 +158,15 @@ public class AchievementManager : MonoBehaviour
         popupCoroutine = StartCoroutine(HideAchievementAfterDelay());
     }
 
+    static readonly System.Collections.Generic.Dictionary<string, string> endingColors = new System.Collections.Generic.Dictionary<string, string>
+    {
+        { "얄팍한속셈", "#8B7C47" },
+        { "자격미달", "#616F7C" },
+        { "절반의성공", "#83C1DB" },
+        { "진정한귀인", "#FEFCA1" },
+        { "히든", "#9187B9" },
+    };
+
     void ShowEndingPopup(string endingId)
     {
         if (endingPopup == null) return;
@@ -169,11 +176,14 @@ public class AchievementManager : MonoBehaviour
         if (endingBadgeImage != null && info != null && info.unlockedIcon != null)
             endingBadgeImage.sprite = info.unlockedIcon;
 
+        string color = endingColors.ContainsKey(endingId) ? endingColors[endingId] : "#FFFFFF";
+        string title = info != null ? info.title : endingId;
+
         if (endingTitleText != null)
-            endingTitleText.text = info != null ? info.title : endingId;
+            endingTitleText.text = $"<color={color}>{title}</color>";
 
         if (endingBodyText != null)
-            endingBodyText.text = "엔딩을 획득하셨습니다.";
+            endingBodyText.text = "엔딩을 획득하였습니다.";
 
         if (sfxSource != null && endingSfx != null)
             sfxSource.PlayOneShot(endingSfx);

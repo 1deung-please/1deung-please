@@ -58,10 +58,19 @@ public class TutorialManager : MonoBehaviour
             tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
 
         if (skipButton != null)
+        {
             skipButton.SetActive(tutorialCompleted);
 
+            Image skipImage = skipButton.GetComponent<Image>();
+            if (skipImage != null)
+            {
+                skipImage.alphaHitTestMinimumThreshold = 0.1f;
+            }
+        }
         else
+        {
             Debug.LogError("skipButton이 연결되지 않았습니다.");
+        }
 
         if (fadePanel != null)
         {
