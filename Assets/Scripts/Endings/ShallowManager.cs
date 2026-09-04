@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
@@ -267,15 +268,20 @@ public class ShallowManager : MonoBehaviour
         switch (index)
         {
             case 0:
-                return "<이걸 안 비켜?>";
+                return "이걸 안 비켜?";
 
             case 1:
-                return "<출격! 논리요새>";
+                return "출격! 논리요새";
 
             case 2:
-                return "<주워줘, 쓰레기>";
+                return "주워줘, 쓰레기";
         }
 
         return "";
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
