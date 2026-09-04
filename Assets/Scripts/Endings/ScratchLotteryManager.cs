@@ -6,28 +6,34 @@ public class ScratchLotteryManager : MonoBehaviour
 {
     [Header("Lottery UI")]
     [SerializeField] private GameObject scratchPanel;
-
-    [Header("Scratch")]
-    [SerializeField] private RawImage scratchArea;
-    [SerializeField] private Texture2D scratchTexture;
+    [SerializeField] private GameObject scratchBefore;
+    [SerializeField] private GameObject scratchAfter;
+    [SerializeField] private GameObject scratchGuideText;
 
     [Header("Cursor")]
     [SerializeField] private Texture2D coinCursor;
 
     [Header("Scratch Settings")]
-    [SerializeField] private int brushSize = 40;
-    [SerializeField] private float requiredPercent = 60f;
+    [SerializeField] private int brushSize = 50;
+    [SerializeField] private float requiredPercent = 60f; // 목표 긁기 비율 (60%)
 
-    [Header("Ending")]
-    [SerializeField] private EndingManager endingManager;
-    [SerializeField] private CanvasGroup fadePanel;
+    [Header("Ending Fade")]
+    [SerializeField] private CanvasGroup fadePanel; // 흰색 이미지 연동 CanvasGroup
+    [SerializeField] private float fadeDuration = 1.0f; // 흰색으로 변하는 시간 (초 단위)
+
+    [Header("Ticket Area Normalized (0~1)")]
+    [SerializeField] private Rect ticketAreaNormalized = new Rect(0.28f, 0.20f, 0.44f, 0.25f);
 
     private Texture2D runtimeTexture;
     private RectTransform scratchRect;
 
-    private bool[] validPixels;
+    private RawImage beforeRawImage;
+    private Image beforeImage;
+
+    private bool[] scratchablePixels;
     private bool[] erasedPixels;
-    private int validPixelCount;
+
+    private int scratchablePixelCount;
     private int erasedPixelCount;
 
     private bool isDragging = false;
@@ -35,153 +41,172 @@ public class ScratchLotteryManager : MonoBehaviour
 
     private void Start()
     {
-        // 처음에는 복권 숨김
-        if (scratchPanel != null)
+        if (scratchPanel != null) scratchPanel.SetActive(false);
+
+        // 1. FadePanel 초기화 (투명 상태)
+        if (fadePanel != null)
         {
-            scratchPanel.SetActive(false);
+            fadePanel.gameObject.SetActive(true);
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false;
         }
 
-        if (scratchArea == null)
+        // 2. 가이드 글자 Raycast 해제
+        if (scratchGuideText != null)
         {
-            Debug.LogError("ScratchArea가 연결되지 않았습니다!");
+            Graphic guideGraphic = scratchGuideText.GetComponent<Graphic>();
+            if (guideGraphic != null) guideGraphic.raycastTarget = false;
+        }
+
+        if (scratchBefore == null || scratchAfter == null)
+        {
+            Debug.LogError("ScratchBefore 또는 ScratchAfter가 연결되지 않았습니다!");
             return;
         }
 
-        if (scratchTexture == null)
+        beforeRawImage = scratchBefore.GetComponent<RawImage>();
+        beforeImage = scratchBefore.GetComponent<Image>();
+
+        Texture2D original = GetOriginalTexture();
+        if (original == null || !original.isReadable)
         {
-            Debug.LogError("ScratchTexture가 연결되지 않았습니다!");
+            Debug.LogError("Texture2D를 읽을 수 없거나 Read/Write Enabled가 꺼져 있습니다.");
             return;
         }
 
-        // 원본 이미지가 읽을 수 있는지 확인
-        if (!scratchTexture.isReadable)
-        {
-            Debug.LogError(
-                "ScratchTexture의 Read/Write가 꺼져 있습니다!"
-            );
-            return;
-        }
+        scratchRect = scratchBefore.GetComponent<RectTransform>();
 
-        scratchRect = scratchArea.rectTransform;
+        runtimeTexture = new Texture2D(original.width, original.height, TextureFormat.RGBA32, false);
+        Color[] sourcePixels = original.GetPixels();
 
-        // 원본을 복사해서 실제로 지울 수 있는 텍스처 생성
-        runtimeTexture = new Texture2D(
-            scratchTexture.width,
-            scratchTexture.height,
-            TextureFormat.RGBA32,
-            false
-        );
-
-        Color[] sourcePixels = scratchTexture.GetPixels();
-
-        // 원래 이미지의 각 픽셀 정보를 저장
-        validPixels = new bool[sourcePixels.Length];
+        scratchablePixels = new bool[sourcePixels.Length];
         erasedPixels = new bool[sourcePixels.Length];
 
-        // 원래 불투명했던 픽셀만 개수에 포함
-        for (int i = 0; i < sourcePixels.Length; i++)
+        scratchablePixelCount = 0;
+        erasedPixelCount = 0;
+
+        int width = original.width;
+        int height = original.height;
+
+        int minX = Mathf.FloorToInt(ticketAreaNormalized.xMin * width);
+        int maxX = Mathf.CeilToInt(ticketAreaNormalized.xMax * width);
+        int minY = Mathf.FloorToInt(ticketAreaNormalized.yMin * height);
+        int maxY = Mathf.CeilToInt(ticketAreaNormalized.yMax * height);
+
+        for (int y = 0; y < height; y++)
         {
-            if (sourcePixels[i].a > 0.1f)
+            for (int x = 0; x < width; x++)
             {
-                validPixels[i] = true;
-                validPixelCount++;
+                int i = y * width + x;
+                Color pixel = sourcePixels[i];
+
+                if (pixel.a <= 0.1f) continue;
+
+                bool isInTicketArea = (x >= minX && x <= maxX && y >= minY && y <= maxY);
+                if (!isInTicketArea) continue;
+
+                Color.RGBToHSV(pixel, out float h, out float s, out float v);
+
+                bool isPureGray = (s < 0.15f) && (v > 0.2f && v < 0.85f);
+
+                if (isPureGray)
+                {
+                    scratchablePixels[i] = true;
+                    scratchablePixelCount++;
+                }
             }
         }
 
-        // 복사한 이미지 생성
         runtimeTexture.SetPixels(sourcePixels);
         runtimeTexture.Apply();
 
-        // 실제 스크래치 이미지로 사용
-        scratchArea.texture = runtimeTexture;
+        ApplyRuntimeTexture();
+        scratchAfter.SetActive(true);
+    }
+
+    private Texture2D GetOriginalTexture()
+    {
+        if (beforeRawImage != null && beforeRawImage.texture != null)
+            return beforeRawImage.texture as Texture2D;
+
+        if (beforeImage != null && beforeImage.sprite != null)
+            return beforeImage.sprite.texture;
+
+        return null;
+    }
+
+    private void ApplyRuntimeTexture()
+    {
+        if (beforeRawImage != null)
+        {
+            beforeRawImage.texture = runtimeTexture;
+        }
+        else if (beforeImage != null)
+        {
+            beforeImage.sprite = Sprite.Create(
+                runtimeTexture,
+                new Rect(0, 0, runtimeTexture.width, runtimeTexture.height),
+                new Vector2(0.5f, 0.5f)
+            );
+        }
     }
 
     private void Update()
     {
-        if (endingStarted)
-            return;
+        if (endingStarted || scratchPanel == null || !scratchPanel.activeSelf) return;
 
-        if (scratchPanel == null || !scratchPanel.activeSelf)
-            return;
-
-        // 마우스 버튼 누르기 시작
         if (Input.GetMouseButtonDown(0))
         {
             isDragging = true;
-
+            HideGuideText();
             ScratchAtMouse();
         }
 
-        // 마우스를 누른 상태에서 이동
         if (Input.GetMouseButton(0) && isDragging)
         {
+            HideGuideText();
             ScratchAtMouse();
         }
 
-        // 마우스 버튼 떼기
         if (Input.GetMouseButtonUp(0))
         {
             isDragging = false;
         }
     }
 
+    public void HideGuideText()
+    {
+        if (scratchGuideText != null && scratchGuideText.activeSelf)
+        {
+            scratchGuideText.SetActive(false);
+        }
+    }
+
     private void ScratchAtMouse()
     {
-        Vector2 localPosition;
+        if (runtimeTexture == null || scratchRect == null) return;
 
-        // Canvas의 카메라 가져오기
-        Canvas canvas = scratchArea.canvas;
+        Canvas canvas = scratchBefore.GetComponentInParent<Canvas>();
+        Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay) ? canvas.worldCamera : null;
 
-        Camera cam = null;
-
-        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(scratchRect, Input.mousePosition, cam, out Vector2 localPosition))
         {
-            cam = canvas.worldCamera;
+            float width = scratchRect.rect.width;
+            float height = scratchRect.rect.height;
+
+            float normalizedX = (localPosition.x + width * 0.5f) / width;
+            float normalizedY = (localPosition.y + height * 0.5f) / height;
+
+            if (normalizedX < 0f || normalizedX > 1f || normalizedY < 0f || normalizedY > 1f) return;
+
+            int pixelX = Mathf.Clamp(Mathf.FloorToInt(normalizedX * runtimeTexture.width), 0, runtimeTexture.width - 1);
+            int pixelY = Mathf.Clamp(Mathf.FloorToInt(normalizedY * runtimeTexture.height), 0, runtimeTexture.height - 1);
+
+            EraseCircle(pixelX, pixelY);
+            runtimeTexture.Apply();
+
+            CheckScratchPercent();
         }
-
-        bool inside = RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            scratchRect,
-            Input.mousePosition,
-            cam,
-            out localPosition
-        );
-
-        if (!inside)
-            return;
-
-        float width = scratchRect.rect.width;
-        float height = scratchRect.rect.height;
-
-        // UI 좌표 → 텍스처 좌표
-        float normalizedX =
-            (localPosition.x + width / 2f) / width;
-
-        float normalizedY =
-            (localPosition.y + height / 2f) / height;
-
-        if (normalizedX < 0f || normalizedX > 1f ||
-            normalizedY < 0f || normalizedY > 1f)
-        {
-            return;
-        }
-
-        int pixelX = Mathf.Clamp(
-            Mathf.FloorToInt(normalizedX * runtimeTexture.width),
-            0,
-            runtimeTexture.width - 1
-        );
-
-        int pixelY = Mathf.Clamp(
-            Mathf.FloorToInt(normalizedY * runtimeTexture.height),
-            0,
-            runtimeTexture.height - 1
-        );
-
-        EraseCircle(pixelX, pixelY);
-
-        runtimeTexture.Apply();
-
-        CheckScratchPercent();
     }
 
     private void EraseCircle(int centerX, int centerY)
@@ -192,118 +217,99 @@ public class ScratchLotteryManager : MonoBehaviour
         {
             for (int x = -radius; x <= radius; x++)
             {
-                // 원 모양 브러시
-                if (x * x + y * y > radius * radius)
-                    continue;
+                if (x * x + y * y > radius * radius) continue;
 
-                int pixelX = centerX + x;
-                int pixelY = centerY + y;
+                int px = centerX + x;
+                int py = centerY + y;
 
-                if (pixelX < 0 || pixelX >= runtimeTexture.width ||
-                    pixelY < 0 || pixelY >= runtimeTexture.height)
-                {
-                    continue;
-                }
+                if (px < 0 || px >= runtimeTexture.width || py < 0 || py >= runtimeTexture.height) continue;
 
-                int index = pixelY * runtimeTexture.width + pixelX;
+                int index = py * runtimeTexture.width + px;
 
-                // 원래 불투명했던 픽셀만 긁은 비율에 포함
-                if (validPixels[index] && !erasedPixels[index])
+                if (!scratchablePixels[index]) continue;
+
+                if (!erasedPixels[index])
                 {
                     erasedPixels[index] = true;
                     erasedPixelCount++;
                 }
 
-                // 화면에서는 투명하게 만들기
-                runtimeTexture.SetPixel(
-                    pixelX,
-                    pixelY,
-                    Color.clear
-                );
+                runtimeTexture.SetPixel(px, py, Color.clear);
             }
         }
     }
 
     private void CheckScratchPercent()
     {
-        if (validPixelCount <= 0)
-            return;
+        if (scratchablePixelCount <= 0) return;
 
-        float percent =
-            erasedPixelCount / (float)validPixelCount * 100f;
+        float percent = ((float)erasedPixelCount / scratchablePixelCount) * 100f;
+        Debug.Log("복권 긁은 정도 : " + percent.ToString("F1") + "%");
 
-        Debug.Log(
-            "복권 긁은 정도 : " +
-            percent.ToString("F1") +
-            "%"
-        );
-
+        // 60% 이상 긁혔을 때 연출 시작
         if (percent >= requiredPercent)
         {
             StartEnding();
         }
     }
 
-    // 대화가 끝났을 때 호출
     public void ShowLottery()
     {
-        if (scratchPanel == null)
-        {
-            Debug.LogError("scratchPanel이 연결되지 않았습니다!");
-            return;
-        }
+        if (scratchPanel == null) return;
 
         scratchPanel.SetActive(true);
 
-        // 복권이 나타나는 순간 동전 커서
+        if (scratchGuideText != null)
+            scratchGuideText.SetActive(true);
+
+        if (scratchAfter != null)
+            scratchAfter.SetActive(true);
+
+        if (fadePanel != null)
+            fadePanel.alpha = 0f;
+
         if (coinCursor != null)
         {
-            Cursor.SetCursor(
-                coinCursor,
-                new Vector2(
-                    coinCursor.width / 2f,
-                    coinCursor.height / 2f
-                ),
-                CursorMode.Auto
-            );
+            Cursor.SetCursor(coinCursor, new Vector2(coinCursor.width / 2f, coinCursor.height / 2f), CursorMode.Auto);
         }
-
-        Debug.Log("복권 등장 → 동전 커서");
     }
 
     private void StartEnding()
     {
-        if (endingStarted)
-            return;
-
+        if (endingStarted) return;
         endingStarted = true;
 
-        Debug.Log("복권 60% 긁음 → 엔딩 진입");
-
-        StartCoroutine(FadeAndEnding());
+        StartCoroutine(FadeToWhiteAndChangeScene());
     }
 
-    private IEnumerator FadeAndEnding()
+    // 60% 달성 시 점차 흰색으로 변한 뒤 씬을 전환하는 코루틴
+    private IEnumerator FadeToWhiteAndChangeScene()
     {
-        float time = 0f;
-
         if (fadePanel != null)
         {
-            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = true; // 연출 중 조작 방지
 
-            while (time < 1f)
+            float elapsedTime = 0f;
+            while (elapsedTime < fadeDuration)
             {
-                time += Time.deltaTime;
-
-                fadePanel.alpha = time;
-
+                elapsedTime += Time.deltaTime;
+                fadePanel.alpha = Mathf.Clamp01(elapsedTime / fadeDuration); // Alpha를 0에서 1로 천천히 변경
                 yield return null;
             }
+            fadePanel.alpha = 1f;
         }
 
-        // 동전 커서 원래대로
+        // 커서 원복
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 
-        SceneLoader.Instance.LoadScene("Ending_Common");
+        // 다음 씬 전환
+        if (SceneLoader.Instance != null)
+        {
+            SceneLoader.Instance.LoadScene("Ending_Common");
+        }
+        else
+        {
+            Debug.LogError("SceneLoader.Instance가 존재하지 않습니다.");
+        }
     }
 }
