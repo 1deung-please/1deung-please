@@ -5,19 +5,15 @@ using UnityEngine.UI;
 public class ChoiceManager : MonoBehaviour
 {
     [Header("UI")]
-
     [SerializeField] private GameObject choicePanel;
     [SerializeField] private Button yesButton;
     [SerializeField] private Button noButton;
     [SerializeField] private Sprite domitGirlPortrait;
     [SerializeField] private Sprite playerPortrait;
 
-
     [Header("Optional")]
     [SerializeField] private TextMeshProUGUI noButtonText;
-
     [SerializeField] private DialogueManager dialogueManager;
-
     [SerializeField] private RectTransform dialoguePanel;
     [SerializeField] private float dialogueX = -39;
 
@@ -37,9 +33,6 @@ public class ChoiceManager : MonoBehaviour
     public void ShowChoice()
     {
         choicePanel.SetActive(true);
-
-        if (noButtonText != null)
-            noButtonText.text = "NO";
     }
 
     public void HideChoice()
@@ -49,8 +42,7 @@ public class ChoiceManager : MonoBehaviour
 
     private void OnYesClicked()
     {
-        HideChoice();
-
+        HideChoice(); // 버튼 즉시 숨김
         noCount = 0;
 
         dialogueManager.StartBranchDialogue(
@@ -82,34 +74,38 @@ public class ChoiceManager : MonoBehaviour
     {
         noCount++;
 
+        HideChoice(); // 버튼 즉시 숨김, 텍스트만 보이도록
+
         if (noCount >= 10)
         {
-            HideChoice();
-
             TutorialManager.Instance.FadeOut();
-
             dialogueManager.OnChoiceResult(false, noCount);
-
             return;
         }
-        string begging = "";
 
+        string begging = "";
         for (int i = 0; i < noCount; i++)
         {
             begging += "제발 ";
         }
 
-        dialogueManager.RepeatCurrentDialogue("도믿걸", domitGirlPortrait, begging + "운명 한 번 맡겨보시겠어요?");
+        dialogueManager.RepeatCurrentDialogue(
+            "도믿걸",
+            domitGirlPortrait,
+            begging + "운명 한 번 맡겨보시겠어요?");
+        // ↑ 타이핑이 끝나도 바로 버튼이 뜨지 않고, 클릭을 한 번 더 기다린 뒤 버튼만 노출됨
 
-        Vector2 pos = dialoguePanel.anchoredPosition;
-        pos.x = dialogueX;
-        dialoguePanel.anchoredPosition = pos;
+        if (dialoguePanel != null)
+        {
+            Vector2 pos = dialoguePanel.anchoredPosition;
+            pos.x = dialogueX;
+            dialoguePanel.anchoredPosition = pos;
+        }
     }
 
     public void ResetChoice()
     {
         noCount = 0;
-
         HideChoice();
     }
 

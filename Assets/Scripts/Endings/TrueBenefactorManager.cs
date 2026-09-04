@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
@@ -98,6 +99,8 @@ public class TrueBenefactorManager : MonoBehaviour
 
     private IEnumerator EndingStart()
     {
+        PlayBGM();
+
         yield return Dialogue(
             "조상님",
             "어이쿠야!!!",
@@ -526,5 +529,10 @@ public class TrueBenefactorManager : MonoBehaviour
 
         if (tryAgainButton != null)
             tryAgainButton.gameObject.SetActive(true);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
@@ -255,5 +256,10 @@ public class HalfSuccessManager : MonoBehaviour
 
         if (tryAgainButton != null)
             tryAgainButton.gameObject.SetActive(true);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
