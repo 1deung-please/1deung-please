@@ -436,7 +436,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 75, y: -170}
+  m_AnchoredPosition: {x: 75, y: -150}
   m_SizeDelta: {x: 120, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &582116242
@@ -496,7 +496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.7294118, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -634,7 +634,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.016235352, y: 0.0020751953}
+  m_AnchoredPosition: {x: -0.016357422, y: 0.0020751953}
   m_SizeDelta: {x: -1427.9, y: -653.48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &705505411
@@ -860,8 +860,11 @@ MonoBehaviour:
   dialogueManager: {fileID: 1535832440}
   tutorialDialogue: {fileID: 11400000, guid: 7faaf472dbc36df47a6cdb133799dd7c, type: 2}
   dialoguePanelRect: {fileID: 1205890034}
-  normalPosX: 0
-  characterPosX: -39.03
+  characterUIRect: {fileID: 1472209682}
+  normalDialoguePosX: 0
+  normalUIPosX: 150
+  characterDialoguePosX: -39
+  characterUIPosX: 102.76
   fadePanel: {fileID: 2093140845}
   fadeDuration: 0.85
   skipButton: {fileID: 705505409}
@@ -1442,6 +1445,10 @@ MonoBehaviour:
   cafeBackground: {fileID: 21300000, guid: 25a0258ca0d86b74aaef32dcc99c0d50, type: 3}
   Background_Timer: {fileID: 21300000, guid: 90e0d3dbfb34da04bbb4c4124c1ecc84, type: 3}
   tutorialBackground: {fileID: 21300000, guid: 263a8c5d0fd305a4fab83d5c70695927, type: 3}
+  tutorial_bus_stop: {fileID: 21300000, guid: 5017acf63322e5b44b18751da2b81df7, type: 3}
+  tutorial_underground_shopping_center: {fileID: 21300000, guid: fe63c33f9f9e4ae419fd5cb54e8af22d, type: 3}
+  tutorial_cafe: {fileID: 21300000, guid: 28ada9f0f42ec0b4da1216b52d6f8cbe, type: 3}
+  tutorial_bag: {fileID: 21300000, guid: 02bf36c8fecceff4d9a014d80b38bb3a, type: 3}
 --- !u!4 &1430243048
 Transform:
   m_ObjectHideFlags: 0
@@ -1541,8 +1548,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 9
-  m_fontSizeBase: 9
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1608,7 +1615,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1472209682
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1625,7 +1632,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 102.759995, y: -133.22}
+  m_AnchoredPosition: {x: 150, y: -133.22}
   m_SizeDelta: {x: 86, y: 58}
   m_Pivot: {x: 0.4, y: 0.4}
 --- !u!114 &1472209683
@@ -1733,8 +1740,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
-  m_sharedMaterial: {fileID: -6140352266110376839, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1dccc5361182e284eaa2a990ecabfa82, type: 2}
+  m_sharedMaterial: {fileID: 5381866873377084355, guid: 1dccc5361182e284eaa2a990ecabfa82, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1764,7 +1771,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1910,6 +1917,7 @@ MonoBehaviour:
   dialogueUI: {fileID: 1472209681}
   characterAnimator: {fileID: 1647563754}
   dialogueData: {fileID: 11400000, guid: 7faaf472dbc36df47a6cdb133799dd7c, type: 2}
+  scratchLotteryManager: {fileID: 0}
   typingSpeed: 0.05
   choicePanel: {fileID: 583529131}
   choiceManager: {fileID: 2137035995}
@@ -2122,8 +2130,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 9
-  m_fontSizeBase: 9
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2232,7 +2240,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c83515dc9b51c85469ccb702ee0d2041, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -2353,7 +2361,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -75, y: -170}
+  m_AnchoredPosition: {x: -75, y: -150}
   m_SizeDelta: {x: 120, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1784860452
@@ -2413,7 +2421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.7294118, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2562,7 +2570,7 @@ MonoBehaviour:
   playerPortrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
   noButtonText: {fileID: 1205890032}
   dialogueManager: {fileID: 1535832440}
-  dialoguePanel: {fileID: 1205890034}
+  dialoguePanel: {fileID: 0}
   dialogueX: -39
 --- !u!4 &2137035996
 Transform:

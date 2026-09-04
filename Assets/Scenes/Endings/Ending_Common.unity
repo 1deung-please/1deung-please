@@ -1306,7 +1306,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueManager: {fileID: 0}
-  endingDialogue: {fileID: 0}
+  endingDialogue: {fileID: 11400000, guid: 6f15209ebac813b42be3383887705989, type: 2}
   useTestData: 0
   testGameData: {fileID: 11400000, guid: 5e04b0731a56a9e4bb6fe24675231b40, type: 2}
   scratchButtonManager: {fileID: 0}
