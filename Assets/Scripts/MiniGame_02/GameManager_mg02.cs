@@ -35,6 +35,9 @@ public class GameManager_mg02 : MonoBehaviour
 
     Coroutine blinkCoroutine;
     Coroutine idleCoroutine;
+    Coroutine punchScaleCoroutine; // PunchScale 중첩 제어용 변수
+
+    private readonly Vector3 baseScale = Vector3.one; // NPC의 기준 크기 고정
 
     [Header("Sound")]
     public AudioSource audioSource;
@@ -93,10 +96,6 @@ public class GameManager_mg02 : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnMiniGameStart();
-        }
-
-        if (GameManager.Instance != null)
-        {
             GameManager.Instance.RecordMiniGamePlay(2);
         }
 
@@ -129,12 +128,6 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         updateMeritUI();
-
-        if (blinkCoroutine != null)
-        {
-            StopCoroutine(blinkCoroutine);
-            blinkCoroutine = null;
-        }
 
         StartCoroutine(FlashRoutine());
 
@@ -180,7 +173,6 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
-
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         if (healthBar != null)
@@ -188,20 +180,6 @@ public class GameManager_mg02 : MonoBehaviour
             healthBar.value = currentHealth / maxHealth;
         }
 
-        timerText.text = Mathf.Ceil(currentGameTime) + "s";
-
-        if (decreaseText != null)
-        {
-            decreaseText.text = $"-{decreaseSpeed:F0}/s";
-        }
-
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        if (healthBar != null)
-        {
-            healthBar.value =
-                currentHealth / maxHealth;
-        }
         timerText.text = Mathf.Ceil(currentGameTime) + "s";
 
         if (decreaseText != null)
@@ -296,11 +274,7 @@ public class GameManager_mg02 : MonoBehaviour
             currentHealth += 15f;
             correctCount++;
             audioSource.PlayOneShot(correctSound);
-            StartCoroutine(
-                PunchScaleRoutine(
-                    passengerImage.transform
-                )
-            );
+            TriggerPunchScale();
         }
         else
         {
@@ -329,11 +303,7 @@ public class GameManager_mg02 : MonoBehaviour
             currentHealth += 15f;
             correctCount++;
             audioSource.PlayOneShot(correctSound);
-            StartCoroutine(
-                PunchScaleRoutine(
-                    passengerImage.transform
-                )
-            );
+            TriggerPunchScale();
         }
         else
         {
@@ -347,22 +317,31 @@ public class GameManager_mg02 : MonoBehaviour
             );
         }
 
-        currentHealth = Mathf.Clamp( currentHealth, 0, maxHealth);
-        StartCoroutine(
-            HealthBarRoutine(
-                currentHealth / maxHealth
-            )
-        );
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        StartCoroutine(HealthBarRoutine(currentHealth / maxHealth));
         updateMeritUI();
         spawnPassenger();
+    }
+
+    // 정답 시 연출 중첩 방지 및 코루틴 실행
+    void TriggerPunchScale()
+    {
+        if (passengerImage == null) return;
+
+        if (punchScaleCoroutine != null)
+        {
+            StopCoroutine(punchScaleCoroutine);
+            passengerImage.transform.localScale = baseScale; // 즉시 원본 스케일로 복구
+        }
+
+        punchScaleCoroutine = StartCoroutine(PunchScaleRoutine(passengerImage.transform));
     }
 
     void updateMeritUI()
     {
         if (meritText != null)
         {
-            meritText.text =
-                $"정답 {correctCount}";
+            meritText.text = $"정답 {correctCount}";
         }
 
         if (currentMeritText != null)
@@ -376,51 +355,21 @@ public class GameManager_mg02 : MonoBehaviour
     {
         isGameOver = true;
 
-        // 전역 공덕 시스템 전달, 결과창에서는 전역 타이머 정지
         if (GameManager.Instance != null)
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-            if (AchievementManager.Instance != null) 
+            if (AchievementManager.Instance != null)
                 AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
-        }
-
-        string reason;
-
-        if (isSuccess)
-        {
-            reason = "시간종료(정상)";
-        }
-        else
-        {
-            reason = "게이지0(오버)";
         }
 
         if (resultPanel != null)
         {
-            resultPanel.SetActive(true);
-            StartCoroutine(ResultPanelRoutine());
-
             if (successImage != null)
                 successImage.SetActive(isSuccess);
 
             if (failImage != null)
                 failImage.SetActive(!isSuccess);
-
-            /*float survivedTime =
-                maxGameTime -
-                Mathf.Max(0, currentGameTime);
-
-            int totalAttempts =
-                correctCount + wrongCount;
-
-            float accuracy =
-                totalAttempts > 0
-                ? ((float)correctCount / totalAttempts) * 100f : 0f;
-
-            float avgCps =
-                survivedTime > 0
-                ? (float)totalAttempts / survivedTime: 0f;*/
 
             if (resultReasonText != null)
             {
@@ -433,22 +382,24 @@ public class GameManager_mg02 : MonoBehaviour
             if (recordText != null)
             {
                 int earnedMerit = correctCount * 20;
-                recordText.text = $"획득 공덕 {earnedMerit}p";
-                /*recordText.text =
-                    $"공덕 {earnedMerit} " +
-                    $"생존 {survivedTime:F0}s " +
-                    $"정답/오답 {correctCount}/{wrongCount} " +
-                    $"정확도 {accuracy:F0}% " +
-                    $"평균 CPS {avgCps:F1} " +
-                    $"최고 CPS {maxCPS:F0} ";*/
+                recordText.text = earnedMerit.ToString();
             }
+            StartCoroutine(ShowPanelDelay());
         }
 
         bool willAutoReturn = GameManager.Instance != null &&
-                      GameManager.Instance.IsPendingEndingTransition();
+                              GameManager.Instance.IsPendingEndingTransition();
 
         if (restartButton != null)
             restartButton.gameObject.SetActive(!willAutoReturn);
+    }
+
+    IEnumerator ShowPanelDelay()
+    {
+        yield return new WaitForSeconds(1.0f); 
+
+        resultPanel.SetActive(true); 
+        StartCoroutine(ResultPanelRoutine()); 
     }
 
     public void restartGame()
@@ -485,11 +436,7 @@ public class GameManager_mg02 : MonoBehaviour
 
         while (!isGameStarted)
         {
-            float alpha =
-                Mathf.PingPong(
-                    Time.time * 1.5f,
-                    1f
-                );
+            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
 
             Color color = startImage.color;
             color.a = alpha;
@@ -501,8 +448,6 @@ public class GameManager_mg02 : MonoBehaviour
         startImage.color = originalColor;
     }
 
-
-    // 시작 Flash
     IEnumerator FlashRoutine()
     {
         if (flashPanel == null)
@@ -520,9 +465,7 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration)
         {
             time += Time.deltaTime;
-
-            float alpha = Mathf.Lerp(  1f, 0f,  time / duration
-                );
+            float alpha = Mathf.Lerp(1f, 0f, time / duration);
 
             color.a = alpha;
             flashPanel.color = color;
@@ -532,11 +475,9 @@ public class GameManager_mg02 : MonoBehaviour
 
         color.a = 0f;
         flashPanel.color = color;
-
         flashPanel.gameObject.SetActive(false);
     }
 
-    // 승객 Idle + Loop
     IEnumerator PassengerIdleRoutine()
     {
         if (passengerImage == null)
@@ -551,27 +492,20 @@ public class GameManager_mg02 : MonoBehaviour
 
         while (isGameStarted && !isGameOver)
         {
-            float offset = Mathf.Sin( Time.time * 2f ) * 3f;
-
-            passenger.anchoredPosition = originalPosition +  new Vector2( 0f,  offset );
-
+            float offset = Mathf.Sin(Time.time * 2f) * 3f;
+            passenger.anchoredPosition = originalPosition + new Vector2(0f, offset);
             yield return null;
         }
 
-        passenger.anchoredPosition =  originalPosition;
+        passenger.anchoredPosition = originalPosition;
     }
 
-    // 정답 Punch Scale
-    IEnumerator PunchScaleRoutine(
-        Transform target
-    )
+    // 수정된 Punch Scale (고정된 baseScale 기준 연출)
+    IEnumerator PunchScaleRoutine(Transform target)
     {
-        if (target == null)
-            yield break;
+        if (target == null) yield break;
 
-        Vector3 originalScale = target.localScale;
-
-        Vector3 punchScale = originalScale * 1.15f;
+        Vector3 punchScale = baseScale * 1.15f;
 
         float duration = 0.2f;
         float time = 0f;
@@ -579,11 +513,9 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration / 2f)
         {
             time += Time.deltaTime;
-
             float t = time / (duration / 2f);
 
-            target.localScale = Vector3.Lerp( originalScale, punchScale,  t );
-
+            target.localScale = Vector3.Lerp(baseScale, punchScale, t);
             yield return null;
         }
 
@@ -592,26 +524,22 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration / 2f)
         {
             time += Time.deltaTime;
-
             float t = time / (duration / 2f);
 
-            target.localScale =Vector3.Lerp( punchScale, originalScale, t );
-
+            target.localScale = Vector3.Lerp(punchScale, baseScale, t);
             yield return null;
         }
 
-        target.localScale = originalScale;
+        target.localScale = baseScale;
+        punchScaleCoroutine = null;
     }
 
-    // 오답 Shake
-    IEnumerator ShakeRoutine(
-        RectTransform target
-    )
+    IEnumerator ShakeRoutine(RectTransform target)
     {
         if (target == null)
             yield break;
 
-        Vector2 originalPosition =target.anchoredPosition;
+        Vector2 originalPosition = target.anchoredPosition;
 
         float time = 0f;
         float duration = 0.25f;
@@ -619,10 +547,9 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration)
         {
             time += Time.deltaTime;
+            float x = Mathf.Sin(time * 50f) * 10f;
 
-            float x = Mathf.Sin( time * 50f) * 10f;
-
-            target.anchoredPosition = originalPosition + new Vector2( x, 0f );
+            target.anchoredPosition = originalPosition + new Vector2(x, 0f);
 
             yield return null;
         }
@@ -630,10 +557,7 @@ public class GameManager_mg02 : MonoBehaviour
         target.anchoredPosition = originalPosition;
     }
 
-    // 게이지 Fill
-    IEnumerator HealthBarRoutine(
-        float targetValue
-    )
+    IEnumerator HealthBarRoutine(float targetValue)
     {
         if (healthBar == null)
             yield break;
@@ -646,17 +570,15 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration)
         {
             time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
 
-            float t =Mathf.Clamp01( time / duration);
-
-            healthBar.value = Mathf.Lerp( startValue,targetValue,t);
+            healthBar.value = Mathf.Lerp(startValue, targetValue, t);
             yield return null;
         }
 
         healthBar.value = targetValue;
     }
 
-    // 결과창 Scale
     IEnumerator ResultPanelRoutine()
     {
         if (resultPanel == null)
@@ -672,17 +594,14 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration)
         {
             time += Time.deltaTime;
-
+            
             float t = Mathf.Clamp01(time / duration);
 
-            // Ease Out Back
             float overshoot = 1.70158f;
             float backT = t - 1f;
-            t = backT * backT *
-                ((overshoot + 1f) * backT +
-                overshoot) + 1f;
+            t = backT * backT * ((overshoot + 1f) * backT + overshoot) + 1f;
 
-            panel.localScale = Vector3.Lerp(Vector3.zero,Vector3.one,t);
+            panel.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
 
             yield return null;
         }
