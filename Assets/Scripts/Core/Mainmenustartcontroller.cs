@@ -31,6 +31,12 @@ public class MainMenuStartController : MonoBehaviour
 
     void Start()
     {
+        // 메인메뉴에서는 전역 타이머 정지
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PauseTimer();
+        }
+
         // 초기 상태: 배경 패널 화면 왼쪽 바깥에, 타이포/텍스트 숨김
         if (backgroundPanel != null)
         {
@@ -58,9 +64,19 @@ public class MainMenuStartController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            isTransitioning = true;
-            if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
-            SceneLoader.Instance.LoadScene(tutorialSceneName);
+             isTransitioning = true;
+
+            if (blinkCoroutine != null)
+                StopCoroutine(blinkCoroutine);
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnStartGame();
+            }
+            else
+            {
+                Debug.LogError("GameManager.Instance가 없습니다.");
+            }
         }
     }
 
