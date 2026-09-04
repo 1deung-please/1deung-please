@@ -27,6 +27,7 @@ public class GameData : ScriptableObject
 
     [Header("Flags")]
     public bool tutorialDone;
+    public bool tutorialSkipAvailable;
 
     [Header("Global Timer")]
     public float globalTimeRemaining = 300f;
@@ -42,6 +43,7 @@ public class GameData : ScriptableObject
         miniGame3Score = 0;
         meritPoint = 0;
         tutorialDone = false;
+        tutorialSkipAvailable = false;
         globalTimeRemaining = 300f;
         isTimerFrozen = true;
         lotteryRoomUnlocked = false;

@@ -53,7 +53,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (BackgroundManager.Instance != null) BackgroundManager.Instance.ChangeToTutorial();
 
-        bool tutorialCompleted = false;
+        bool tutorialSkipAvailable = false;
 
         if (GameManager.Instance == null)
             Debug.LogError("GameManager.Instance가 null입니다.");
@@ -62,11 +62,12 @@ public class TutorialManager : MonoBehaviour
             Debug.LogError("gameData가 null입니다.");
 
         else
-            tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
+            tutorialSkipAvailable = GameManager.Instance.gameData.tutorialSkipAvailable;
+
 
         if (skipButton != null)
         {
-            skipButton.SetActive(tutorialCompleted);
+            skipButton.SetActive(tutorialSkipAvailable);
 
             Image skipImage = skipButton.GetComponent<Image>();
             if (skipImage != null)
