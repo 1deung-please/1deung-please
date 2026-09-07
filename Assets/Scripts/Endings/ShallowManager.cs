@@ -77,7 +77,7 @@ public class ShallowManager : MonoBehaviour
     private IEnumerator EndingStart()
     {
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "흠... 점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래",
             ancestorAngry
         );
@@ -85,7 +85,7 @@ public class ShallowManager : MonoBehaviour
         PlayBGM();
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "뭐얏!!!!",
             ancestorAngry
         );
@@ -93,25 +93,25 @@ public class ShallowManager : MonoBehaviour
         string mostPlayedGame = GetMostPlayedGame();
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "네 이녀석! 지금까지 진심으로 공덕을 쌓은 것이 아니라 오로지 돈만 바라보며 공덕을 쌓은 것이구나!!!",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "가장 공덕 쌓기 쉬운 " + mostPlayedGame + "로 공덕 쌓기만 했어!!!!!!",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "너는 선행을 위한 선행을 한 것이 아니라 오로지 돈만 보고 일을 한 것이로구나!",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "썩 꺼지거라! 그리고 다시 진심을 다해 공덕을 쌓아오거라!!!",
             ancestorAngry
         );

@@ -76,43 +76,43 @@ public class UnqualifiedManager : MonoBehaviour
         PlayBGM();
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             ".....",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "...............",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "................................................",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "정말 보잘 것 없구나..",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "오랫동안 봐 왔지만, 학생 때부터 지금까지 참 한결같이 성적이 안 좋구나. 꾸준하네...",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "플레이를 한 건 맞느냐? 혹, 회사나 학교에서 몰폰 중이라 플레이를 제대로 못 하였던 것이냐?",
             ancestorAngry
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "흠..... 볼 것도 없구나. 돌아가서 다시 공덕을 쌓고 오거라!",
             ancestorAngry
         );
