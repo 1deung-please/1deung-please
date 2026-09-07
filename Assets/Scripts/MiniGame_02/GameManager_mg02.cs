@@ -373,16 +373,17 @@ public class GameManager_mg02 : MonoBehaviour
 
             if (resultReasonText != null)
             {
+                string correctColorHex = "#FFAF4D";
+                string wrongColorHex = "#FFFFFF";
                 resultReasonText.text =
-                    $"맞힌 문제: {correctCount}문제 " +
-                    $"틀린 문제: {wrongCount}문제\n" +
-                    $"도믿걸 남은 체력: {currentHealth:F0} / {maxHealth:F0}";
+                    $"맞춘 승객 수: <color={correctColorHex}>{correctCount}</color> 개\n" +
+                    $"틀린 승객 수: <color={wrongColorHex}>{wrongCount}</color> 개";
             }
 
             if (recordText != null)
             {
                 int earnedMerit = correctCount * 20;
-                recordText.text = earnedMerit.ToString();
+                recordText.text = $"얻은 공덕 포인트: <color=#FF69F3>{earnedMerit}</color> P";
             }
             StartCoroutine(ShowPanelDelay());
         }

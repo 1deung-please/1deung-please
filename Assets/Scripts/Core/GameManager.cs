@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     private const string KEY_MERIT_POINT = "MeritPoint";
     private const string KEY_TUTORIAL_DONE = "TutorialDone";
     private const string KEY_TUTORIAL_SKIP_AVAILABLE = "TutorialSkipAvailable";
+    private const string KEY_MG1_SCORE = "MiniGame1Score";
+    private const string KEY_MG2_SCORE = "MiniGame2Score";
+    private const string KEY_MG3_SCORE = "MiniGame3Score";
 
     public bool IsPendingEndingTransition() => pendingEndingTransition;
 
@@ -69,6 +72,14 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt(KEY_TUTORIAL_DONE, gameData.tutorialDone ? 1 : 0);
         PlayerPrefs.SetInt(KEY_TUTORIAL_SKIP_AVAILABLE, gameData.tutorialSkipAvailable ? 1 : 0);
 
+        PlayerPrefs.SetInt(KEY_MG1_SCORE, gameData.miniGame1Score);
+        PlayerPrefs.SetInt(KEY_MG2_SCORE, gameData.miniGame2Score);
+        PlayerPrefs.SetInt(KEY_MG3_SCORE, gameData.miniGame3Score);
+
+        for (int i = 0; i < gameData.playCount.Length; i++)
+        {
+            PlayerPrefs.SetInt($"PlayCount_{i}", gameData.playCount[i]);
+        }
         PlayerPrefs.Save();
         Debug.Log($"[GameManager] 플레이 데이터 저장 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초, 튜토리얼 완료: {gameData.tutorialDone})");
     }
@@ -87,6 +98,14 @@ public class GameManager : MonoBehaviour
             gameData.tutorialDone = PlayerPrefs.GetInt(KEY_TUTORIAL_DONE, 0) == 1;
             gameData.tutorialSkipAvailable = PlayerPrefs.GetInt(KEY_TUTORIAL_SKIP_AVAILABLE, 0) == 1;
 
+            gameData.miniGame1Score = PlayerPrefs.GetInt(KEY_MG1_SCORE, 0);
+            gameData.miniGame2Score = PlayerPrefs.GetInt(KEY_MG2_SCORE, 0);
+            gameData.miniGame3Score = PlayerPrefs.GetInt(KEY_MG3_SCORE, 0);
+
+            for (int i = 0; i < gameData.playCount.Length; i++)
+            {
+                gameData.playCount[i] = PlayerPrefs.GetInt($"PlayCount_{i}", 0);
+            }
             Debug.Log($"[GameManager] 저장된 플레이 데이터 불러오기 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초)");
         }
         else
@@ -104,6 +123,11 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.DeleteKey(KEY_MERIT_POINT);
         PlayerPrefs.DeleteKey(KEY_TUTORIAL_DONE);
         PlayerPrefs.DeleteKey(KEY_TUTORIAL_SKIP_AVAILABLE);
+
+        PlayerPrefs.DeleteKey(KEY_MG1_SCORE);
+        PlayerPrefs.DeleteKey(KEY_MG2_SCORE);
+        PlayerPrefs.DeleteKey(KEY_MG3_SCORE);
+
         PlayerPrefs.Save();
         Debug.Log("[GameManager] 세이브 데이터 삭제 완료");
     }
@@ -209,27 +233,44 @@ public class GameManager : MonoBehaviour
 
     public void CompleteMiniGame1(int collectedCount, int targetCount)
     {
-        gameData.miniGame1Score = collectedCount;
+        if (gameData.playCount != null && gameData.playCount.Length > 0)
+        {
+            gameData.playCount[0]++;
+        }
 
-        if (collectedCount >= targetCount)
-            addMeritPoint(collectedCount + 50);
-        else
-            addMeritPoint(Mathf.RoundToInt(collectedCount * 0.5f));
+        int earnedPoint = (collectedCount >= targetCount)
+            ? (collectedCount + 50)
+            : Mathf.RoundToInt(collectedCount * 0.5f);
+
+        gameData.miniGame1Score += earnedPoint;
+
+        addMeritPoint(earnedPoint);
 
         SaveGameData();
     }
 
     public void CompleteMiniGame2(int correctCount)
     {
-        gameData.miniGame2Score = correctCount;
-        addMeritPoint(correctCount * 20);
+        int earnedPoint = correctCount * 20;
+        gameData.miniGame2Score += earnedPoint;
+
+        addMeritPoint(earnedPoint);
+
         SaveGameData();
     }
 
     public void CompleteMiniGame3(bool isSuccess)
     {
-        gameData.miniGame3Score = isSuccess ? 700 : 0;
-        if (isSuccess) addMeritPoint(700);
+        if (gameData.playCount != null && gameData.playCount.Length > 2)
+        {
+            gameData.playCount[2]++;
+        }
+
+        int earnedPoint = isSuccess ? 700 : 0;
+        gameData.miniGame3Score += earnedPoint;
+
+        addMeritPoint(earnedPoint);
+
         SaveGameData();
     }
 
@@ -396,6 +437,11 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.DeleteKey(KEY_MERIT_POINT);
         PlayerPrefs.DeleteKey(KEY_TUTORIAL_DONE);
         PlayerPrefs.DeleteKey(KEY_TUTORIAL_SKIP_AVAILABLE);
+
+        PlayerPrefs.DeleteKey(KEY_MG1_SCORE);
+        PlayerPrefs.DeleteKey(KEY_MG2_SCORE);
+        PlayerPrefs.DeleteKey(KEY_MG3_SCORE);
+
         PlayerPrefs.Save();
         Debug.Log("[GameManager] 세이브 데이터가 완전히 삭제되었습니다.");
     }

@@ -8,6 +8,7 @@ public class CommonEndingManager : MonoBehaviour
     [Header("Ending UI")]
     public TMP_Text titleText;
     public TMP_Text meritPointText;
+    public TMP_Text ptText;
     public TMP_Text pointText;
 
     [Header("Signboard Animation")]
@@ -35,6 +36,9 @@ public class CommonEndingManager : MonoBehaviour
 
         if (pointText != null)
             pointText.gameObject.SetActive(false);
+
+        if (ptText != null)
+            ptText.gameObject.SetActive(false);
 
         if (signboard != null)
         {
@@ -116,6 +120,8 @@ public class CommonEndingManager : MonoBehaviour
             titleText.gameObject.SetActive(true);
         }
 
+        yield return new WaitForSeconds(0.5f);
+
         if (meritPointText != null)
         {
             meritPointText.gameObject.SetActive(true);
@@ -124,45 +130,46 @@ public class CommonEndingManager : MonoBehaviour
 
             string pointString = totalPoint.ToString();
 
-            // 처음에는 아무것도 표시하지 않음
             meritPointText.text = "";
 
-            // 일의 자리 → 십의 자리 → 백의 자리 → ...
             for (int i = pointString.Length - 1; i >= 0; i--)
             {
-                string revealedNumber =
-                    pointString.Substring(
-                        i,
-                        pointString.Length - i
-                    );
+                if (ptText != null && !ptText.gameObject.activeSelf)
+                {
+                    ptText.gameObject.SetActive(true);
+                }
 
-                meritPointText.text =
-                    revealedNumber + " pt";
+                string revealedNumber = pointString.Substring(i, pointString.Length - i);
 
-                // 숫자 하나 공개될 때 효과음
-                if (audioSource != null &&
-                    numberSound != null)
+                meritPointText.text = revealedNumber;
+
+                if (audioSource != null && numberSound != null)
                 {
                     audioSource.PlayOneShot(numberSound);
                 }
 
-                yield return new WaitForSeconds(
-                    numberDelay
-                );
+                yield return new WaitForSeconds(numberDelay);
+            }
+
+            if (ptText != null)
+            {
+                ptText.gameObject.SetActive(true);
             }
         }
+
+        yield return new WaitForSeconds(0.3f);
 
         if (pointText != null)
         {
             pointText.text =
                 "이걸 안 비켜? " +
-                gameData.miniGame2Score + " PT\n" +
+                gameData.miniGame2Score + "\n" +
 
                 "출격! 논리요새 " +
-                gameData.miniGame3Score + " PT\n" +
+                gameData.miniGame3Score + "\n" +
 
                 "주워줘, 쓰레기! " +
-                gameData.miniGame1Score + " PT";
+                gameData.miniGame1Score;
 
             // 한 번에 공개
             pointText.gameObject.SetActive(true);
