@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
 
+    [Header("Exit Popup")]
+    [SerializeField] private GameObject exitConfirmPopup;
+
     // PlayerPrefs 저장용 키 값 정의
     private const string KEY_TIME_REMAINING = "GlobalTimeRemaining";
     private const string KEY_TIMER_FROZEN = "IsTimerFrozen";
@@ -43,6 +46,16 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (ExitPopupManager.Instance != null)
+            {
+                ExitPopupManager.Instance.ShowPopup();
+            }
+
+            return;
+        }
+
         if (gameData == null)
             return;
 
