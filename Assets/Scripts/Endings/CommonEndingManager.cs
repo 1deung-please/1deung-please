@@ -5,15 +5,23 @@ using TMPro;
 
 public class CommonEndingManager : MonoBehaviour
 {
+    [Header("Dialogue UI (조상신 대화)")]
+    public GameObject dialoguePanel; 
+    public TMP_Text dialogueText;
+
     [Header("Ending UI")]
     public TMP_Text titleText;
     public TMP_Text meritPointText;
+    public TMP_Text ptText;
     public TMP_Text pointText;
 
     [Header("Signboard Animation")]
     public RectTransform signboard;
     public float moveDuration = 3f;
     public float startOffsetY = 1000f;
+
+    [Header("Typing Effect")]
+    public float typingSpeed = 0.05f;
 
     [Header("Merit Point Animation")]
     public float numberDelay = 0.3f;
@@ -24,6 +32,21 @@ public class CommonEndingManager : MonoBehaviour
     public AudioClip numberSound;
 
     private Vector2 targetPosition;
+
+    private string[] ancestorDialogues = new string[]
+    {
+        "그래... 처음 보는구나.",
+        "내가 바로 네 조상이다.",
+        "내가 널 참 오랫동안 지켜보고 있었지... 갓난아기일 때부터 회사에 치이는 지금까지...",
+        "얼마나 고생이 많았느냐. 난 널 도와주러 온 사람이야.",
+        "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까."
+    };
+    private int dialogueIndex = 0;
+    private bool isDialogueEnding = false;
+
+    private Coroutine typingCoroutine;
+    private bool isTyping = false;
+    private string currentSentence = "";
 
     void Start()
     {
@@ -36,28 +59,105 @@ public class CommonEndingManager : MonoBehaviour
         if (pointText != null)
             pointText.gameObject.SetActive(false);
 
+        if (ptText != null)
+            ptText.gameObject.SetActive(false);
+
         if (signboard != null)
         {
-            Debug.Log("Signboard 연결됨");
             targetPosition = signboard.anchoredPosition;
-
-            // 원래 위치보다 위에서 시작
             signboard.anchoredPosition = new Vector2(
                 targetPosition.x,
                 targetPosition.y + startOffsetY
             );
-
-            StartCoroutine(MoveSignboard());
         }
         else
         {
             Debug.LogError("Signboard가 연결되지 않았습니다.");
         }
+
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(true);
+            ShowNextDialogue();
+        }
+    }
+
+    void Update()
+    {
+        if (!isDialogueEnding && dialoguePanel != null && dialoguePanel.activeSelf)
+        {
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
+            {
+                OnDialogueClick();
+            }
+        }
+    }
+
+    private void OnDialogueClick()
+    {
+        if (isTyping)
+        {
+            if (typingCoroutine != null)
+                StopCoroutine(typingCoroutine);
+
+            dialogueText.text = currentSentence;
+            isTyping = false;
+            return;
+        }
+
+        dialogueIndex++;
+
+        if (dialogueIndex < ancestorDialogues.Length)
+        {
+            ShowNextDialogue();
+        }
+        else
+        {
+            isDialogueEnding = true;
+            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+            if (signboard != null)
+            {
+                StartCoroutine(MoveSignboard());
+            }
+        }
+    }
+
+    private void ShowNextDialogue()
+    {
+        if (dialogueText != null)
+        {
+            currentSentence = ancestorDialogues[dialogueIndex];
+
+            if (typingCoroutine != null)
+                StopCoroutine(typingCoroutine);
+
+            typingCoroutine = StartCoroutine(TypeText(currentSentence));
+        }
+    }
+
+    private IEnumerator TypeText(string text)
+    {
+        isTyping = true;
+        dialogueText.text = "";
+
+        foreach (char c in text)
+        {
+            dialogueText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        isTyping = false;
     }
 
     private IEnumerator MoveSignboard()
     {
         Debug.Log("Signboard 이동 시작");
+
+        if (audioSource != null && signboardSound != null)
+        {
+            audioSource.PlayOneShot(signboardSound);
+        }
 
         float elapsed = 0f;
         Vector2 startPosition = signboard.anchoredPosition;
@@ -73,12 +173,7 @@ public class CommonEndingManager : MonoBehaviour
             // Ease Out
             t = 1f - Mathf.Pow(1f - t, 3f);
 
-            signboard.anchoredPosition =
-                Vector2.Lerp(
-                    startPosition,
-                    targetPosition,
-                    t
-                );
+            signboard.anchoredPosition = Vector2.Lerp(startPosition, targetPosition, t);
 
             yield return null;
         }
@@ -116,6 +211,8 @@ public class CommonEndingManager : MonoBehaviour
             titleText.gameObject.SetActive(true);
         }
 
+        yield return new WaitForSeconds(0.5f);
+
         if (meritPointText != null)
         {
             meritPointText.gameObject.SetActive(true);
@@ -124,45 +221,46 @@ public class CommonEndingManager : MonoBehaviour
 
             string pointString = totalPoint.ToString();
 
-            // 처음에는 아무것도 표시하지 않음
             meritPointText.text = "";
 
-            // 일의 자리 → 십의 자리 → 백의 자리 → ...
             for (int i = pointString.Length - 1; i >= 0; i--)
             {
-                string revealedNumber =
-                    pointString.Substring(
-                        i,
-                        pointString.Length - i
-                    );
+                if (ptText != null && !ptText.gameObject.activeSelf)
+                {
+                    ptText.gameObject.SetActive(true);
+                }
 
-                meritPointText.text =
-                    revealedNumber + " pt";
+                string revealedNumber = pointString.Substring(i, pointString.Length - i);
 
-                // 숫자 하나 공개될 때 효과음
-                if (audioSource != null &&
-                    numberSound != null)
+                meritPointText.text = revealedNumber;
+
+                if (audioSource != null && numberSound != null)
                 {
                     audioSource.PlayOneShot(numberSound);
                 }
 
-                yield return new WaitForSeconds(
-                    numberDelay
-                );
+                yield return new WaitForSeconds(numberDelay);
+            }
+
+            if (ptText != null)
+            {
+                ptText.gameObject.SetActive(true);
             }
         }
+
+        yield return new WaitForSeconds(0.3f);
 
         if (pointText != null)
         {
             pointText.text =
                 "이걸 안 비켜? " +
-                gameData.miniGame2Score + " PT\n" +
+                gameData.miniGame2Score + "\n" +
 
                 "출격! 논리요새 " +
-                gameData.miniGame3Score + " PT\n" +
+                gameData.miniGame3Score + "\n" +
 
                 "주워줘, 쓰레기! " +
-                gameData.miniGame1Score + " PT";
+                gameData.miniGame1Score;
 
             // 한 번에 공개
             pointText.gameObject.SetActive(true);

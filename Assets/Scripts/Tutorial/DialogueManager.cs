@@ -35,6 +35,13 @@ public class DialogueManager : MonoBehaviour
     private Coroutine typingCoroutine;
     private bool isTyping = false;
     private string currentSentence = "";
+
+    // 타이핑이 끝났을 때 호출할 콜백
+    private System.Action onTypingComplete;
+
+    // NO 재입력 텍스트가 다 타이핑된 후, "다음 클릭"에 버튼을 보여줄지 대기하는 상태
+    private bool awaitingChoiceReveal = false;
+
     public System.Action OnDialogueFinished;
 
     private string[] branchTexts;
@@ -42,6 +49,7 @@ public class DialogueManager : MonoBehaviour
     private Sprite[] branchPortraits;
     private int branchIndex = 0;
     private bool isBranchDialogue = false;
+
     private void Awake()
     {
         if (portraitImage != null)
@@ -53,14 +61,21 @@ public class DialogueManager : MonoBehaviour
         dialogueData = data;
         currentIndex = 0;
         dialogueStarted = false;
-        nameText.gameObject.SetActive(false);
-        dialogueText.text = "";
+        awaitingChoiceReveal = false;
+
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
+
+        if (dialogueText != null)
+            dialogueText.text = "";
 
         if (portraitImage != null)
             portraitImage.gameObject.SetActive(false);
 
-        if (choicePanel != null)
-            choicePanel.SetActive(false);
+        HideChoicePanel();
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
 
         gameObject.SetActive(true);
     }
@@ -69,12 +84,16 @@ public class DialogueManager : MonoBehaviour
     {
         if (TutorialManager.Instance != null)
         {
-            if (TutorialManager.Instance.IsFading()) return;
+            if (TutorialManager.Instance.IsFading())
+                return;
 
-            if (TutorialManager.Instance.ConsumeClick()) return;
+            if (TutorialManager.Instance.ConsumeClick())
+                return;
         }
 
-        if (choicePanel != null && choicePanel.activeSelf) return;
+        // 선택지 버튼이 떠 있을 때는 대화 진행 금지 (버튼 클릭으로만 진행)
+        if (choicePanel != null && choicePanel.activeSelf)
+            return;
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -85,62 +104,71 @@ public class DialogueManager : MonoBehaviour
                 return;
             }
 
+            // 타이핑 중이면 한 번 클릭해서 즉시 완성
             if (isTyping)
             {
-                if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-                dialogueText.text = currentSentence;
-                isTyping = false;
+                if (typingCoroutine != null)
+                    StopCoroutine(typingCoroutine);
 
-                if (dialogueUI != null) dialogueUI.SetActive(true);
+                dialogueText.text = currentSentence;
+                FinishTyping();
+                return;
             }
 
+            // ★ 재입력 텍스트가 다 타이핑되고 클릭을 기다리는 상태
+            if (awaitingChoiceReveal)
+            {
+                awaitingChoiceReveal = false;
+
+                // 텍스트 숨기고 버튼만 노출
+                ToggleDialogueUI(false);
+                ShowChoicePanel();
+                return;
+            }
+
+            // 다음 대사로 넘어가기 전 UI 숨김
+            if (dialogueUI != null)
+                dialogueUI.SetActive(false);
+
+            if (isBranchDialogue)
+            {
+                branchIndex++;
+                ShowCurrentBranchDialogue();
+            }
             else
             {
-                if (dialogueUI != null)
-                    dialogueUI.SetActive(false);
-
-                if (isBranchDialogue)
-                {
-                    branchIndex++;
-                    ShowCurrentBranchDialogue();
-                }
-                else
-                {
-                    NextDialogue();
-                }
+                NextDialogue();
             }
         }
     }
 
     private void ShowDialogue()
     {
-        if (dialogueData == null || dialogueData.lines == null || currentIndex >= dialogueData.lines.Count)
+        if (dialogueData == null ||
+            dialogueData.lines == null ||
+            currentIndex >= dialogueData.lines.Count)
         {
             EndDialogue();
             return;
         }
 
-        currentLine = dialogueData.lines[currentIndex]; 
+        currentLine = dialogueData.lines[currentIndex];
 
         DialogueLine line = currentLine;
 
-        bool isBackgroundChange = 
-            line.dialogueEvent == DialogueEvent.ChangeStreet || 
-            line.dialogueEvent == DialogueEvent.ChangeCafe;
+        bool isBackgroundChange = IsBackgroundChangeLine(line);
 
         if (TutorialManager.Instance != null)
         {
             TutorialManager.Instance.SetDialoguePos(currentLine.isNormalDialogue);
         }
 
+        // 이름
         if (nameText != null)
         {
             if (string.IsNullOrEmpty(line.speaker))
             {
                 nameText.gameObject.SetActive(false);
-
-                if (dialogueUI != null)
-                    dialogueUI.SetActive(false);
             }
             else
             {
@@ -149,6 +177,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        // 초상화
         if (portraitImage != null)
         {
             if (line.portrait == null)
@@ -160,23 +189,25 @@ public class DialogueManager : MonoBehaviour
                 portraitImage.sprite = line.portrait;
 
                 if (!isBackgroundChange)
-                {
                     portraitImage.gameObject.SetActive(true);
-                }
                 else
-                {
                     portraitImage.gameObject.SetActive(false);
-                }
             }
         }
 
-        if (dialogueUI != null) dialogueUI.SetActive(false);
+        // 우선 Dialogue UI / 선택지 버튼 숨김
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        HideChoicePanel();
+        awaitingChoiceReveal = false;
 
         currentSentence = line.text;
 
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);
 
+        // ★ 배경 전환 줄
         if (isBackgroundChange)
         {
             ToggleDialogueUI(false);
@@ -185,37 +216,62 @@ public class DialogueManager : MonoBehaviour
                 dialogueText.text = "";
 
             ExecuteEvent(line.dialogueEvent);
+
             StartCoroutine(ShowDialogueAfterFade(line));
         }
         else
         {
+            // 일반 대사: 이 줄이 선택지 줄이면, 타이핑 끝나자마자 텍스트와 "함께" 버튼 노출
+            onTypingComplete = line.isChoice ? (System.Action)ShowChoicePanel : null;
+
             typingCoroutine = StartCoroutine(TypeText(currentSentence));
+
             ExecuteEvent(line.dialogueEvent);
         }
-        ExecuteAnimEvent(line.animEvent);
 
-        if (choicePanel != null)
-            choicePanel.SetActive(line.isChoice);
+        ExecuteAnimEvent(line.animEvent);
     }
 
     private IEnumerator TypeText(string text)
     {
         isTyping = true;
-        dialogueText.text = "";
+
+        if (dialogueText != null)
+            dialogueText.gameObject.SetActive(true);
+
+        if (dialogueText != null)
+            dialogueText.text = "";
 
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            if (dialogueText != null)
+                dialogueText.text += c;
+
             yield return new WaitForSeconds(typingSpeed);
         }
 
+        FinishTyping();
+    }
+
+    // 타이핑이 끝났을 때(자동 완료든, 클릭으로 스킵했든) 공통 처리
+    private void FinishTyping()
+    {
         isTyping = false;
 
-        if (dialogueUI != null && currentLine != null &&
+        if (dialogueText != null)
+            dialogueText.gameObject.SetActive(true);
+
+        if (dialogueUI != null &&
+            currentLine != null &&
+            !IsBackgroundChangeLine(currentLine) &&
             !string.IsNullOrEmpty(currentLine.speaker))
         {
             dialogueUI.SetActive(true);
-        }   
+        }
+
+        var callback = onTypingComplete;
+        onTypingComplete = null;
+        callback?.Invoke();
     }
 
     private void NextDialogue()
@@ -227,6 +283,7 @@ public class DialogueManager : MonoBehaviour
     public void EndDialogue()
     {
         Debug.Log("대화 종료");
+
         OnDialogueFinished?.Invoke();
 
         if (scratchLotteryManager != null)
@@ -239,7 +296,9 @@ public class DialogueManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("TutorialCompleted", 1);
             PlayerPrefs.Save();
+
             Debug.Log("튜토리얼 완료");
+
             TutorialManager.Instance.MoveLobbyAndStartTimer();
         }
     }
@@ -267,6 +326,7 @@ public class DialogueManager : MonoBehaviour
                 break;
 
             case DialogueEvent.ChangeStreet:
+
                 if (TutorialManager.Instance != null)
                 {
                     ToggleDialogueUI(false);
@@ -274,15 +334,18 @@ public class DialogueManager : MonoBehaviour
                     TutorialManager.Instance.FadeOutAndIn(() =>
                     {
                         BackgroundManager.Instance.ChangeToStreet();
+
                         TutorialManager.Instance.StopCafeAnimation();
 
                         if (streetBGM != null)
                             TutorialManager.Instance.ChangeBGMDirectly(streetBGM);
                     });
                 }
+
                 break;
 
             case DialogueEvent.ChangeCafe:
+
                 if (TutorialManager.Instance != null)
                 {
                     ToggleDialogueUI(false);
@@ -290,24 +353,58 @@ public class DialogueManager : MonoBehaviour
                     TutorialManager.Instance.FadeOutAndIn(() =>
                     {
                         BackgroundManager.Instance.ChangeToCafe();
+
                         TutorialManager.Instance.PlayCafeAnimation();
 
                         if (cafeBGM != null)
                             TutorialManager.Instance.ChangeBGMDirectly(cafeBGM);
                     });
                 }
+
                 break;
 
             case DialogueEvent.ChangeToTimer:
                 BackgroundManager.Instance.ChangeToTimer();
                 break;
+
+            case DialogueEvent.ChangeToTutorial_bus_stop:
+                BackgroundManager.Instance.ChangeToTutorial_bus_stop();
+                break;
+
+            case DialogueEvent.ChangeToTutorial_underground_shopping_center:
+                BackgroundManager.Instance.ChangeToTutorial_underground_shopping_center();
+                break;
+
+            case DialogueEvent.ChangeToTutorial_cafe:
+                BackgroundManager.Instance.ChangeToTutorial_cafe();
+                break;
+
+            case DialogueEvent.ChangeToTutorial_bag:
+                BackgroundManager.Instance.ChangeToTutorial_bag();
+                break;
+
+            case DialogueEvent.ChangeToStreet_Normal:
+                BackgroundManager.Instance.ChangeToStreet_Normal();
+                break;
         }
+    }
+
+    private bool IsBackgroundChangeLine(DialogueLine line)
+    {
+        if (line == null)
+            return false;
+
+        return line.dialogueEvent == DialogueEvent.ChangeStreet ||
+               line.dialogueEvent == DialogueEvent.ChangeCafe;
     }
 
     private void ToggleDialogueUI(bool show)
     {
-        if (nameText != null) nameText.gameObject.SetActive(show);
-        if (dialogueText != null) dialogueText.gameObject.SetActive(show);
+        if (nameText != null)
+            nameText.gameObject.SetActive(show);
+
+        if (dialogueText != null)
+            dialogueText.gameObject.SetActive(show);
 
         if (portraitImage != null)
         {
@@ -317,19 +414,23 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
-                if (currentLine != null && (currentLine.portrait != null || currentLine.animEvent != DialogueAnimEvent.None))
+                if (currentLine != null &&
+                    (currentLine.portrait != null ||
+                     currentLine.animEvent != DialogueAnimEvent.None))
                 {
                     portraitImage.gameObject.SetActive(true);
                 }
             }
         }
 
-        if (dialogueUI != null) dialogueUI.SetActive(show);
+        if (dialogueUI != null)
+            dialogueUI.SetActive(show);
     }
 
     private void ExecuteAnimEvent(DialogueAnimEvent animEvent)
     {
-        if (characterAnimator == null) return;
+        if (characterAnimator == null)
+            return;
 
         switch (animEvent)
         {
@@ -363,14 +464,20 @@ public class DialogueManager : MonoBehaviour
     public void OnChoiceResult(bool yes, int noCount = 0)
     {
         if (yes)
-
+        {
             NextDialogue();
-
+        }
         else
+        {
             AchievementManager.Instance.OnTutorialNoButtonClicked();
+        }
     }
 
-    public void RepeatCurrentDialogue(string speaker, Sprite portrait, string newText)
+    // ChoiceManager가 NO 클릭 시 호출: 텍스트만 다시 타이핑, 끝나면 "클릭 대기" 상태로 전환
+    public void RepeatCurrentDialogue(
+        string speaker,
+        Sprite portrait,
+        string newText)
     {
         currentSentence = newText;
 
@@ -386,14 +493,27 @@ public class DialogueManager : MonoBehaviour
             portraitImage.gameObject.SetActive(true);
         }
 
-        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        // ★ 일반 대사와 동일하게: 타이핑 시작 전엔 UI 숨김
+        //   (기존엔 여기서 dialogueUI.SetActive(true)로 미리 보여주고 있었음)
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        awaitingChoiceReveal = false;
+
+        // 타이핑 끝나면 FinishTyping()이 dialogueUI를 다시 보여주고,
+        // 그 다음 클릭을 기다리는 상태로 전환
+        onTypingComplete = () => { awaitingChoiceReveal = true; };
+
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
 
         typingCoroutine = StartCoroutine(TypeText(newText));
     }
 
     public void SkipDialogue()
     {
-        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
 
         gameObject.SetActive(false);
     }
@@ -422,6 +542,8 @@ public class DialogueManager : MonoBehaviour
         {
             isBranchDialogue = false;
             branchIndex = 0;
+
+            NextDialogue();
             return;
         }
 
@@ -449,9 +571,12 @@ public class DialogueManager : MonoBehaviour
             dialogueUI.SetActive(false);
 
         currentSentence = branchTexts[branchIndex];
+
+        onTypingComplete = null;
+
         typingCoroutine = StartCoroutine(TypeText(currentSentence));
     }
-    
+
     private IEnumerator ShowDialogueAfterFade(DialogueLine line)
     {
         yield return null;
@@ -468,7 +593,29 @@ public class DialogueManager : MonoBehaviour
             yield return null;
         }
 
+        if (IsBackgroundChangeLine(line))
+        {
+            ToggleDialogueUI(false);
+
+            if (dialogueText != null)
+                dialogueText.text = "";
+
+            if (nameText != null)
+                nameText.gameObject.SetActive(false);
+
+            if (portraitImage != null)
+                portraitImage.gameObject.SetActive(false);
+
+            currentIndex++;
+            ShowDialogue();
+
+            yield break;
+        }
+
         ToggleDialogueUI(true);
+
+        if (dialogueText != null)
+            dialogueText.gameObject.SetActive(true);
 
         if (nameText != null)
         {
@@ -500,6 +647,25 @@ public class DialogueManager : MonoBehaviour
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);
 
+        onTypingComplete = line.isChoice ? (System.Action)ShowChoicePanel : null;
+
         typingCoroutine = StartCoroutine(TypeText(currentSentence));
     }
-} 
+
+    // ── 선택지 패널 표시/숨김 헬퍼 (ChoiceManager를 우선 사용) ──
+    private void ShowChoicePanel()
+    {
+        if (choiceManager != null)
+            choiceManager.ShowChoice();
+        else if (choicePanel != null)
+            choicePanel.SetActive(true);
+    }
+
+    private void HideChoicePanel()
+    {
+        if (choiceManager != null)
+            choiceManager.HideChoice();
+        else if (choicePanel != null)
+            choicePanel.SetActive(false);
+    }
+}

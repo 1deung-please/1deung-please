@@ -198,10 +198,7 @@ public class Game3Manager : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
         }
-
-        if (resultPanel != null)
-            resultPanel.SetActive(true);
-
+        
         if (attackButtonText != null)
             attackButtonText.gameObject.SetActive(false);
 
@@ -216,11 +213,23 @@ public class Game3Manager : MonoBehaviour
 
         Time.timeScale = 0f;
 
+        // 결과 패널은 1초 후 등장
+        StartCoroutine(ShowResultPanelAfterDelay());
+
         //전역 타이머가 미니게임 도중 끝났을 경우 미니게임이 끝났을 때
         if (GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition())
         {
             StartCoroutine(AutoReturnToLobbyAfterDelay());
         }
+    }
+
+    // 결과 패널 1초 후 표시
+    private IEnumerator ShowResultPanelAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+
+        if (resultPanel != null)
+            resultPanel.SetActive(true);
     }
 
     //다시 하기 버튼 눌렀을 때

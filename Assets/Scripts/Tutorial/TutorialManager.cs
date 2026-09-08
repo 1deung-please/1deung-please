@@ -13,11 +13,18 @@ public class TutorialManager : MonoBehaviour
     [Header("Dialogue UI Rect Settings")]
     [SerializeField] private RectTransform dialoguePanelRect;
 
-    [Header("Normal Dialogue Position (Checked)")]
-    [SerializeField] private float normalPosX = 0f;
+    [Header("Character UI Rect")]
+    [SerializeField] private RectTransform characterUIRect;
 
-    [Header("Character Dialogue Position (Unchecked)")]
-    [SerializeField] private float characterPosX = -39.03f;
+    [Header("Normal Dialogue Position")]
+    [SerializeField] private float normalDialoguePosX = 0f;
+    [Header("Normal UI Position")]
+    [SerializeField] private float normalUIPosX = 150f;
+
+    [Header("Character Dialogue Position")]
+    [SerializeField] private float characterDialoguePosX = -39f;
+    [Header("Character UI Position")]
+    [SerializeField] private float characterUIPosX = 102.76f;
 
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadePanel;
@@ -46,7 +53,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (BackgroundManager.Instance != null) BackgroundManager.Instance.ChangeToTutorial();
 
-        bool tutorialCompleted = false;
+        bool tutorialSkipAvailable = false;
 
         if (GameManager.Instance == null)
             Debug.LogError("GameManager.Instance가 null입니다.");
@@ -55,11 +62,12 @@ public class TutorialManager : MonoBehaviour
             Debug.LogError("gameData가 null입니다.");
 
         else
-            tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
+            tutorialSkipAvailable = GameManager.Instance.gameData.tutorialSkipAvailable;
+
 
         if (skipButton != null)
         {
-            skipButton.SetActive(tutorialCompleted);
+            skipButton.SetActive(tutorialSkipAvailable);
 
             Image skipImage = skipButton.GetComponent<Image>();
             if (skipImage != null)
@@ -97,17 +105,29 @@ public class TutorialManager : MonoBehaviour
 
     public void SetDialoguePos(bool isNormal)
     {
-        if (dialoguePanelRect == null) return;
+        if (dialoguePanelRect != null)
+        {
+            Vector2 dialoguePos = dialoguePanelRect.anchoredPosition;
 
-        Vector2 anchoredPos = dialoguePanelRect.anchoredPosition;
+            if (isNormal)
+                dialoguePos.x = normalDialoguePosX;
+            else
+                dialoguePos.x = characterDialoguePosX;
 
-        if (isNormal)
-            anchoredPos.x = normalPosX;
+            dialoguePanelRect.anchoredPosition = dialoguePos;
+        }
 
-        else
-            anchoredPos.x = characterPosX;
+        if (characterUIRect != null)
+        {
+            Vector2 uiPos = characterUIRect.anchoredPosition;
 
-        dialoguePanelRect.anchoredPosition = anchoredPos;
+            if (isNormal)
+                uiPos.x = normalUIPosX;
+            else
+                uiPos.x = characterUIPosX;
+
+            characterUIRect.anchoredPosition = uiPos;
+        }
     }
 
     public void MoveLobbyAndStartTimer()

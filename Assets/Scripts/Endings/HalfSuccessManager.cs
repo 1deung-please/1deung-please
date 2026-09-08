@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
@@ -73,7 +74,7 @@ public class HalfSuccessManager : MonoBehaviour
     private IEnumerator EndingStart()
     {
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "흠... 어디 보자...",
             Ancestor
         );
@@ -81,43 +82,43 @@ public class HalfSuccessManager : MonoBehaviour
         PlayBGM();
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "참으로 애~매하구나!",
             Ancestor
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "열심히 안 한 건 아닌데, 그렇다고 눈물겹게 열심히 한 것도 아니고...",
             Ancestor
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "딱 주 5일 턱걸이로 출근 도장만 찍은 느낌이구나...",
             Ancestor
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "그래도 이 팍팍한 세상에 평타라도 친 게 어디냐.",
             Ancestor
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "네 성의를 봐서 대박 복권까지는 아니어도, 로또 3등 당첨권을 내려주마!",
             Ancestor
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "감질나느냐? 억울하면 다음엔 눈 딱 감고 풀악셀로 덕 한번 쌓아보거라!",
             Ancestor
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "자, 리스폰 고고!",
             Ancestor
         );
@@ -255,5 +256,10 @@ public class HalfSuccessManager : MonoBehaviour
 
         if (tryAgainButton != null)
             tryAgainButton.gameObject.SetActive(true);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
