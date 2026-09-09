@@ -329,7 +329,7 @@ public class AchievementManager : MonoBehaviour
 
     public void ForceShowEndingPopup(string endingId)
     {
-        Debug.Log($"[AchievementManager] 엔딩 팝업 강제 노출 테스 (ID: {endingId})");
+        Debug.Log($"[AchievementManager] 엔딩 팝업 강제 노출 테스트 (ID: {endingId})");
         ShowEndingPopup(endingId);
     }
 
