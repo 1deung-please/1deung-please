@@ -16,7 +16,12 @@ public enum DialogueEvent
     Achievement,
     ChangeStreet,
     ChangeCafe,
-    ChangeToTimer
+    ChangeToTimer,
+    ChangeToTutorial_bus_stop,
+    ChangeToTutorial_underground_shopping_center,
+    ChangeToTutorial_cafe,
+    ChangeToTutorial_bag,
+    ChangeToStreet_Normal
 }
 
 //애니메이션 종류를 고르는 목록

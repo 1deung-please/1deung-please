@@ -9,8 +9,8 @@ public enum MiniGame01Phase { Start, Ready, Countdown, Playing, Result }
 public class MiniGame01Controller : MonoBehaviour
 {
     [Header("Settings")]
-    public int minTarget = 150;
-    public int maxTarget = 200;
+    public int minTarget = 70;
+    public int maxTarget = 100;
     public float timeLimit = 10f;
     public int successBonus = 50;
     public float failPenaltyRate = 0.5f;
