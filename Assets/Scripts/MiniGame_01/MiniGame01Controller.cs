@@ -9,8 +9,8 @@ public enum MiniGame01Phase { Start, Ready, Countdown, Playing, Result }
 public class MiniGame01Controller : MonoBehaviour
 {
     [Header("Settings")]
-    public int minTarget = 70;
-    public int maxTarget = 100;
+    public int minTarget = 150;
+    public int maxTarget = 200;
     public float timeLimit = 10f;
     public int successBonus = 50;
     public float failPenaltyRate = 0.5f;
@@ -34,28 +34,28 @@ public class MiniGame01Controller : MonoBehaviour
     public Button retryButton; // 다시하기 버튼
 
     [Header("Play HUD (모래시계/타이머박스/쓰레기봉투 묶음)")]
-    // 모래시계, 모래시계 배경, 타이머 박스 외곽/내곽, 쓰레기 봉투, 쓰레기 봉투 배경 박스는
-    // 전부 이 오브젝트의 자식으로 배치하면 됨. 개별 로직이 필요 없는 정적 이미지라
-    // 스크립트에서 따로 참조하지 않고, 이 부모 오브젝트를 Playing 단계에서만 켜고 끔.
     public GameObject playHudPanel;
 
     [Header("쓰레기 팝업 (터치할 때마다 1~5 중 랜덤 등장)")]
-    public Sprite[] trashSprites;           // 쓰레기 1~5 스프라이트 5개 등록
-    public RectTransform trashPopupParent;  // 팝업이 생길 부모 RectTransform (Play HUD가 속한 Canvas 하위 권장)
+    public Sprite[] trashSprites;
+    public RectTransform trashPopupParent;
     public Vector2 trashPopupSize = new Vector2(80f, 80f);
-    public float trashPopupDuration = 2f; // TODO: 위치 확인 테스트용으로 임시로 늘림, 확인 끝나면 0.2f로 되돌릴 것
-    public float trashPopupOvershootScale = 1.2f; // 튀어나올 때 살짝 커졌다가 원래 크기로 정착
-    public int trashPopupSortingOrder = 10; // 다른 UI(박스 등)보다 항상 위에 그려지도록
+    public float trashPopupDuration = 2f;
+    public float trashPopupOvershootScale = 1.2f;
+    public int trashPopupSortingOrder = 10;
 
     [Header("오디오")]
-    public AudioSource bgmSource;         // 미니게임 BGM
-    public AudioSource sfxSource;         // 효과음 공용 소스
-    public AudioClip buttonSfx;           // 버튼 탭 효과음
-    public AudioClip trashSfx;            // 쓰레기 연타 효과음
+    public AudioSource bgmSource;
+    public AudioSource sfxSource;
+    public AudioClip buttonSfx;
+    public AudioClip trashSfx;
 
     [Header("Fade")]
-    public CanvasGroup fadePanel;         // 검은 FadePanel (CanvasGroup 붙인 것)
+    public CanvasGroup fadePanel;
     public float fadeDuration = 0.25f;
+
+    [Header("결과 패널 등장 딜레이")]
+    public float resultPanelDelay = 1f; // 실수 클릭 방지를 위한 결과 패널 등장 지연 시간
 
     private MiniGame01Phase currentPhase;
     private int targetCount;
@@ -71,7 +71,6 @@ public class MiniGame01Controller : MonoBehaviour
         if (touchToStartText != null)
             blinkCoroutine = StartCoroutine(BlinkText());
 
-        // 씬 진입 페이드인 + BGM 시작
         StartCoroutine(FadeIn());
         if (bgmSource != null) bgmSource.Play();
     }
@@ -149,7 +148,6 @@ public class MiniGame01Controller : MonoBehaviour
     {
         if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
 
-        // 화면 Flash 효과
         if (flashPanel != null)
         {
             Image flashImage = flashPanel.GetComponent<Image>();
@@ -166,7 +164,6 @@ public class MiniGame01Controller : MonoBehaviour
             flashPanel.SetActive(false);
         }
 
-        // 조상신 대사 화면(Ready)으로 이동 + 목표 개수 산정
         currentPhase = MiniGame01Phase.Ready;
         targetCount = Random.Range(minTarget, maxTarget + 1);
 
@@ -252,8 +249,6 @@ public class MiniGame01Controller : MonoBehaviour
         RectTransform rt = popup.GetComponent<RectTransform>();
         rt.SetParent(trashPopupParent, false);
 
-        // 새로 만든 RectTransform은 기본이 부모를 꽉 채우는 Stretch 앵커라
-        // sizeDelta가 절대 크기로 취급되도록 앵커/피벗을 점(Point)으로 고정
         rt.anchorMin = new Vector2(0.5f, 0.5f);
         rt.anchorMax = new Vector2(0.5f, 0.5f);
         rt.pivot = new Vector2(0.5f, 0.5f);
@@ -263,16 +258,10 @@ public class MiniGame01Controller : MonoBehaviour
             trashPopupParent, screenPosition, GetCanvasCamera(trashPopupParent), out Vector2 localPoint);
         rt.anchoredPosition = localPoint;
 
-        // TODO: 위치 어긋남 원인 확인되면 이 로그는 지워도 됨
-        Debug.Log($"[TrashPopup] screenPos={screenPosition}, Screen={Screen.width}x{Screen.height}, " +
-                  $"localPoint={localPoint}, camera={GetCanvasCamera(trashPopupParent)}, " +
-                  $"camViewportRect={(Camera.main != null ? Camera.main.rect.ToString() : "N/A")}");
-
         Image img = popup.GetComponent<Image>();
         img.sprite = trashSprites[Random.Range(0, trashSprites.Length)];
         img.raycastTarget = false;
 
-        // 박스 등 다른 UI에 가려지지 않도록 개별 Canvas로 정렬 순서를 강제로 높임
         Canvas canvas = popup.AddComponent<Canvas>();
         canvas.overrideSorting = true;
         canvas.sortingOrder = trashPopupSortingOrder;
@@ -280,24 +269,20 @@ public class MiniGame01Controller : MonoBehaviour
         StartCoroutine(AnimateTrashPopup(rt));
     }
 
-    // Canvas Render Mode가 Overlay가 아니면 좌표 변환에 카메라가 필요함
     Camera GetCanvasCamera(RectTransform parent)
     {
         Canvas canvas = parent.GetComponentInParent<Canvas>();
         if (canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay)
             return null;
 
-        // Canvas의 Render Camera가 비어있는 경우를 대비한 대체값
         return canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
     }
 
-    // 터치 지점에서 구긴 종이 쓰레기 아이콘이 튀어나오는 듯한 모션 (0 -> 살짝 오버슈트 -> 1 스케일)
-    // 모션이 끝나면 바로 사라짐
     IEnumerator AnimateTrashPopup(RectTransform rt)
     {
         rt.localScale = Vector3.zero;
 
-        const float overshootPoint = 0.6f; // 전체 duration 중 튀어나오는 구간 비율
+        const float overshootPoint = 0.6f;
         float t = 0f;
 
         while (t < trashPopupDuration)
@@ -327,25 +312,19 @@ public class MiniGame01Controller : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.RecordMiniGameResult(1, isSuccess);
-        }
-
-        if (AchievementManager.Instance != null)
-        {
-            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.PickTrash, isSuccess);
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.PickTrash, isSuccess);
         }
 
         int merit = isSuccess
             ? currentCount + successBonus
             : Mathf.RoundToInt(currentCount * failPenaltyRate);
 
-        ShowPanel(resultPanel);
-
         if (successImage != null) successImage.SetActive(isSuccess);
         if (failImage != null) failImage.SetActive(!isSuccess);
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
+                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n\n" +
                 $"주운 쓰레기 개수:  <size=130%><color=#FFC756>{currentCount}</color></size> 개";
 
         if (meritText != null)
@@ -355,9 +334,17 @@ public class MiniGame01Controller : MonoBehaviour
 
         bool willAutoReturn = GameManager.Instance.IsPendingEndingTransition();
 
-        // 자동 복귀 예정이면 다시하기 버튼 비활성화
         if (retryButton != null)
             retryButton.gameObject.SetActive(!willAutoReturn);
+
+        // 결과 패널은 실수 클릭 방지를 위해 딜레이 후 등장
+        StartCoroutine(ShowResultPanelDelayed(resultPanelDelay));
+    }
+
+    IEnumerator ShowResultPanelDelayed(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        ShowPanel(resultPanel);
     }
 
     void ShowPanel(GameObject target)
@@ -371,12 +358,24 @@ public class MiniGame01Controller : MonoBehaviour
 
     public void OnClickRetry()
     {
-        SceneLoader.Instance.LoadScene("MiniGame_01");
+        PlaySfx(buttonSfx);
+        StartCoroutine(FadeOut());
+        StartCoroutine(LoadAfterFade("MiniGame_01"));
     }
 
     public void OnClickReturnToLobby()
     {
-        GameManager.Instance.ReturnToLobby();
+        PlaySfx(buttonSfx);
+        StartCoroutine(FadeOut());
+        StartCoroutine(LoadAfterFade(null));
     }
 
+    IEnumerator LoadAfterFade(string sceneName)
+    {
+        yield return new WaitForSeconds(fadeDuration);
+        if (sceneName != null)
+            SceneLoader.Instance.LoadScene(sceneName);
+        else
+            GameManager.Instance.ReturnToLobby();
+    }
 }

@@ -6,7 +6,7 @@ using TMPro;
 public class CommonEndingManager : MonoBehaviour
 {
     [Header("Dialogue UI (조상신 대화)")]
-    public GameObject dialoguePanel; 
+    public GameObject dialoguePanel;
     public TMP_Text dialogueText;
 
     [Header("Ending UI")]
@@ -196,7 +196,7 @@ public class CommonEndingManager : MonoBehaviour
 
         GameData gameData = GameManager.Instance.gameData;
 
-       int totalPlayCount = 0;
+        int totalPlayCount = 0;
 
         foreach (int count in gameData.playCount)
         {
@@ -275,17 +275,6 @@ public class CommonEndingManager : MonoBehaviour
             return;
         }
 
-        EndingManager endingManager =
-            FindFirstObjectByType<EndingManager>();
-
-        if (endingManager == null)
-        {
-            Debug.LogError(
-                "EndingManager를 찾을 수 없습니다."
-            );
-            return;
-        }
-
-        endingManager.DetermineEnding();
+        GameManager.Instance.DetermineEnding();
     }
 }
