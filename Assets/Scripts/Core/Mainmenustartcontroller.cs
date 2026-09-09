@@ -62,9 +62,13 @@ public class MainMenuStartController : MonoBehaviour
     {
         if (!introComplete || isTransitioning) return;
 
+        // 업적/엔딩 팝업이 떠 있는 동안에는 화면 클릭을 튜토리얼 진입으로 처리하지 않음
+        if (AchievementManager.Instance != null && AchievementManager.Instance.IsPopupActive)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
-             isTransitioning = true;
+            isTransitioning = true;
 
             if (blinkCoroutine != null)
                 StopCoroutine(blinkCoroutine);

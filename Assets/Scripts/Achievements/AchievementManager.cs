@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 
@@ -32,7 +33,23 @@ public class AchievementManager : MonoBehaviour
     public AchievementListData achievementList;
     public EndingListData endingList;
 
-    private Coroutine popupCoroutine;
+    // ---- 팝업 큐 시스템 ----
+    // 엔딩 우선순위: 얄팍한속셈 > 자격미달 > 절반의성공 > 진정한귀인 > 히든
+    static readonly List<string> endingPriorityOrder = new List<string>
+    {
+        "얄팍한속셈", "자격미달", "절반의성공", "진정한귀인", "히든"
+    };
+
+    class PopupRequest
+    {
+        public bool isEnding;      // true: 엔딩, false: 업적
+        public string endingId;    // 엔딩일 때
+        public int achievementId;  // 업적일 때 (1~20, 오름차순 우선순위)
+    }
+
+    private readonly List<PopupRequest> pendingQueue = new List<PopupRequest>();
+    private bool isShowingPopup = false;
+    public bool IsPopupActive => isShowingPopup;
 
     void Awake()
     {
@@ -105,11 +122,11 @@ public class AchievementManager : MonoBehaviour
     {
         switch (endingId)
         {
-            case "얄팍한속셈": TryUnlock(14); ShowEndingPopup(endingId); break;
-            case "자격미달": TryUnlock(15); ShowEndingPopup(endingId); break;
-            case "절반의성공": TryUnlock(16); ShowEndingPopup(endingId); break;
-            case "진정한귀인": TryUnlock(17); ShowEndingPopup(endingId); break;
-            case "히든": TryUnlock(18); ShowEndingPopup(endingId); break;
+            case "얄팍한속셈": TryUnlock(14); EnqueueEnding(endingId); break;
+            case "자격미달": TryUnlock(15); EnqueueEnding(endingId); break;
+            case "절반의성공": TryUnlock(16); EnqueueEnding(endingId); break;
+            case "진정한귀인": TryUnlock(17); EnqueueEnding(endingId); break;
+            case "히든": TryUnlock(18); EnqueueEnding(endingId); break;
         }
 
         TryUnlock(13);
@@ -127,15 +144,77 @@ public class AchievementManager : MonoBehaviour
     {
         if (AchievementStorage.IsUnlocked(id)) return;
         AchievementStorage.Unlock(id);
-        ShowAchievementPopup(id);
+        EnqueueAchievement(id);
+    }
+
+    // ---- 큐에 추가 + 정렬 + 처리 시작 ----
+
+    void EnqueueAchievement(int id)
+    {
+        pendingQueue.Add(new PopupRequest { isEnding = false, achievementId = id });
+        SortQueue();
+        TryProcessNext();
+    }
+
+    void EnqueueEnding(string endingId)
+    {
+        pendingQueue.Add(new PopupRequest { isEnding = true, endingId = endingId });
+        SortQueue();
+        TryProcessNext();
+    }
+
+    // 엔딩 > 업적, 엔딩끼리는 지정된 순서, 업적끼리는 id 오름차순
+    void SortQueue()
+    {
+        pendingQueue.Sort((a, b) =>
+        {
+            if (a.isEnding != b.isEnding)
+                return a.isEnding ? -1 : 1; // 엔딩이 항상 먼저
+
+            if (a.isEnding && b.isEnding)
+            {
+                int ai = endingPriorityOrder.IndexOf(a.endingId);
+                int bi = endingPriorityOrder.IndexOf(b.endingId);
+                if (ai < 0) ai = int.MaxValue;
+                if (bi < 0) bi = int.MaxValue;
+                return ai.CompareTo(bi);
+            }
+
+            // 둘 다 업적
+            return a.achievementId.CompareTo(b.achievementId);
+        });
+    }
+
+    void TryProcessNext()
+    {
+        if (isShowingPopup) return;
+        if (pendingQueue.Count == 0) return;
+
+        PopupRequest next = pendingQueue[0];
+        pendingQueue.RemoveAt(0);
+
+        isShowingPopup = true;
+
+        if (next.isEnding)
+            ShowEndingPopup(next.endingId);
+        else
+            ShowAchievementPopup(next.achievementId);
     }
 
     void ShowAchievementPopup(int id)
     {
-        if (achievementPopup == null) return;
+        if (achievementPopup == null)
+        {
+            OnPopupFinished();
+            return;
+        }
 
         var info = GetAchievementInfo(id);
-        if (info == null) return;
+        if (info == null)
+        {
+            OnPopupFinished();
+            return;
+        }
 
         if (achievementBadgeImage != null && info.badge != null)
             achievementBadgeImage.sprite = info.badge;
@@ -154,11 +233,10 @@ public class AchievementManager : MonoBehaviour
 
         achievementPopup.SetActive(true);
 
-        if (popupCoroutine != null) StopCoroutine(popupCoroutine);
-        popupCoroutine = StartCoroutine(HideAchievementAfterDelay());
+        // 자동 닫힘 없이, 화면 터치(팝업 버튼/오버레이 클릭)로만 닫힘 - CloseAchievementPopup() 참고
     }
 
-    static readonly System.Collections.Generic.Dictionary<string, string> endingColors = new System.Collections.Generic.Dictionary<string, string>
+    static readonly Dictionary<string, string> endingColors = new Dictionary<string, string>
     {
         { "얄팍한속셈", "#8B7C47" },
         { "자격미달", "#616F7C" },
@@ -169,15 +247,17 @@ public class AchievementManager : MonoBehaviour
 
     void ShowEndingPopup(string endingId)
     {
-        if (endingPopup == null) return;
+        if (endingPopup == null)
+        {
+            OnPopupFinished();
+            return;
+        }
 
         var info = GetEndingInfo(endingId);
 
         if (endingBadgeImage != null && info != null && info.unlockedIcon != null)
         {
             endingBadgeImage.sprite = info.unlockedIcon;
-
-            // 데이터 에셋에 설정된 offset 값을 RectTransform 위치에 적용
             endingBadgeImage.rectTransform.anchoredPosition = info.imageOffset;
         }
 
@@ -194,6 +274,14 @@ public class AchievementManager : MonoBehaviour
             sfxSource.PlayOneShot(endingSfx);
 
         endingPopup.SetActive(true);
+
+        // 자동 닫힘 없이, 화면 터치(팝업 버튼/오버레이 클릭)로만 닫힘 - CloseEndingPopup() 참고
+    }
+
+    void OnPopupFinished()
+    {
+        isShowingPopup = false;
+        TryProcessNext();
     }
 
     AchievementInfo GetAchievementInfo(int id)
@@ -212,32 +300,25 @@ public class AchievementManager : MonoBehaviour
         return null;
     }
 
-    IEnumerator HideAchievementAfterDelay()
-    {
-        yield return new WaitForSeconds(popupDuration);
-        CloseAchievementPopup();
-    }
-
+    // 외부(버튼 등)에서 즉시 닫고 싶을 때 - 큐 처리도 이어서 진행
     public void CloseAchievementPopup()
     {
-        if (popupCoroutine != null)
-        {
-            StopCoroutine(popupCoroutine);
-            popupCoroutine = null;
-        }
-
+        StopAllCoroutines();
         if (achievementPopup != null)
             achievementPopup.SetActive(false);
+        OnPopupFinished();
     }
 
     public void CloseEndingPopup()
     {
+        StopAllCoroutines();
         if (endingPopup != null)
             endingPopup.SetActive(false);
+        OnPopupFinished();
     }
 
     // ==========================================
-    // [테스트용] 팝업 강제 노출 메서드
+    // [테스트용] 팝업 강제 노출 메서드 (큐 우회, 즉시 표시)
     // ==========================================
 
     public void ForceShowAchievementPopup(int id)

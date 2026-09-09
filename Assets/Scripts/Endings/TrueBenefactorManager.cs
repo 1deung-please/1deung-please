@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -533,6 +533,9 @@ public class TrueBenefactorManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        if (GameManager.Instance != null)
+            GameManager.Instance.ReturnToMainMenuFromEnding();
+        else
+            SceneManager.LoadScene("MainMenu");
     }
 }

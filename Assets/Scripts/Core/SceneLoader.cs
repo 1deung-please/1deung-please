@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -51,31 +52,38 @@ public class SceneLoader : MonoBehaviour
     }
 
     // 기존 방식: 로딩 화면 없이 즉시 전환
-    public void LoadScene(string sceneName)
+    // onComplete: 씬 전환이 끝난 뒤(다음 프레임) 호출할 콜백
+    public void LoadScene(string sceneName, Action onComplete = null)
     {
         if (isLoading) return;
         isLoading = true;
         SceneManager.LoadScene(sceneName);
-        StartCoroutine(ResetLoadingFlagNextFrame());
+        StartCoroutine(ResetLoadingFlagNextFrame(onComplete));
     }
 
     // 로딩 화면과 함께 전환 (엔딩 진입 등에 사용)
-    public void LoadSceneWithLoadingScreen(string sceneName)
+    // onComplete: 씬 전환이 완전히 끝난 뒤(로딩 패널이 꺼진 직후) 호출할 콜백
+    // - 업적/엔딩 팝업처럼 "로딩 화면 위에 겹쳐 보이면 안 되는" 처리를 여기서 실행하면 됨
+    public void LoadSceneWithLoadingScreen(string sceneName, Action onComplete = null)
     {
         if (isLoading) return;
         isLoading = true;
-        StartCoroutine(LoadSceneRoutine(sceneName));
+        StartCoroutine(LoadSceneRoutine(sceneName, onComplete));
     }
 
-    IEnumerator ResetLoadingFlagNextFrame()
+    IEnumerator ResetLoadingFlagNextFrame(Action onComplete)
     {
         yield return null;
         isLoading = false;
         Time.timeScale = 1f;
+        onComplete?.Invoke();
     }
 
-    IEnumerator LoadSceneRoutine(string sceneName)
+    IEnumerator LoadSceneRoutine(string sceneName, Action onComplete)
     {
+        // 로딩 화면 진입: 현재 재생 중인 모든 BGM(및 다른 오디오) 정지
+        StopAllActiveAudio();
+
         if (loadingPanel != null)
             loadingPanel.SetActive(true);
 
@@ -119,6 +127,21 @@ public class SceneLoader : MonoBehaviour
 
         isLoading = false;
         Time.timeScale = 1f;
+
+        // 씬 전환이 완전히 끝난 뒤 콜백 실행 (업적/엔딩 팝업 등)
+        onComplete?.Invoke();
+    }
+
+    // 씬에 남아있는(DontDestroyOnLoad 포함) 모든 AudioSource를 정지
+    // 로딩 화면은 BGM 없이 완전 암전이어야 하므로, 로딩 시작 시점의 소리를 전부 끔
+    void StopAllActiveAudio()
+    {
+        AudioSource[] allSources = FindObjectsOfType<AudioSource>();
+        foreach (var src in allSources)
+        {
+            if (src != null && src.isPlaying)
+                src.Stop();
+        }
     }
 
     void SetProgress(float value)

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -25,6 +25,9 @@ public class HiddenManager : MonoBehaviour
     // 클릭을 한 번만 감지하기 위한 변수
     private bool clickRequested = false;
 
+    // 모든 대사가 끝난 뒤: true가 되면 화면 클릭 시 메인메뉴로 돌아감
+    private bool endingFinished = false;
+
     private void Start()
     {
         if (portraitImage != null)
@@ -41,6 +44,15 @@ public class HiddenManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;
+
+            // 대사가 모두 끝난 뒤의 클릭이면 메인메뉴로 돌아감 (버튼 없이 화면 클릭으로 처리)
+            if (endingFinished)
+            {
+                endingFinished = false; // 중복 실행 방지
+
+                if (GameManager.Instance != null)
+                    GameManager.Instance.ReturnToMainMenuFromEnding();
+            }
         }
     }
 
@@ -71,6 +83,9 @@ public class HiddenManager : MonoBehaviour
         yield return Dialogue("주인공", "조상님 대신 저희가 응원하고 있을게요!", player);
 
         yield return Dialogue("전원", " 1등 되게 해주세요!!", narration);
+
+        // 모든 대사 종료: 이제부터 클릭하면 메인메뉴로 돌아감
+        endingFinished = true;
     }
 
     IEnumerator Dialogue(string speaker, string text, Sprite portrait)

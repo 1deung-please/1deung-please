@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Game3Manager : MonoBehaviour
 {
     public static Game3Manager Instance;
-    
+
     [Header("기존 게임 연결")]
     public EnemyManager enemy;
 
@@ -24,7 +24,7 @@ public class Game3Manager : MonoBehaviour
     private Coroutine blinkCoroutine;
 
     private bool gameStarted = false;
-    
+
     [Header("결과 화면")]
     public GameObject resultPanel;
     public Image successImage;
@@ -44,7 +44,7 @@ public class Game3Manager : MonoBehaviour
     public AudioClip buttonSfx;
 
     private List<char> selectedChars = new List<char>();
-    
+
     private bool gameEnded = false;
     public bool IsGameEnded => gameEnded;
 
@@ -60,7 +60,7 @@ public class Game3Manager : MonoBehaviour
 
         if (ReadyPanel != null)
             ReadyPanel.SetActive(true);
-        
+
         if (resultPanel != null)
             resultPanel.SetActive(false);
 
@@ -122,20 +122,20 @@ public class Game3Manager : MonoBehaviour
         if (!gameStarted || gameEnded)
             return;
 
-        if(attackButtonText != null)
+        if (attackButtonText != null)
             attackButtonText.gameObject.SetActive(false);
 
         string playerAnswer = new string(selectedChars.ToArray());
         string correctAnswer = ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
-        
+
         if (playerAnswer == correctAnswer)
         {
             Debug.Log("정답");
 
             enemy.Damage(20);
 
-           if (!gameEnded)
-            ProblemManager.Instance.NextProblem();
+            if (!gameEnded)
+                ProblemManager.Instance.NextProblem();
         }
         else
         {
@@ -151,11 +151,7 @@ public class Game3Manager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.CompleteMiniGame3(true);
-
-            if (AchievementManager.Instance != null)
-            {
-                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,true);
-            }
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.LogicFortress, true);
         }
         else
         {
@@ -171,11 +167,7 @@ public class Game3Manager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.CompleteMiniGame3(false);
-
-            if (AchievementManager.Instance != null)
-            {
-                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,false);
-            }
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.LogicFortress, false);
         }
         else
         {
@@ -198,7 +190,7 @@ public class Game3Manager : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
         }
-        
+
         if (attackButtonText != null)
             attackButtonText.gameObject.SetActive(false);
 
@@ -209,18 +201,18 @@ public class Game3Manager : MonoBehaviour
             failImage.gameObject.SetActive(!isSuccess);
 
         if (pointText != null)
-            pointText.text = earnedPoint.ToString();;
+            pointText.text = earnedPoint.ToString(); ;
 
         Time.timeScale = 0f;
 
+        // 자동 복귀 예정이면(전역 타이머가 미니게임 도중 끝난 경우) 다시하기 버튼만 비활성화
+        // - 미니게임1과 동일하게, 자동으로 로비 복귀하지 않고 사용자가 "거리로 돌아가기"를 눌러야 넘어감
+        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
+        if (retryButton != null)
+            retryButton.gameObject.SetActive(!willAutoReturn);
+
         // 결과 패널은 1초 후 등장
         StartCoroutine(ShowResultPanelAfterDelay());
-
-        //전역 타이머가 미니게임 도중 끝났을 경우 미니게임이 끝났을 때
-        if (GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition())
-        {
-            StartCoroutine(AutoReturnToLobbyAfterDelay());
-        }
     }
 
     // 결과 패널 1초 후 표시
@@ -246,14 +238,14 @@ public class Game3Manager : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.2f);
 
         Time.timeScale = 1f;
-        
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     //거리로 돌아가기 버튼 눌렀을 때
     private void ReturnToStreet()
     {
-         StartCoroutine(ReturnToStreetRoutine());
+        StartCoroutine(ReturnToStreetRoutine());
     }
 
     private IEnumerator ReturnToStreetRoutine()
@@ -263,6 +255,7 @@ public class Game3Manager : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.2f);
 
+        // 로딩 화면 애니메이션이 정상 재생되도록 timeScale 복구
         Time.timeScale = 1f;
 
         if (GameManager.Instance != null)
@@ -272,14 +265,6 @@ public class Game3Manager : MonoBehaviour
         }
 
         SceneManager.LoadScene(streetSceneName);
-    }
-
-    //전역 타이머가 미니게임 도중 끝났을 경우 미니게임이 끝났을 때
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(2f);
-        GameManager.Instance.ReturnToLobby();
-        //결과창 2초 표시 후 자동 로비로 이동
     }
 
     //게임 시작할 때
