@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     private const string KEY_MG1_SCORE = "MiniGame1Score";
     private const string KEY_MG2_SCORE = "MiniGame2Score";
     private const string KEY_MG3_SCORE = "MiniGame3Score";
+    private const string KEY_PLAY_CYCLE = "PlayCycle";
 
     public bool IsPendingEndingTransition() => pendingEndingTransition;
 
@@ -100,6 +101,8 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt(KEY_MG2_SCORE, gameData.miniGame2Score);
         PlayerPrefs.SetInt(KEY_MG3_SCORE, gameData.miniGame3Score);
 
+        PlayerPrefs.SetInt(KEY_PLAY_CYCLE, gameData.playCycle);
+
         for (int i = 0; i < gameData.playCount.Length; i++)
         {
             PlayerPrefs.SetInt($"PlayCount_{i}", gameData.playCount[i]);
@@ -125,6 +128,8 @@ public class GameManager : MonoBehaviour
             gameData.miniGame1Score = PlayerPrefs.GetInt(KEY_MG1_SCORE, 0);
             gameData.miniGame2Score = PlayerPrefs.GetInt(KEY_MG2_SCORE, 0);
             gameData.miniGame3Score = PlayerPrefs.GetInt(KEY_MG3_SCORE, 0);
+
+            gameData.playCycle = PlayerPrefs.GetInt(KEY_PLAY_CYCLE, 1);
 
             for (int i = 0; i < gameData.playCount.Length; i++)
             {
@@ -486,6 +491,8 @@ public class GameManager : MonoBehaviour
         {
             PersistentStats.IncrementResetCycleCount();
         }
+
+        gameData.playCycle++;
 
         // 새 회차 시작 시 기기 내부 세이브 파일 초기화
         ClearSavedData();

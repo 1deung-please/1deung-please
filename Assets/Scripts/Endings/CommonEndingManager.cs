@@ -196,17 +196,12 @@ public class CommonEndingManager : MonoBehaviour
 
         GameData gameData = GameManager.Instance.gameData;
 
-        int totalPlayCount = 0;
-
-        foreach (int count in gameData.playCount)
-        {
-            totalPlayCount += count;
-        }
+        int totalPlayCount = gameData.playCycle;
 
         if (titleText != null)
         {
             titleText.text =
-                totalPlayCount + "번째.. 쌓은 공덕 포인트";
+                totalPlayCount + "번째... 플레이 모은 공덕 포인트";
 
             titleText.gameObject.SetActive(true);
         }
@@ -253,16 +248,10 @@ public class CommonEndingManager : MonoBehaviour
         if (pointText != null)
         {
             pointText.text =
-                "이걸 안 비켜? " +
-                gameData.miniGame2Score + "\n" +
+                "이걸 안 비켜?<pos=75%>" + gameData.miniGame2Score + "\n" +
+                "출격! 논리요새<pos=75%>" + gameData.miniGame3Score + "\n" +
+                "주워줘, 쓰레기!<pos=75%>" + gameData.miniGame1Score;
 
-                "출격! 논리요새 " +
-                gameData.miniGame3Score + "\n" +
-
-                "주워줘, 쓰레기! " +
-                gameData.miniGame1Score;
-
-            // 한 번에 공개
             pointText.gameObject.SetActive(true);
         }
     }
