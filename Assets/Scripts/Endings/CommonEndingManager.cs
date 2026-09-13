@@ -48,6 +48,12 @@ public class CommonEndingManager : MonoBehaviour
     private bool isTyping = false;
     private string currentSentence = "";
 
+    // 점수판 연출(ShowEndingInfo)이 진행 중인지 여부
+    private bool isScoreInfoPlaying = false;
+    // 연출이 전부 끝나서 이제 클릭하면 엔딩으로 넘어갈 수 있는 상태인지
+    private bool scoreInfoFinished = false;
+    private Coroutine scoreInfoCoroutine;
+
     void Start()
     {
         if (titleText != null)
@@ -183,7 +189,8 @@ public class CommonEndingManager : MonoBehaviour
         Debug.Log("Signboard 도착");
 
         // 표지판이 도착한 후 텍스트 연출 시작
-        StartCoroutine(ShowEndingInfo());
+        isScoreInfoPlaying = true;
+        scoreInfoCoroutine = StartCoroutine(ShowEndingInfo());
     }
 
     private IEnumerator ShowEndingInfo()
@@ -245,6 +252,44 @@ public class CommonEndingManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
 
+        ShowFullPointText(gameData);
+
+        // 연출 자연 종료: 이제부터 클릭하면 엔딩으로 넘어감
+        isScoreInfoPlaying = false;
+        scoreInfoFinished = true;
+    }
+
+    // 연출을 건너뛰고 모든 텍스트를 즉시 최종 상태로 보여줌
+    private void SkipScoreInfo()
+    {
+        if (scoreInfoCoroutine != null)
+            StopCoroutine(scoreInfoCoroutine);
+
+        GameData gameData = GameManager.Instance.gameData;
+
+        if (titleText != null)
+        {
+            titleText.text = gameData.playCycle + "번째... 플레이 모은 공덕 포인트";
+            titleText.gameObject.SetActive(true);
+        }
+
+        if (meritPointText != null)
+        {
+            meritPointText.text = gameData.meritPoint.ToString();
+            meritPointText.gameObject.SetActive(true);
+        }
+
+        if (ptText != null)
+            ptText.gameObject.SetActive(true);
+
+        ShowFullPointText(gameData);
+
+        isScoreInfoPlaying = false;
+        scoreInfoFinished = true;
+    }
+
+    private void ShowFullPointText(GameData gameData)
+    {
         if (pointText != null)
         {
             pointText.text =
@@ -256,8 +301,21 @@ public class CommonEndingManager : MonoBehaviour
         }
     }
 
+    // Signboard 버튼 OnClick에 연결: 연출 중이면 스킵, 연출이 끝난 상태면 엔딩으로 진행
     public void OnScoreBoardClick()
     {
+        if (isScoreInfoPlaying)
+        {
+            SkipScoreInfo();
+            return;
+        }
+
+        if (!scoreInfoFinished)
+        {
+            // 아직 표지판 연출조차 끝나지 않은 상태 - 클릭 무시
+            return;
+        }
+
         if (GameManager.Instance == null)
         {
             Debug.LogError("GameManager가 없습니다.");

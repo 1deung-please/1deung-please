@@ -78,7 +78,11 @@ public class RecordBookPanel : MonoBehaviour
             endingPopupReplayButton.onClick.RemoveAllListeners();
             endingPopupReplayButton.onClick.AddListener(() =>
             {
-                SceneLoader.Instance.LoadScene(info.sceneName);
+                // 가방에서 "다시보기" 진입: Fade Out(0.25초) -> 씬 전환 -> Fade In(0.25초)
+                if (GameManager.Instance != null)
+                    GameManager.Instance.StartEndingReplay(info.sceneName);
+                else if (SceneLoader.Instance != null)
+                    SceneLoader.Instance.LoadSceneWithFade(info.sceneName);
             });
         }
 

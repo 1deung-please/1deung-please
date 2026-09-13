@@ -248,10 +248,19 @@ public class UnqualifiedManager : MonoBehaviour
         if (portraitImage != null)
             portraitImage.gameObject.SetActive(false);
 
+        // 가방에서 "다시보기"로 재생한 경우: 버튼 없이 자동으로 로비+가방으로 복귀
+        if (GameManager.Instance != null && GameManager.Instance.IsEndingReplay)
+        {
+            GameManager.Instance.EndEndingReplay();
+            return;
+        }
+
         if (tryAgainButton != null)
             tryAgainButton.gameObject.SetActive(true);
     }
 
+    // 엔딩 씬 종료 후 메인메뉴로 돌아갈 때 - GameManager를 통해 전환하면
+    // 업적/엔딩 팝업이 메인메뉴 전환 완료 후 표시됨
     public void GoToMainMenu()
     {
         if (GameManager.Instance != null)

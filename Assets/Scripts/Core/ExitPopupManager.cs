@@ -1,10 +1,12 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ExitPopupManager : MonoBehaviour
 {
     public static ExitPopupManager Instance;
 
     [SerializeField] private GameObject exitConfirmPopup;
+
+    public bool IsPopupActive => exitConfirmPopup != null && exitConfirmPopup.activeSelf;
 
     private void Awake()
     {

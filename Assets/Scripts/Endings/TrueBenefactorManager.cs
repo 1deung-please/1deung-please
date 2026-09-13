@@ -527,6 +527,13 @@ public class TrueBenefactorManager : MonoBehaviour
         if (portraitImage != null)
             portraitImage.gameObject.SetActive(false);
 
+        // 가방에서 "다시보기"로 재생한 경우: 버튼 없이 자동으로 로비+가방으로 복귀
+        if (GameManager.Instance != null && GameManager.Instance.IsEndingReplay)
+        {
+            GameManager.Instance.EndEndingReplay();
+            return;
+        }
+
         if (tryAgainButton != null)
             tryAgainButton.gameObject.SetActive(true);
     }
