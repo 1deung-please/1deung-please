@@ -64,10 +64,11 @@ public class AchievementManager : MonoBehaviour
         }
     }
 
-    public void OnTutorialNoButtonClicked()
+    // noCount: ChoiceManager가 이미 정확히 세고 있는 NO 클릭 횟수를 그대로 전달받아 사용
+    public void OnTutorialNoButtonClicked(int noCount)
     {
         var data = GameManager.Instance.gameData;
-        data.tutorialNoButtonCount++;
+        data.tutorialNoButtonCount = noCount;
         if (data.tutorialNoButtonCount >= 10)
             TryUnlock(1);
     }
