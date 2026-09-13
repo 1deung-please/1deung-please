@@ -469,7 +469,7 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            AchievementManager.Instance.OnTutorialNoButtonClicked();
+            AchievementManager.Instance.OnTutorialNoButtonClicked(noCount);
         }
     }
 

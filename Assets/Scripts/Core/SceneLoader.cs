@@ -32,6 +32,10 @@ public class SceneLoader : MonoBehaviour
     [Header("가짜 로딩 시간 (연출용 최소 시간, 초)")]
     [SerializeField] private float minLoadingDuration = 3f;
 
+    [Header("짧은 Fade 전환 (엔딩 다시보기 등)")]
+    [SerializeField] private CanvasGroup shortFadePanel; // 검은 화면 CanvasGroup (FadePanel)
+    [SerializeField] private float shortFadeDuration = 0.25f;
+
     private bool isLoading = false;
 
     void Awake()
@@ -69,6 +73,55 @@ public class SceneLoader : MonoBehaviour
         if (isLoading) return;
         isLoading = true;
         StartCoroutine(LoadSceneRoutine(sceneName, onComplete));
+    }
+
+    // 짧은 검정 Fade Out(0.25초) -> 씬 전환 -> Fade In(0.25초).
+    // 로딩바 연출 없이 빠르게 암전 전환만 필요한 경우(엔딩 다시보기 등)에 사용
+    public void LoadSceneWithFade(string sceneName, Action onComplete = null)
+    {
+        if (isLoading) return;
+        isLoading = true;
+        StartCoroutine(LoadSceneWithFadeRoutine(sceneName, onComplete));
+    }
+
+    IEnumerator LoadSceneWithFadeRoutine(string sceneName, Action onComplete)
+    {
+        // unscaledDeltaTime을 사용해 게임이 일시정지(PauseTimer 등)된 상태에서도 Fade가 정상 진행되게 함
+        if (shortFadePanel != null)
+        {
+            shortFadePanel.gameObject.SetActive(true);
+            shortFadePanel.blocksRaycasts = true;
+
+            float t = 0f;
+            while (t < shortFadeDuration)
+            {
+                t += Time.unscaledDeltaTime;
+                shortFadePanel.alpha = Mathf.Lerp(0f, 1f, t / shortFadeDuration);
+                yield return null;
+            }
+            shortFadePanel.alpha = 1f;
+        }
+
+        AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
+        while (!op.isDone)
+            yield return null;
+
+        if (shortFadePanel != null)
+        {
+            float t = 0f;
+            while (t < shortFadeDuration)
+            {
+                t += Time.unscaledDeltaTime;
+                shortFadePanel.alpha = Mathf.Lerp(1f, 0f, t / shortFadeDuration);
+                yield return null;
+            }
+            shortFadePanel.alpha = 0f;
+            shortFadePanel.blocksRaycasts = false;
+        }
+
+        isLoading = false;
+
+        onComplete?.Invoke();
     }
 
     IEnumerator ResetLoadingFlagNextFrame(Action onComplete)
