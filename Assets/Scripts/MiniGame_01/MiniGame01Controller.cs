@@ -324,7 +324,7 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n\n" +
+                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
                 $"주운 쓰레기 개수:  <size=130%><color=#FFC756>{currentCount}</color></size> 개";
 
         if (meritText != null)
