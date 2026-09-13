@@ -35,6 +35,9 @@ public class GameData : ScriptableObject
     public bool lotteryRoomUnlocked = false;
     public bool isTimeOver = false;
 
+    [Header("Play Cycle")]
+    public int playCycle = 1;
+
     // 개발 중 초기화용
     public void ResetData()
     {
