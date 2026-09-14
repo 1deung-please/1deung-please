@@ -64,10 +64,11 @@ public class AchievementManager : MonoBehaviour
         }
     }
 
-    public void OnTutorialNoButtonClicked()
+    // noCount: ChoiceManager가 이미 정확히 세고 있는 NO 클릭 횟수를 그대로 전달받아 사용
+    public void OnTutorialNoButtonClicked(int noCount)
     {
         var data = GameManager.Instance.gameData;
-        data.tutorialNoButtonCount++;
+        data.tutorialNoButtonCount = noCount;
         if (data.tutorialNoButtonCount >= 10)
             TryUnlock(1);
     }
@@ -120,14 +121,21 @@ public class AchievementManager : MonoBehaviour
 
     public void OnEndingConfirmed(string endingId)
     {
+        // 엔딩 팝업은 최초 획득 시에만 표시: 해당 엔딩 전용 업적(14~18)이
+        // "방금 새로 해금됐는지"로 판단 (엔딩은 여러 번 다시 볼 수 있지만 업적은 한 번만 해금됨)
+        bool newlyUnlocked = false;
+
         switch (endingId)
         {
-            case "얄팍한속셈": TryUnlock(14); EnqueueEnding(endingId); break;
-            case "자격미달": TryUnlock(15); EnqueueEnding(endingId); break;
-            case "절반의성공": TryUnlock(16); EnqueueEnding(endingId); break;
-            case "진정한귀인": TryUnlock(17); EnqueueEnding(endingId); break;
-            case "히든": TryUnlock(18); EnqueueEnding(endingId); break;
+            case "얄팍한속셈": newlyUnlocked = TryUnlock(14); break;
+            case "자격미달": newlyUnlocked = TryUnlock(15); break;
+            case "절반의성공": newlyUnlocked = TryUnlock(16); break;
+            case "진정한귀인": newlyUnlocked = TryUnlock(17); break;
+            case "히든": newlyUnlocked = TryUnlock(18); break;
         }
+
+        if (newlyUnlocked)
+            EnqueueEnding(endingId);
 
         TryUnlock(13);
 
@@ -140,11 +148,12 @@ public class AchievementManager : MonoBehaviour
 
     public void TryUnlockPublic(int id) => TryUnlock(id);
 
-    void TryUnlock(int id)
+    bool TryUnlock(int id)
     {
-        if (AchievementStorage.IsUnlocked(id)) return;
+        if (AchievementStorage.IsUnlocked(id)) return false;
         AchievementStorage.Unlock(id);
         EnqueueAchievement(id);
+        return true;
     }
 
     // ---- 큐에 추가 + 정렬 + 처리 시작 ----
@@ -217,7 +226,12 @@ public class AchievementManager : MonoBehaviour
         }
 
         if (achievementBadgeImage != null && info.badge != null)
+        {
             achievementBadgeImage.sprite = info.badge;
+
+            // 엔딩 팝업과 동일한 방식: 업적마다 다른 위치 보정값 적용
+            achievementBadgeImage.rectTransform.anchoredPosition = info.popupImageOffset;
+        }
 
         if (achievementTitleText != null)
             achievementTitleText.text = info.title;
@@ -349,5 +363,22 @@ public class AchievementManager : MonoBehaviour
     public void ResetOnlyAchievementsData()
     {
         AchievementStorage.ClearAllAchievements();
+    }
+
+    // [테스트용] 모든 엔딩(얄팍한속셈~히든)을 해금된 상태로 만들어서
+    // 가방(RecordBookPanel)에서 지폐 UI가 전부 클릭 가능한 상태로 뜨는지 테스트할 때 사용
+    [ContextMenu("Test - Unlock All Endings")]
+    public void TestUnlockAllEndings()
+    {
+        string[] allEndings = { "얄팍한속셈", "자격미달", "절반의성공", "진정한귀인", "히든" };
+        int[] linkedAchievementIds = { 14, 15, 16, 17, 18 };
+
+        for (int i = 0; i < allEndings.Length; i++)
+        {
+            EndingStorage.Unlock(allEndings[i]);
+            AchievementStorage.Unlock(linkedAchievementIds[i]); // 엔딩 슬롯의 잠금 해제 조건(linkedAchievementId)도 함께 해금
+        }
+
+        Debug.Log("[AchievementManager] 모든 엔딩 테스트용 해금 완료");
     }
 }

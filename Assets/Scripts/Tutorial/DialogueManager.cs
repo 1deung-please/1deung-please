@@ -32,6 +32,7 @@ public class DialogueManager : MonoBehaviour
     private DialogueLine currentLine;
     private int currentIndex = 0;
     private bool dialogueStarted = false;
+    private bool dialogueFullyEnded = false; // EndDialogue() 이후 클릭을 더 이상 가로채지 않기 위한 플래그
     private Coroutine typingCoroutine;
     private bool isTyping = false;
     private string currentSentence = "";
@@ -61,6 +62,7 @@ public class DialogueManager : MonoBehaviour
         dialogueData = data;
         currentIndex = 0;
         dialogueStarted = false;
+        dialogueFullyEnded = false;
         awaitingChoiceReveal = false;
 
         if (nameText != null)
@@ -82,6 +84,11 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        // 대화가 완전히 끝난 뒤에는 더 이상 클릭을 가로채지 않음
+        // (그렇지 않으면 EndDialogue() 이후의 클릭(예: 복권 긁기)마다 EndDialogue()가 재호출됨)
+        if (dialogueFullyEnded)
+            return;
+
         if (TutorialManager.Instance != null)
         {
             if (TutorialManager.Instance.IsFading())
@@ -282,6 +289,12 @@ public class DialogueManager : MonoBehaviour
 
     public void EndDialogue()
     {
+        // 이미 종료 처리된 상태면 재실행 방지 (복권 긁기 클릭 등으로 Update가 다시 이 함수를 부르는 것 차단)
+        if (dialogueFullyEnded)
+            return;
+
+        dialogueFullyEnded = true;
+
         Debug.Log("대화 종료");
 
         OnDialogueFinished?.Invoke();
@@ -469,7 +482,7 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            AchievementManager.Instance.OnTutorialNoButtonClicked();
+            AchievementManager.Instance.OnTutorialNoButtonClicked(noCount);
         }
     }
 

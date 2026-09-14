@@ -66,6 +66,10 @@ public class MainMenuStartController : MonoBehaviour
         if (AchievementManager.Instance != null && AchievementManager.Instance.IsPopupActive)
             return;
 
+        // 게임 종료 확인 팝업이 떠 있는 동안에도 마찬가지
+        if (ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             isTransitioning = true;

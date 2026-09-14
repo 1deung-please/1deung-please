@@ -51,7 +51,13 @@ public class HiddenManager : MonoBehaviour
                 endingFinished = false; // 중복 실행 방지
 
                 if (GameManager.Instance != null)
-                    GameManager.Instance.ReturnToMainMenuFromEnding();
+                {
+                    // 가방에서 "다시보기"로 재생한 경우: 자동으로 로비+가방으로 복귀
+                    if (GameManager.Instance.IsEndingReplay)
+                        GameManager.Instance.EndEndingReplay();
+                    else
+                        GameManager.Instance.ReturnToMainMenuFromEnding();
+                }
             }
         }
     }

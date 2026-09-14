@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -29,6 +29,7 @@ public class TutorialManager : MonoBehaviour
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadePanel;
     [SerializeField] private float fadeDuration = 0.8f; // 페이드 속도 조절
+    public float FadeDuration => fadeDuration;
 
     [Header("UI")]
     [SerializeField] private GameObject skipButton;
@@ -155,6 +156,15 @@ public class TutorialManager : MonoBehaviour
         StartCoroutine(FadeOutCoroutine());
     }
 
+    // FadeOut()으로 암전된 화면을 다시 밝히기 위한 단독 Fade In
+    // (업적 팝업처럼 "암전 유지 시간"이 가변적인 연출 뒤에 사용)
+    public void FadeIn()
+    {
+        if (isFading) return;
+
+        StartCoroutine(FadeInCoroutine());
+    }
+
     public void ChangeBGMWithFade(AudioClip newClip)
     {
         StartCoroutine(BGMCrossFade(newClip));
@@ -227,6 +237,31 @@ public class TutorialManager : MonoBehaviour
         }
 
         if (fadePanel != null) fadePanel.alpha = 1f;
+
+        isFading = false;
+    }
+
+    private IEnumerator FadeInCoroutine()
+    {
+        isFading = true;
+
+        float time = 0f;
+
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+
+            if (fadePanel != null)
+                fadePanel.alpha = Mathf.Lerp(1f, 0f, time / fadeDuration);
+
+            yield return null;
+        }
+
+        if (fadePanel != null)
+        {
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false;
+        }
 
         isFading = false;
     }

@@ -16,8 +16,9 @@ public class GameManager : MonoBehaviour
     private bool pendingAchievementSuccess;
     private string pendingEndingId = null;
 
-    [Header("Exit Popup")]
-    [SerializeField] private GameObject exitConfirmPopup;
+    // 가방(RecordBookPanel)에서 엔딩을 "다시보기"로 재생할 때 true
+    // - 엔딩 씬에서 이 값을 보고 "다시하기" 버튼 대신 자동으로 로비+가방 복귀 처리
+    public bool IsEndingReplay { get; private set; } = false;
 
     // PlayerPrefs 저장용 키 값 정의
     private const string KEY_TIME_REMAINING = "GlobalTimeRemaining";
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     private const string KEY_MG1_SCORE = "MiniGame1Score";
     private const string KEY_MG2_SCORE = "MiniGame2Score";
     private const string KEY_MG3_SCORE = "MiniGame3Score";
+    private const string KEY_PLAY_CYCLE = "PlayCycle";
 
     public bool IsPendingEndingTransition() => pendingEndingTransition;
 
@@ -100,6 +102,8 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt(KEY_MG2_SCORE, gameData.miniGame2Score);
         PlayerPrefs.SetInt(KEY_MG3_SCORE, gameData.miniGame3Score);
 
+        PlayerPrefs.SetInt(KEY_PLAY_CYCLE, gameData.playCycle);
+
         for (int i = 0; i < gameData.playCount.Length; i++)
         {
             PlayerPrefs.SetInt($"PlayCount_{i}", gameData.playCount[i]);
@@ -125,6 +129,8 @@ public class GameManager : MonoBehaviour
             gameData.miniGame1Score = PlayerPrefs.GetInt(KEY_MG1_SCORE, 0);
             gameData.miniGame2Score = PlayerPrefs.GetInt(KEY_MG2_SCORE, 0);
             gameData.miniGame3Score = PlayerPrefs.GetInt(KEY_MG3_SCORE, 0);
+
+            gameData.playCycle = PlayerPrefs.GetInt(KEY_PLAY_CYCLE, 1);
 
             for (int i = 0; i < gameData.playCount.Length; i++)
             {
@@ -373,6 +379,30 @@ public class GameManager : MonoBehaviour
         SceneLoader.Instance.LoadScene("LotteryRoom");
     }
 
+    // 가방(RecordBookPanel)에서 엔딩 "다시보기" 진입 시 호출
+    // - Fade Out(0.25초) -> 씬 전환 -> Fade In(0.25초)
+    // - 리플레이 중에는 각 엔딩 씬에서 IsEndingReplay를 보고 "다시하기" 버튼 대신
+    //   자동으로 로비 + 가방으로 복귀하도록 처리해야 함
+    public void StartEndingReplay(string sceneName)
+    {
+        IsEndingReplay = true;
+        SceneLoader.Instance.LoadSceneWithFade(sceneName);
+    }
+
+    // 엔딩 리플레이 대화가 끝났을 때 각 엔딩 매니저에서 호출:
+    // 로비로 돌아감 - IsEndingReplay는 켜진 채로 유지되고, 로비의 BagManager가
+    // 이 값을 보고 자동으로 가방을 연 뒤 ConsumeEndingReplay()로 꺼줌
+    public void EndEndingReplay()
+    {
+        SceneLoader.Instance.LoadSceneWithFade("Lobby");
+    }
+
+    // 로비(BagManager)가 자동으로 가방을 연 직후 호출: 리플레이 플래그 소비
+    public void ConsumeEndingReplay()
+    {
+        IsEndingReplay = false;
+    }
+
     public void DetermineEnding()
     {
         if (gameData == null)
@@ -486,6 +516,8 @@ public class GameManager : MonoBehaviour
         {
             PersistentStats.IncrementResetCycleCount();
         }
+
+        gameData.playCycle++;
 
         // 새 회차 시작 시 기기 내부 세이브 파일 초기화
         ClearSavedData();
