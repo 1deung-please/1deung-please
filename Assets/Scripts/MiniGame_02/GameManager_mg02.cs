@@ -56,6 +56,7 @@ public class GameManager_mg02 : MonoBehaviour
     bool needSeat;
     bool isGameOver;
     bool isGameStarted;
+    bool isStarting = false; // StartGame() 중복 실행 방지 (연출 중 추가 터치 무시)
 
     int correctCount;
     int wrongCount;
@@ -137,6 +138,17 @@ public class GameManager_mg02 : MonoBehaviour
 
     void Update()
     {
+        // 타이틀 화면(터치 대기 상태)에서 화면 전체 터치로 게임 시작
+        if (!isGameStarted && !isStarting && titlePanel != null && titlePanel.activeSelf)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                isStarting = true;
+                StartGame();
+            }
+            return;
+        }
+
         if (!isGameStarted || isGameOver) return;
 
         currentGameTime -= Time.deltaTime;
@@ -407,10 +419,10 @@ public class GameManager_mg02 : MonoBehaviour
 
     IEnumerator ShowPanelDelay()
     {
-        yield return new WaitForSeconds(1.0f); 
+        yield return new WaitForSeconds(1.0f);
 
-        resultPanel.SetActive(true); 
-        StartCoroutine(ResultPanelRoutine()); 
+        resultPanel.SetActive(true);
+        StartCoroutine(ResultPanelRoutine());
     }
 
     public void restartGame()
@@ -605,7 +617,7 @@ public class GameManager_mg02 : MonoBehaviour
         while (time < duration)
         {
             time += Time.deltaTime;
-            
+
             float t = Mathf.Clamp01(time / duration);
 
             float overshoot = 1.70158f;
