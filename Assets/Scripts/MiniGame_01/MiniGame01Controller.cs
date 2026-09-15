@@ -345,6 +345,34 @@ public class MiniGame01Controller : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         ShowPanel(resultPanel);
+        StartCoroutine(ResultPanelPopRoutine());
+    }
+
+    // 결과 패널이 가운데에서 튀어나오듯 작아졌다 커지는 연출 (미니게임2와 동일한 Back-Ease)
+    IEnumerator ResultPanelPopRoutine()
+    {
+        if (resultPanel == null) yield break;
+
+        Transform panel = resultPanel.transform;
+        panel.localScale = Vector3.zero;
+
+        float time = 0f;
+        float duration = 0.4f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            float overshoot = 1.70158f;
+            float backT = t - 1f;
+            t = backT * backT * ((overshoot + 1f) * backT + overshoot) + 1f;
+
+            panel.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
+            yield return null;
+        }
+
+        panel.localScale = Vector3.one;
     }
 
     void ShowPanel(GameObject target)
