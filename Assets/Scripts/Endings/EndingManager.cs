@@ -72,8 +72,8 @@ public class EndingManager : MonoBehaviour
         // 기본 엔딩 결정
         if (!allPlayed)
         {
-            endingId = "얄팍한속셈";
-            sceneName = "Ending_Shallow";
+            endingId = "자격미달";
+            sceneName = "Ending_Unqualified";
         }
         else
         {
