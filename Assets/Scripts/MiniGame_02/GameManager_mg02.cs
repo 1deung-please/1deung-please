@@ -14,6 +14,7 @@ public class GameManager_mg02 : MonoBehaviour
     [Header("In-Game UI")]
     public Image passengerImage;
     public Sprite[] passengerSprites;
+    public Vector2[] passengerSizes;
     public Slider healthBar;
     public TMP_Text timerText;
     public TMP_Text meritText;
@@ -236,6 +237,15 @@ public class GameManager_mg02 : MonoBehaviour
         int random = Random.Range(0, passengerSprites.Length);
 
         passengerImage.sprite = passengerSprites[random];
+
+        if (passengerSizes != null && random < passengerSizes.Length)
+        {
+            RectTransform rt = passengerImage.GetComponent<RectTransform>();
+            if (rt != null && passengerSizes[random] != Vector2.zero)
+            {
+                rt.sizeDelta = passengerSizes[random];
+            }
+        }
 
         switch (random)
         {
