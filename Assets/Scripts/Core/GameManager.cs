@@ -108,6 +108,15 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetInt($"PlayCount_{i}", gameData.playCount[i]);
         }
+
+        // playedGames(각 미니게임을 이번 회차에 플레이했는지 여부)도 저장
+        // - 이게 저장 안 되면 앱 종료 후 재실행 시 false로 초기화되어
+        //   "중간에 나갔다 들어오면 이전에 플레이한 게임이 안 한 것으로 처리"되는 버그가 생김
+        for (int i = 0; i < gameData.playedGames.Length; i++)
+        {
+            PlayerPrefs.SetInt($"PlayedGames_{i}", gameData.playedGames[i] ? 1 : 0);
+        }
+
         PlayerPrefs.Save();
         Debug.Log($"[GameManager] 플레이 데이터 저장 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초, 튜토리얼 완료: {gameData.tutorialDone})");
     }
@@ -136,6 +145,12 @@ public class GameManager : MonoBehaviour
             {
                 gameData.playCount[i] = PlayerPrefs.GetInt($"PlayCount_{i}", 0);
             }
+
+            for (int i = 0; i < gameData.playedGames.Length; i++)
+            {
+                gameData.playedGames[i] = PlayerPrefs.GetInt($"PlayedGames_{i}", 0) == 1;
+            }
+
             Debug.Log($"[GameManager] 저장된 플레이 데이터 불러오기 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초)");
         }
         else
@@ -157,6 +172,15 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.DeleteKey(KEY_MG1_SCORE);
         PlayerPrefs.DeleteKey(KEY_MG2_SCORE);
         PlayerPrefs.DeleteKey(KEY_MG3_SCORE);
+
+        if (gameData != null)
+        {
+            for (int i = 0; i < gameData.playCount.Length; i++)
+                PlayerPrefs.DeleteKey($"PlayCount_{i}");
+
+            for (int i = 0; i < gameData.playedGames.Length; i++)
+                PlayerPrefs.DeleteKey($"PlayedGames_{i}");
+        }
 
         PlayerPrefs.Save();
         Debug.Log("[GameManager] 세이브 데이터 삭제 완료");
@@ -241,6 +265,9 @@ public class GameManager : MonoBehaviour
     {
         gameData.playedGames[miniGameIndex - 1] = true;
         gameData.playCount[miniGameIndex - 1]++;
+
+        // 플레이 여부/횟수는 게임 도중 언제든 앱이 종료될 수 있으므로 즉시 저장
+        SaveGameData();
     }
 
     public void RecordMiniGameResult(int miniGameIndex, bool success)
@@ -555,6 +582,15 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.DeleteKey(KEY_MG1_SCORE);
         PlayerPrefs.DeleteKey(KEY_MG2_SCORE);
         PlayerPrefs.DeleteKey(KEY_MG3_SCORE);
+
+        if (gameData != null)
+        {
+            for (int i = 0; i < gameData.playCount.Length; i++)
+                PlayerPrefs.DeleteKey($"PlayCount_{i}");
+
+            for (int i = 0; i < gameData.playedGames.Length; i++)
+                PlayerPrefs.DeleteKey($"PlayedGames_{i}");
+        }
 
         PlayerPrefs.Save();
         Debug.Log("[GameManager] 세이브 데이터가 완전히 삭제되었습니다.");
