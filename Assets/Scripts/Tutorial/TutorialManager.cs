@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -12,18 +12,38 @@ public class TutorialManager : MonoBehaviour
 
     [Header("Dialogue UI Rect Settings")]
     [SerializeField] private RectTransform dialoguePanelRect;
-    [SerializeField] private float normalPosY = -300f;
-    [SerializeField] private float narrationPosY = -400f;
+
+    [Header("Character UI Rect")]
+    [SerializeField] private RectTransform characterUIRect;
+
+    [Header("Normal Dialogue Position")]
+    [SerializeField] private float normalDialoguePosX = 0f;
+    [Header("Normal UI Position")]
+    [SerializeField] private float normalUIPosX = 150f;
+
+    [Header("Character Dialogue Position")]
+    [SerializeField] private float characterDialoguePosX = -39f;
+    [Header("Character UI Position")]
+    [SerializeField] private float characterUIPosX = 102.76f;
 
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadePanel;
+    [SerializeField] private float fadeDuration = 0.8f; // 페이드 속도 조절
+    public float FadeDuration => fadeDuration;
 
     [Header("UI")]
     [SerializeField] private GameObject skipButton;
 
-    private bool waitingForClick = false;
+    [Header("BGM")]
+    [SerializeField] private AudioSource bgmSource;
+    [SerializeField] private float bgmFadeInDuration = 4f;
+    [SerializeField] private float bgmFadeOutDuration = 1f;
+
+
+    [Header("Cafe Animation")]
+    [SerializeField] private GameObject cafeBackgroundAnimObject;
+
     private bool isFading = false;
-    private bool consumeClick = false;
 
     private void Awake()
     {
@@ -32,91 +52,122 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        bool tutorialCompleted = false;
+        if (BackgroundManager.Instance != null) BackgroundManager.Instance.ChangeToTutorial();
+
+        bool tutorialSkipAvailable = false;
 
         if (GameManager.Instance == null)
-        {
             Debug.LogError("GameManager.Instance가 null입니다.");
-        }
-        else if (GameManager.Instance.gameData == null)
-        {
-            Debug.LogError("gameData가 null입니다.");
-        }
-        else
-        {
-            tutorialCompleted = GameManager.Instance.gameData.tutorialDone;
-        }
 
-        // 튜토리얼을 한 번 완료했으면 스킵 버튼 활성화
+        else if (GameManager.Instance.gameData == null)
+            Debug.LogError("gameData가 null입니다.");
+
+        else
+            tutorialSkipAvailable = GameManager.Instance.gameData.tutorialSkipAvailable;
+
+
         if (skipButton != null)
         {
-            skipButton.SetActive(tutorialCompleted);
+            skipButton.SetActive(tutorialSkipAvailable);
+
+            Image skipImage = skipButton.GetComponent<Image>();
+            if (skipImage != null)
+            {
+                skipImage.alphaHitTestMinimumThreshold = 0.1f;
+            }
         }
         else
         {
             Debug.LogError("skipButton이 연결되지 않았습니다.");
         }
 
-        // 페이드 초기 상태
         if (fadePanel != null)
         {
-            fadePanel.alpha = 0f;
-            fadePanel.blocksRaycasts = false;
+            fadePanel.alpha = 1f;
+            fadePanel.blocksRaycasts = true;
+            StartCoroutine(StartFadeInCoroutine());
+        }
+
+        if (bgmSource != null)
+        {
+            bgmSource.volume = 0f;
+            bgmSource.Play();
+            StartCoroutine(BGMFadeIn(bgmFadeInDuration));
         }
 
         StartTutorial();
     }
 
-    private void Update()
-    {
-        if (waitingForClick && Input.GetMouseButtonDown(0))
-        {
-            waitingForClick = false;
-
-            // 이 클릭은 FadeIn만을 위한 클릭
-            consumeClick = true;
-
-            StartCoroutine(FadeInCoroutine());
-        }
-    }
-
     public void StartTutorial()
     {
         if (dialogueManager != null)
-        {
             dialogueManager.StartDialogue(tutorialDialogue);
-        }
     }
 
-    public void SetDialoguePosY(bool isNarration)
+    public void SetDialoguePos(bool isNormal)
     {
-        if (dialoguePanelRect == null)
-            return;
+        if (dialoguePanelRect != null)
+        {
+            Vector2 dialoguePos = dialoguePanelRect.anchoredPosition;
 
-        Vector2 anchoredPos = dialoguePanelRect.anchoredPosition;
-        anchoredPos.y = isNarration ? narrationPosY : normalPosY;
-        dialoguePanelRect.anchoredPosition = anchoredPos;
+            if (isNormal)
+                dialoguePos.x = normalDialoguePosX;
+            else
+                dialoguePos.x = characterDialoguePosX;
+
+            dialoguePanelRect.anchoredPosition = dialoguePos;
+        }
+
+        if (characterUIRect != null)
+        {
+            Vector2 uiPos = characterUIRect.anchoredPosition;
+
+            if (isNormal)
+                uiPos.x = normalUIPosX;
+            else
+                uiPos.x = characterUIPosX;
+
+            characterUIRect.anchoredPosition = uiPos;
+        }
     }
 
     public void MoveLobbyAndStartTimer()
     {
+        Debug.Log("MoveLobbyAndStartTimer 실행됨");
+
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.OnTutorialComplete();
-        }
+
         else
-        {
             Debug.LogError("GameManager.Instance가 없습니다.");
-        }
+    }
+
+    public void FadeOutAndIn(System.Action onBlackoutAction = null)
+    {
+        if (isFading) return;
+
+        StartCoroutine(AutoFadeOutInCoroutine(onBlackoutAction));
     }
 
     public void FadeOut()
     {
-        // 이미 페이드 중이면 중복 실행 방지
-        if (isFading)
-            return;
+        if (isFading) return;
 
-        StartCoroutine(FadeCoroutine());
+        StartCoroutine(FadeOutCoroutine());
+    }
+
+    // FadeOut()으로 암전된 화면을 다시 밝히기 위한 단독 Fade In
+    // (업적 팝업처럼 "암전 유지 시간"이 가변적인 연출 뒤에 사용)
+    public void FadeIn()
+    {
+        if (isFading) return;
+
+        StartCoroutine(FadeInCoroutine());
+    }
+
+    public void ChangeBGMWithFade(AudioClip newClip)
+    {
+        StartCoroutine(BGMCrossFade(newClip));
     }
 
     public void UnlockAchievement(string achievementName)
@@ -124,42 +175,70 @@ public class TutorialManager : MonoBehaviour
         Debug.Log("업적 획득 : " + achievementName);
     }
 
-    private IEnumerator FadeCoroutine()
+    private IEnumerator AutoFadeOutInCoroutine(System.Action onBlackoutAction)
     {
         isFading = true;
 
+        if (fadePanel != null) fadePanel.blocksRaycasts = true;
+
         float time = 0f;
 
-        // 페이드 중에는 화면 클릭을 막음
-        if (fadePanel != null)
-        {
-            fadePanel.blocksRaycasts = true;
-        }
-
-        while (time < 1f)
+        while (time < fadeDuration)
         {
             time += Time.deltaTime;
 
             if (fadePanel != null)
-            {
-                fadePanel.alpha = Mathf.Lerp(0f, 1f, time);
-            }
+                fadePanel.alpha = Mathf.Lerp(0f, 1f, time / fadeDuration);
+
+            yield return null;
+        }
+
+        if (fadePanel != null) fadePanel.alpha = 1f;
+
+        onBlackoutAction?.Invoke();
+        yield return new WaitForSeconds(0.2f);
+        time = 0f;
+
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+
+            if (fadePanel != null)
+                fadePanel.alpha = Mathf.Lerp(1f, 0f, time / fadeDuration);
 
             yield return null;
         }
 
         if (fadePanel != null)
         {
-            fadePanel.alpha = 1f;
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false;
         }
 
-        UnlockAchievement("사이비 퇴치!");
-
-        // 페이드 완료
         isFading = false;
+    }
 
-        // 검은 화면에서 클릭을 기다림
-        waitingForClick = true;
+    private IEnumerator FadeOutCoroutine()
+    {
+        isFading = true;
+
+        if (fadePanel != null) fadePanel.blocksRaycasts = true;
+
+        float time = 0f;
+
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+
+            if (fadePanel != null)
+                fadePanel.alpha = Mathf.Lerp(0f, 1f, time / fadeDuration);
+
+            yield return null;
+        }
+
+        if (fadePanel != null) fadePanel.alpha = 1f;
+
+        isFading = false;
     }
 
     private IEnumerator FadeInCoroutine()
@@ -168,14 +247,12 @@ public class TutorialManager : MonoBehaviour
 
         float time = 0f;
 
-        while (time < 1f)
+        while (time < fadeDuration)
         {
             time += Time.deltaTime;
 
             if (fadePanel != null)
-            {
-                fadePanel.alpha = Mathf.Lerp(1f, 0f, time);
-            }
+                fadePanel.alpha = Mathf.Lerp(1f, 0f, time / fadeDuration);
 
             yield return null;
         }
@@ -189,31 +266,129 @@ public class TutorialManager : MonoBehaviour
         isFading = false;
     }
 
+    private IEnumerator StartFadeInCoroutine()
+    {
+        isFading = true;
+        float duration = 1f;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            if (fadePanel != null)
+                fadePanel.alpha = Mathf.Lerp(1f, 0f, time / duration);
+
+            yield return null;
+        }
+
+        if (fadePanel != null)
+        {
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false;
+        }
+
+        isFading = false;
+    }
+
+    private IEnumerator BGMFadeIn(float duration)
+    {
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            if (bgmSource != null)
+                bgmSource.volume = Mathf.Lerp(0f, 1f, time / duration);
+
+            yield return null;
+        }
+
+        if (bgmSource != null) bgmSource.volume = 1f;
+    }
+
+
+
+    private IEnumerator BGMFadeOut(float duration)
+    {
+        float time = 0f;
+        float startVolume = bgmSource != null ? bgmSource.volume : 1f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            if (bgmSource != null)
+                bgmSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+
+            yield return null;
+        }
+
+        if (bgmSource != null)
+        {
+            bgmSource.volume = 0f;
+            bgmSource.Stop();
+        }
+    }
+
+    private IEnumerator BGMCrossFade(AudioClip newClip)
+    {
+        yield return StartCoroutine(BGMFadeOut(bgmFadeOutDuration));
+
+        if (bgmSource != null)
+        {
+            bgmSource.clip = newClip;
+            bgmSource.Play();
+        }
+
+        yield return StartCoroutine(BGMFadeIn(bgmFadeInDuration));
+    }
+
     public bool IsFading()
     {
-        return isFading;
+        if (isFading) return true;
+
+        if (fadePanel != null && fadePanel.alpha > 0.1f) return true;
+
+        return false;
     }
+
+    public bool ConsumeClick() => false;
 
     public void SkipTutorial()
     {
         Debug.Log("스킵 버튼 클릭!");
 
         if (dialogueManager != null)
-        {
             dialogueManager.SkipDialogue();
-        }
 
         MoveLobbyAndStartTimer();
     }
 
-    public bool ConsumeClick()
+    public void ChangeBGMDirectly(AudioClip newClip)
     {
-        if (consumeClick)
-        {
-            consumeClick = false;
-            return true;
-        }
+        if (bgmSource == null || newClip == null) return;
 
-        return false;
+        bgmSource.Stop();
+        bgmSource.clip = newClip;
+        bgmSource.volume = 1f;
+        bgmSource.Play();
+    }
+
+    public void PlayCafeAnimation()
+    {
+        if (cafeBackgroundAnimObject != null)
+        {
+            cafeBackgroundAnimObject.SetActive(true);
+        }
+    }
+
+    public void StopCafeAnimation()
+    {
+        if (cafeBackgroundAnimObject != null)
+        {
+            cafeBackgroundAnimObject.SetActive(false);
+        }
     }
 }

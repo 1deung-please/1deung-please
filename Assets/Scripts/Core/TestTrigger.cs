@@ -39,8 +39,8 @@ public class TestTrigger : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.U))
         {
-            for (int i = 0; i < 10; i++)
-                AchievementManager.Instance.OnTutorialNoButtonClicked();
+            // noCount를 10으로 직접 지정해서 10번째 NO 클릭 상황을 바로 재현
+            AchievementManager.Instance.OnTutorialNoButtonClicked(10);
         }
 
         // 아래는 전역 타이머 테스트 전용 (실제 게임 로직 아님)

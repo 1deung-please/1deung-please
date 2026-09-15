@@ -1,5 +1,6 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
@@ -9,152 +10,255 @@ public class ShallowManager : MonoBehaviour
     [SerializeField] private GameData gameData;
 
     [Header("UI")]
+    [SerializeField] private Image portraitImage;
     [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private GameObject scoreBoard;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject dialogueUI;
 
     [Header("Portrait")]
-    [SerializeField] private Image portraitImage;
-    [SerializeField] private Sprite ancestorGod;
-    [SerializeField] private Sprite player;
-    
-    private bool isTyping = false;
-    private bool skipTyping = false;
+    [SerializeField] private Sprite ancestorAngry;
 
-    // 클릭을 한 번만 감지하기 위한 변수
+    [Header("Try Again")]
+    [SerializeField] private Button tryAgainButton;
+
+    [Header("Typing")]
+    [SerializeField] private float typingSpeed = 0.05f;
+
+    [Header("Background Animation")]
+    [SerializeField] private GameObject backgroundAnimObject;
+
+    [Header("BGM")]
+    [SerializeField] private AudioSource bgmSource;
+    [SerializeField] private float bgmFadeInDuration = 4f;
+
     private bool clickRequested = false;
+    private Coroutine typingCoroutine;
 
     private void Start()
     {
-       scoreBoard.SetActive(false);
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
+
+        if (dialogueText != null)
+        {
+            dialogueText.text = "";
+            dialogueText.gameObject.SetActive(true);
+        }
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
+
+        if (tryAgainButton != null)
+            tryAgainButton.gameObject.SetActive(false);
+
+        if (bgmSource != null)
+        {
+            bgmSource.Stop();
+            bgmSource.volume = 0f;
         }
+
+        if (backgroundAnimObject != null)
+            backgroundAnimObject.SetActive(true);
 
         StartCoroutine(EndingStart());
     }
 
     private void Update()
     {
-        // 모든 클릭은 여기서만 감지
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;
         }
     }
 
-    IEnumerator EndingStart()
+    private IEnumerator EndingStart()
     {
-        yield return Dialogue("조상님", "그래... 처음 보는구나.", ancestorGod);
+        yield return Dialogue(
+            "조상신",
+            "흠... 점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래",
+            ancestorAngry
+        );
 
-        yield return Dialogue("조상님", "내가 바로 네 조상이다.", ancestorGod);
+        PlayBGM();
 
-        yield return Dialogue("조상님", "내가 널 참 오랫동안 지켜보고 있었지...\n" + "갓난아기일 때부터 회사에 치이는 지금까지...", ancestorGod);
-
-        yield return Dialogue("조상님", "얼마나 고생이 많았느냐.\n" + "난 널 도와주러 온 사람이야.", ancestorGod);
-
-        yield return Dialogue("조상님", "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까.", ancestorGod);
-
-        yield return ShowScore();
-
-        yield return Dialogue("조상님", "흠... 점수는 괜찮고, 그래 꽤 잘 쌓아왔구나. 그래그래", ancestorGod);
-
-        yield return Dialogue("조상님", "뭐얏!!!!", ancestorGod);
+        yield return Dialogue(
+            "조상신",
+            "뭐얏!!!!",
+            ancestorAngry
+        );
 
         string mostPlayedGame = GetMostPlayedGame();
 
-        yield return Dialogue("조상님", "네 이녀석! 지금까지 진심으로 공덕을 쌓은 것이 아니라 오로지 돈만 바라보며 공덕을 쌓은 것이구나!!!", ancestorGod);
+        yield return Dialogue(
+            "조상신",
+            "네 이녀석! 지금까지 진심으로 공덕을 쌓은 것이 아니라 오로지 돈만 바라보며 공덕을 쌓은 것이구나!!!",
+            ancestorAngry
+        );
 
-        yield return Dialogue("조상님", "가장 공덕 쌓기 쉬운 " + mostPlayedGame + "로 공덕 쌓기만 했어!!!!!!", ancestorGod);
+        yield return Dialogue(
+            "조상신",
+            "가장 공덕 쌓기 쉬운 " + mostPlayedGame + "로 공덕 쌓기만 했어!!!!!!",
+            ancestorAngry
+        );
 
-        yield return Dialogue("조상님", "너는 선행을 위한 선행을 한 것이 아니라\n" + "오로지 돈만 보고 일을 한 것이로구나!", ancestorGod);
+        yield return Dialogue(
+            "조상신",
+            "너는 선행을 위한 선행을 한 것이 아니라 오로지 돈만 보고 일을 한 것이로구나!",
+            ancestorAngry
+        );
 
-        yield return Dialogue("조상님", "썩 꺼지거라!\n" + "그리고 다시 진심을 다해 공덕을 쌓아오거라!!!", ancestorGod);
+        yield return Dialogue(
+            "조상신",
+            "썩 꺼지거라! 그리고 다시 진심을 다해 공덕을 쌓아오거라!!!",
+            ancestorAngry
+        );
+
+        EndDialogue();
     }
 
-    IEnumerator Dialogue(string speaker, string text, Sprite portrait)
+    private IEnumerator Dialogue(string speaker, string text, Sprite portrait)
     {
-        // 이름 변경
+        clickRequested = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (nameText != null)
         {
-            nameText.text = speaker;
-        }
-
-        // 사진 변경
-        if (portraitImage != null)
-        {
-            if (portrait != null)
+            if (string.IsNullOrEmpty(speaker))
             {
-                portraitImage.sprite = portrait;
-                portraitImage.gameObject.SetActive(true);
+                nameText.gameObject.SetActive(false);
             }
             else
             {
-                portraitImage.gameObject.SetActive(false);
+                nameText.gameObject.SetActive(true);
+                nameText.text = speaker;
             }
         }
 
-        dialogueText.text = "";
+        SetPortrait(portrait);
 
-        isTyping = true;
-        skipTyping = false;
+        if (dialogueText != null)
+            dialogueText.text = "";
 
-        // 이전 클릭 제거
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeText(text));
+
+        yield return typingCoroutine;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
+
         clickRequested = false;
 
-        // 타이핑
+        yield return new WaitUntil(() => clickRequested);
+
+        clickRequested = false;
+    }
+
+    private IEnumerator TypeText(string text)
+    {
+        if (dialogueText == null)
+            yield break;
+
+        dialogueText.text = "";
+
         foreach (char c in text)
         {
-            // 타이핑 중 클릭하면 즉시 전체 대사 표시
             if (clickRequested)
             {
                 dialogueText.text = text;
-
-                // 이 클릭은 "타이핑 스킵"에 사용했으므로 제거
                 clickRequested = false;
-
                 break;
             }
 
             dialogueText.text += c;
 
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(typingSpeed);
+        }
+    }
+
+    private void SetPortrait(Sprite portrait)
+    {
+        if (portraitImage == null)
+            return;
+
+        if (portrait == null)
+        {
+            portraitImage.gameObject.SetActive(false);
+            return;
         }
 
-        isTyping = false;
-
-        // 타이핑이 끝난 뒤 혹시 남아있는 클릭 제거
-        clickRequested = false;
-
-        // 대사가 모두 나온 후
-        // 새로운 클릭을 기다림
-        yield return new WaitUntil(() => clickRequested);
-
-        // 이 클릭은 다음 대사로 넘어가는 데 사용
-        clickRequested = false;
+        portraitImage.sprite = portrait;
+        portraitImage.gameObject.SetActive(true);
     }
 
-    IEnumerator ShowScore()
+    private void PlayBGM()
     {
-        // 스코어보드 표시
-        scoreBoard.SetActive(true);
-        scoreText.text = "공덕 점수: " + gameData.meritPoint;
+        if (bgmSource == null)
+            return;
 
-        // 이전 클릭 제거
-        clickRequested = false;
+        bgmSource.volume = 0f;
+        bgmSource.Play();
 
-        // 새로운 클릭을 기다림
-        yield return new WaitUntil(() => clickRequested);
-
-        // 클릭하면 스코어보드 숨김
-        clickRequested = false;
-        scoreBoard.SetActive(false);
+        StartCoroutine(BGMFadeIn());
     }
 
-    string GetMostPlayedGame()
+    private IEnumerator BGMFadeIn()
+    {
+        float time = 0f;
+
+        while (time < bgmFadeInDuration)
+        {
+            time += Time.deltaTime;
+
+            if (bgmSource != null)
+            {
+                bgmSource.volume = Mathf.Lerp(
+                    0f,
+                    1f,
+                    time / bgmFadeInDuration
+                );
+            }
+
+            yield return null;
+        }
+
+        if (bgmSource != null)
+            bgmSource.volume = 1f;
+    }
+
+    private void EndDialogue()
+    {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
+
+        if (dialogueText != null)
+            dialogueText.gameObject.SetActive(false);
+
+        if (portraitImage != null)
+            portraitImage.gameObject.SetActive(false);
+
+        // 가방에서 "다시보기"로 재생한 경우: 버튼 없이 자동으로 로비+가방으로 복귀
+        if (GameManager.Instance != null && GameManager.Instance.IsEndingReplay)
+        {
+            GameManager.Instance.EndEndingReplay();
+            return;
+        }
+
+        if (tryAgainButton != null)
+            tryAgainButton.gameObject.SetActive(true);
+    }
+
+    private string GetMostPlayedGame()
     {
         int max = gameData.playCount[0];
         int index = 0;
@@ -171,13 +275,25 @@ public class ShallowManager : MonoBehaviour
         switch (index)
         {
             case 0:
-                return "<이걸 안 비켜?>";
+                return "이걸 안 비켜?";
+
             case 1:
-                return "<출격! 논리요새>";
+                return "출격! 논리요새";
+
             case 2:
-                return "<주워줘, 쓰레기>";
+                return "주워줘, 쓰레기";
         }
 
         return "";
+    }
+
+    // 엔딩 씬 종료 후 메인메뉴로 돌아갈 때 - GameManager를 통해 전환하면
+    // 업적/엔딩 팝업이 메인메뉴 전환 완료 후 표시됨
+    public void GoToMainMenu()
+    {
+        if (GameManager.Instance != null)
+            GameManager.Instance.ReturnToMainMenuFromEnding();
+        else
+            SceneManager.LoadScene("MainMenu");
     }
 }

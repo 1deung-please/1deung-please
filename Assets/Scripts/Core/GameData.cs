@@ -27,12 +27,16 @@ public class GameData : ScriptableObject
 
     [Header("Flags")]
     public bool tutorialDone;
+    public bool tutorialSkipAvailable;
 
     [Header("Global Timer")]
     public float globalTimeRemaining = 300f;
     public bool isTimerFrozen = true; // 튜토리얼 끝나기 전까지는 얼려둔 상태로 시작
     public bool lotteryRoomUnlocked = false;
     public bool isTimeOver = false;
+
+    [Header("Play Cycle")]
+    public int playCycle = 1;
 
     // 개발 중 초기화용
     public void ResetData()
@@ -42,6 +46,7 @@ public class GameData : ScriptableObject
         miniGame3Score = 0;
         meritPoint = 0;
         tutorialDone = false;
+        tutorialSkipAvailable = false;
         globalTimeRemaining = 300f;
         isTimerFrozen = true;
         lotteryRoomUnlocked = false;

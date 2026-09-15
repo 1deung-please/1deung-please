@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -13,6 +14,7 @@ public class GameManager_mg02 : MonoBehaviour
     [Header("In-Game UI")]
     public Image passengerImage;
     public Sprite[] passengerSprites;
+    public Vector2[] passengerSizes;
     public Slider healthBar;
     public TMP_Text timerText;
     public TMP_Text meritText;
@@ -20,9 +22,30 @@ public class GameManager_mg02 : MonoBehaviour
     public TMP_Text decreaseText;
 
     [Header("Result UI Texts")]
-    public TMP_Text titleText;
+    public GameObject successImage;
+    public GameObject failImage;
     public TMP_Text resultReasonText;
     public TMP_Text recordText;
+
+    [Header("Result Buttons")]
+    public Button restartButton;
+
+    [Header("Animation")]
+    public Image flashPanel;
+    public Image startImage;
+
+    Coroutine blinkCoroutine;
+    Coroutine idleCoroutine;
+    Coroutine punchScaleCoroutine; // PunchScale 중첩 제어용 변수
+
+    private readonly Vector3 baseScale = Vector3.one; // NPC의 기준 크기 고정
+
+    [Header("Sound")]
+    public AudioSource audioSource;
+
+    public AudioClip buttonSound;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
@@ -33,6 +56,7 @@ public class GameManager_mg02 : MonoBehaviour
     bool needSeat;
     bool isGameOver;
     bool isGameStarted;
+    bool isStarting = false; // StartGame() 중복 실행 방지 (연출 중 추가 터치 무시)
 
     int correctCount;
     int wrongCount;
@@ -42,14 +66,31 @@ public class GameManager_mg02 : MonoBehaviour
 
     void Start()
     {
-        if (titlePanel != null)
-            titlePanel.SetActive(true);
+        if (successImage != null)
+            successImage.SetActive(false);
+
+        if (failImage != null)
+            failImage.SetActive(false);
 
         if (resultPanel != null)
             resultPanel.SetActive(false);
 
         isGameStarted = false;
         isGameOver = false;
+
+        if (startImage != null)
+        {
+            startImage.gameObject.SetActive(true);
+            blinkCoroutine = StartCoroutine(BlinkImage());
+        }
+
+        if (flashPanel != null)
+        {
+            Color color = flashPanel.color;
+            color.a = 0f;
+            flashPanel.color = color;
+            flashPanel.gameObject.SetActive(false);
+        }
     }
 
     public void StartGame()
@@ -57,10 +98,6 @@ public class GameManager_mg02 : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnMiniGameStart();
-        }
-
-        if (GameManager.Instance != null)
-        {
             GameManager.Instance.RecordMiniGamePlay(2);
         }
 
@@ -78,18 +115,62 @@ public class GameManager_mg02 : MonoBehaviour
         isGameOver = false;
         isGameStarted = true;
 
+        if (blinkCoroutine != null)
+        {
+            StopCoroutine(blinkCoroutine);
+            blinkCoroutine = null;
+        }
+
+        if (startImage != null)
+        {
+            Color color = startImage.color;
+            color.a = 0f;
+            startImage.color = color;
+            startImage.gameObject.SetActive(false);
+        }
+
         updateMeritUI();
+
+        StartCoroutine(FlashRoutine());
 
         spawnPassenger();
     }
 
     void Update()
     {
+        // 타이틀 화면(터치 대기 상태)에서 화면 전체 터치로 게임 시작
+        if (!isGameStarted && !isStarting && titlePanel != null && titlePanel.activeSelf)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                isStarting = true;
+                StartGame();
+            }
+            return;
+        }
+
         if (!isGameStarted || isGameOver) return;
 
         currentGameTime -= Time.deltaTime;
 
-        float decreaseSpeed = 10f;
+        float decreaseSpeed;
+
+        if (currentGameTime > 15f)
+        {
+            decreaseSpeed = 10f;
+        }
+        else if (currentGameTime > 10f)
+        {
+            decreaseSpeed = 15f;
+        }
+        else if (currentGameTime > 5f)
+        {
+            decreaseSpeed = 20f;
+        }
+        else
+        {
+            decreaseSpeed = 25f;
+        }
 
         if (currentGameTime <= 14f && currentGameTime > 10f)
         {
@@ -105,10 +186,13 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
-
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        healthBar.value = currentHealth / maxHealth;
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth / maxHealth;
+        }
+
         timerText.text = Mathf.Ceil(currentGameTime) + "s";
 
         if (decreaseText != null)
@@ -159,10 +243,21 @@ public class GameManager_mg02 : MonoBehaviour
 
     void spawnPassenger()
     {
+        if (passengerImage == null)
+            return;
+
         int random = Random.Range(0, passengerSprites.Length);
 
-        passengerImage.sprite =
-            passengerSprites[random];
+        passengerImage.sprite = passengerSprites[random];
+
+        if (passengerSizes != null && random < passengerSizes.Length)
+        {
+            RectTransform rt = passengerImage.GetComponent<RectTransform>();
+            if (rt != null && passengerSizes[random] != Vector2.zero)
+            {
+                rt.sizeDelta = passengerSizes[random];
+            }
+        }
 
         switch (random)
         {
@@ -179,6 +274,13 @@ public class GameManager_mg02 : MonoBehaviour
                 needSeat = false;
                 break;
         }
+
+        if (idleCoroutine != null)
+        {
+            StopCoroutine(idleCoroutine);
+        }
+
+        idleCoroutine = StartCoroutine(PassengerIdleRoutine());
     }
 
     public void giveSeat()
@@ -187,20 +289,25 @@ public class GameManager_mg02 : MonoBehaviour
             return;
 
         registerClick();
+        audioSource.PlayOneShot(buttonSound);
 
         if (needSeat)
         {
             currentHealth += 15f;
             correctCount++;
+            audioSource.PlayOneShot(correctSound);
+            TriggerPunchScale();
         }
         else
         {
             currentHealth -= 30f;
             wrongCount++;
+            audioSource.PlayOneShot(wrongSound);
+            StartCoroutine(ShakeRoutine(passengerImage.GetComponent<RectTransform>()));
         }
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
+        StartCoroutine(HealthBarRoutine(currentHealth / maxHealth));
         updateMeritUI();
         spawnPassenger();
     }
@@ -211,30 +318,52 @@ public class GameManager_mg02 : MonoBehaviour
             return;
 
         registerClick();
+        audioSource.PlayOneShot(buttonSound);
 
         if (!needSeat)
         {
             currentHealth += 15f;
             correctCount++;
+            audioSource.PlayOneShot(correctSound);
+            TriggerPunchScale();
         }
         else
         {
             currentHealth -= 30f;
             wrongCount++;
+            audioSource.PlayOneShot(wrongSound);
+            StartCoroutine(
+                ShakeRoutine(
+                    passengerImage.GetComponent<RectTransform>()
+                )
+            );
         }
 
-        currentHealth = Mathf.Clamp( currentHealth, 0, maxHealth);
-
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        StartCoroutine(HealthBarRoutine(currentHealth / maxHealth));
         updateMeritUI();
         spawnPassenger();
+    }
+
+    // 정답 시 연출 중첩 방지 및 코루틴 실행
+    void TriggerPunchScale()
+    {
+        if (passengerImage == null) return;
+
+        if (punchScaleCoroutine != null)
+        {
+            StopCoroutine(punchScaleCoroutine);
+            passengerImage.transform.localScale = baseScale; // 즉시 원본 스케일로 복구
+        }
+
+        punchScaleCoroutine = StartCoroutine(PunchScaleRoutine(passengerImage.transform));
     }
 
     void updateMeritUI()
     {
         if (meritText != null)
         {
-            meritText.text =
-                $"정답 {correctCount}";
+            meritText.text = $"정답 {correctCount}";
         }
 
         if (currentMeritText != null)
@@ -248,85 +377,258 @@ public class GameManager_mg02 : MonoBehaviour
     {
         isGameOver = true;
 
-        // 전역 공덕 시스템 전달, 결과창에서는 전역 타이머 정지
         if (GameManager.Instance != null)
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
-        }
-
-        string reason;
-
-        if (isSuccess)
-        {
-            reason = "시간종료(정상)";
-        }
-        else
-        {
-            reason = "게이지0(오버)";
+            if (AchievementManager.Instance != null)
+                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
         }
 
         if (resultPanel != null)
         {
-            resultPanel.SetActive(true);
+            if (successImage != null)
+                successImage.SetActive(isSuccess);
 
-            if (titleText != null)
-                titleText.text = "플레이 기록";
-
-            float survivedTime =
-                maxGameTime -
-                Mathf.Max(0, currentGameTime);
-
-            int totalAttempts =
-                correctCount + wrongCount;
-
-            float accuracy =
-                totalAttempts > 0
-                ? ((float)correctCount / totalAttempts) * 100f : 0f;
-
-            float avgCps =
-                survivedTime > 0
-                ? (float)totalAttempts / survivedTime: 0f;
+            if (failImage != null)
+                failImage.SetActive(!isSuccess);
 
             if (resultReasonText != null)
-                resultReasonText.text = reason;
+            {
+                string correctColorHex = "#FFAF4D";
+                string wrongColorHex = "#FFFFFF";
+                resultReasonText.text =
+                    $"맞춘 승객 수: <color={correctColorHex}>{correctCount}</color> 개\n" +
+                    $"틀린 승객 수: <color={wrongColorHex}>{wrongCount}</color> 개";
+            }
 
             if (recordText != null)
             {
-                int earnedMerit =
-                    correctCount * 20;
-
-                recordText.text =
-                    $"공덕 {earnedMerit} " +
-                    $"생존 {survivedTime:F0}s " +
-                    $"정답/오답 {correctCount}/{wrongCount} " +
-                    $"정확도 {accuracy:F0}% " +
-                    $"평균 CPS {avgCps:F1} " +
-                    $"최고 CPS {maxCPS:F0} ";
+                int earnedMerit = correctCount * 20;
+                recordText.text = $"얻은 공덕 포인트: <color=#FF69F3>{earnedMerit}</color> P";
             }
+            StartCoroutine(ShowPanelDelay());
         }
 
-        if (GameManager.Instance != null &&
-        GameManager.Instance.IsPendingEndingTransition())
-        {
-            StartCoroutine(AutoReturnToLobbyAfterDelay());
-        }
+        bool willAutoReturn = GameManager.Instance != null &&
+                              GameManager.Instance.IsPendingEndingTransition();
+
+        if (restartButton != null)
+            restartButton.gameObject.SetActive(!willAutoReturn);
+    }
+
+    IEnumerator ShowPanelDelay()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        resultPanel.SetActive(true);
+        StartCoroutine(ResultPanelRoutine());
     }
 
     public void restartGame()
     {
-        SceneLoader.Instance.LoadScene("MiniGame_02");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MiniGame_02");
     }
 
     public void returnToLobby()
     {
-        GameManager.Instance.ReturnToLobby();
+        Time.timeScale = 1f;
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ReturnToLobby();
+        }
+        else
+        {
+            Debug.LogError("GameManager.Instance NULL");
+        }
     }
 
     IEnumerator AutoReturnToLobbyAfterDelay()
     {
         yield return new WaitForSeconds(2f);
         GameManager.Instance.ReturnToLobby();
+    }
+
+    IEnumerator BlinkImage()
+    {
+        if (startImage == null)
+            yield break;
+
+        Color originalColor = startImage.color;
+
+        while (!isGameStarted)
+        {
+            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
+
+            Color color = startImage.color;
+            color.a = alpha;
+            startImage.color = color;
+
+            yield return null;
+        }
+        originalColor.a = 1f;
+        startImage.color = originalColor;
+    }
+
+    IEnumerator FlashRoutine()
+    {
+        if (flashPanel == null)
+            yield break;
+
+        flashPanel.gameObject.SetActive(true);
+
+        Color color = flashPanel.color;
+        color.a = 1f;
+        flashPanel.color = color;
+
+        float time = 0f;
+        float duration = 0.3f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, time / duration);
+
+            color.a = alpha;
+            flashPanel.color = color;
+
+            yield return null;
+        }
+
+        color.a = 0f;
+        flashPanel.color = color;
+        flashPanel.gameObject.SetActive(false);
+    }
+
+    IEnumerator PassengerIdleRoutine()
+    {
+        if (passengerImage == null)
+            yield break;
+
+        RectTransform passenger = passengerImage.GetComponent<RectTransform>();
+
+        if (passenger == null)
+            yield break;
+
+        Vector2 originalPosition = passenger.anchoredPosition;
+
+        while (isGameStarted && !isGameOver)
+        {
+            float offset = Mathf.Sin(Time.time * 2f) * 3f;
+            passenger.anchoredPosition = originalPosition + new Vector2(0f, offset);
+            yield return null;
+        }
+
+        passenger.anchoredPosition = originalPosition;
+    }
+
+    // 수정된 Punch Scale (고정된 baseScale 기준 연출)
+    IEnumerator PunchScaleRoutine(Transform target)
+    {
+        if (target == null) yield break;
+
+        Vector3 punchScale = baseScale * 1.15f;
+
+        float duration = 0.2f;
+        float time = 0f;
+
+        while (time < duration / 2f)
+        {
+            time += Time.deltaTime;
+            float t = time / (duration / 2f);
+
+            target.localScale = Vector3.Lerp(baseScale, punchScale, t);
+            yield return null;
+        }
+
+        time = 0f;
+
+        while (time < duration / 2f)
+        {
+            time += Time.deltaTime;
+            float t = time / (duration / 2f);
+
+            target.localScale = Vector3.Lerp(punchScale, baseScale, t);
+            yield return null;
+        }
+
+        target.localScale = baseScale;
+        punchScaleCoroutine = null;
+    }
+
+    IEnumerator ShakeRoutine(RectTransform target)
+    {
+        if (target == null)
+            yield break;
+
+        Vector2 originalPosition = target.anchoredPosition;
+
+        float time = 0f;
+        float duration = 0.25f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float x = Mathf.Sin(time * 50f) * 10f;
+
+            target.anchoredPosition = originalPosition + new Vector2(x, 0f);
+
+            yield return null;
+        }
+
+        target.anchoredPosition = originalPosition;
+    }
+
+    IEnumerator HealthBarRoutine(float targetValue)
+    {
+        if (healthBar == null)
+            yield break;
+
+        float startValue = healthBar.value;
+
+        float time = 0f;
+        float duration = 0.25f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            healthBar.value = Mathf.Lerp(startValue, targetValue, t);
+            yield return null;
+        }
+
+        healthBar.value = targetValue;
+    }
+
+    IEnumerator ResultPanelRoutine()
+    {
+        if (resultPanel == null)
+            yield break;
+
+        Transform panel = resultPanel.transform;
+
+        panel.localScale = Vector3.zero;
+
+        float time = 0f;
+        float duration = 0.4f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            float t = Mathf.Clamp01(time / duration);
+
+            float overshoot = 1.70158f;
+            float backT = t - 1f;
+            t = backT * backT * ((overshoot + 1f) * backT + overshoot) + 1f;
+
+            panel.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
+
+            yield return null;
+        }
+
+        panel.localScale = Vector3.one;
     }
 }

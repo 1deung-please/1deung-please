@@ -4,72 +4,78 @@ using UnityEngine.UI;
 
 public class WordButton : MonoBehaviour
 {
-    public TMP_Text text;
+    [Header("UI")]
+    public Image buttonImage;   //단어 버튼 이미지
+    public TMP_Text wordText;   //단어 버튼 텍스트
 
-    private string letter;
-    private Transform originalParent;
-    private int originalSiblingIndex;
-    private GameObject placeholder;
+    [Header("Button Sprite")]
+    public Sprite normalSprite; //기본 단어 버튼 이미지
+    public Sprite blankSprite;  //블랭크 단어 버튼 이미지
 
-    public void Initialize(string value)
+    private char letter;                //단어 버튼 글자
+    public char Letter => letter;
+    private bool isSelected = false;    
+
+    private void Awake()
     {
-        letter = value;
-        text.text = value;
-
-        originalParent = transform.parent;
-        originalSiblingIndex = transform.GetSiblingIndex();
-    }
-
-    public void Click()
-    {
-        if (AnswerManager.Instance != null)
-            AnswerManager.Instance.SelectWord(this);
-    }
-
-    public string GetWord()
-    {
-        return letter;
-    }
-
-    public void MoveToAnswerPanel(Transform answerPanel)
-    {
-        if (originalParent == null)
-            originalParent = transform.parent;
-
-        originalSiblingIndex = transform.GetSiblingIndex();
-
-        // 원래 버튼과 같은 크기의 빈자리 생성
-        placeholder = new GameObject(
-            "WordPlaceholder",
-            typeof(RectTransform),
-            typeof(LayoutElement)
-        );
-
-        placeholder.transform.SetParent(originalParent, false);
-        placeholder.transform.SetSiblingIndex(originalSiblingIndex);
-
-        RectTransform myRect = GetComponent<RectTransform>();
-        LayoutElement layout = placeholder.GetComponent<LayoutElement>();
-
-        layout.preferredWidth = myRect.rect.width;
-        layout.preferredHeight = myRect.rect.height;
-        layout.minWidth = myRect.rect.width;
-        layout.minHeight = myRect.rect.height;
-        layout.flexibleWidth = 0;
-        layout.flexibleHeight = 0;
-
-        transform.SetParent(answerPanel, false);
-    }
-
-    public void ReturnToOrigin()
-    {
-        transform.SetParent(originalParent, false);
-        transform.SetSiblingIndex(originalSiblingIndex);
-
-        if (placeholder != null)
+        if (buttonImage != null)    //이미지의 투명 공백 부분은 클릭되지 않도록 설정
         {
-            Destroy(placeholder);
-            placeholder = null;
+            buttonImage.alphaHitTestMinimumThreshold = 0.1f;
         }
+    }
+
+    //단어 버튼 글자 설정
+    public void Initialize(char newLetter)
+    {
+        letter = newLetter;
+        isSelected = false;
+
+        buttonImage.sprite = normalSprite;
+
+        wordText.gameObject.SetActive(true);
+        wordText.text = newLetter.ToString();
+    }
+
+    //7글자 이하인 문장일때 나머지 블랭크 설정
+    public void SetEmpty()
+    {
+        letter = '\0';
+        isSelected = true;
+
+        buttonImage.sprite = blankSprite;
+
+        wordText.text = "";
+        wordText.gameObject.SetActive(false);
+    }
+
+    //단어 버튼 눌렀을 때
+    public void Select()
+    {
+        if (isSelected)
+            return;
+
+        isSelected = true;
+
+        if (AnswerManager.Instance != null)
+        {
+            AnswerManager.Instance.SelectWord(this, letter);
+        }
+
+        buttonImage.sprite = blankSprite;
+        wordText.gameObject.SetActive(false);
+    }
+
+    //취소 버튼 눌렀을 때 복구 과정
+    public void Restore()
+    {
+        if (letter == '\0')
+            return;
+
+        isSelected = false;
+
+        buttonImage.sprite = normalSprite;
+
+        wordText.gameObject.SetActive(true);
+        wordText.text = letter.ToString();
     }
 }

@@ -4,30 +4,44 @@ public class WordSpawner : MonoBehaviour
 {
     public static WordSpawner Instance;
 
-    public Transform wordPanel;
+    [Header("고정 Word Buttons")]
+    public WordButton[] wordButtons = new WordButton[7];
 
-    public GameObject wordButtonPrefab;
-
-    void Awake()
+    private void Awake()
     {
         Instance = this;
     }
 
-    public void SpawnWords(string shuffled)
+    //글자들을 7개 버튼에 배치
+    public void SpawnWords(string shuffledWord)
     {
-        Debug.Log(shuffled);
-
-        foreach (Transform child in wordPanel)
-            Destroy(child.gameObject);
-
-        foreach (char c in shuffled)
+        for (int i = 0; i < wordButtons.Length; i++)
         {
-            Debug.Log(c);
-            GameObject obj =
-                Instantiate(wordButtonPrefab, wordPanel);
+            if (wordButtons[i] == null)
+            {
+                continue;
+            }
 
-            obj.GetComponent<WordButton>()
-                .Initialize(c.ToString());
+            if (i < shuffledWord.Length)
+            {
+                wordButtons[i].gameObject.SetActive(true);
+                wordButtons[i].Initialize(shuffledWord[i]);
+            }
+            else
+            {
+                wordButtons[i].gameObject.SetActive(true);
+                wordButtons[i].SetEmpty();
+            }
+        }
+    }
+
+    //취소 버튼 눌렀을 때 복구 과정
+    public void RestoreAll()
+    {
+        foreach (WordButton button in wordButtons)
+        {
+            if (button.Letter != '\0')
+                button.Restore();
         }
     }
 }

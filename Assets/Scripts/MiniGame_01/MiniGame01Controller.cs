@@ -25,12 +25,37 @@ public class MiniGame01Controller : MonoBehaviour
     public GameObject resultPanel;     // 결과 패널
     public TMP_Text targetText;        // "192개 이상 쓰레기를 줍거라!"
     public TMP_Text countdownText;     // 3,2,1
-    public TMP_Text timerText;         // TIME 8.46
-    public Slider timerBar;            // 타이머 바
-    public TMP_Text collectCountText;  // 좌측 상단 수집 개수
-    public TMP_Text resultReasonText;  // 성공/실패
+    public TMP_Text timerText;         // TIME 08:39 (mm:ss)
+    public TMP_Text collectCountText;  // "주운 쓰레기 189개"
+    public GameObject successImage;   // SUCCESS! 이미지 오브젝트
+    public GameObject failImage;       // FAIL 이미지 오브젝트
     public TMP_Text resultRecordText;  // 목표/수집/공덕
     public TMP_Text meritText;         // 공덕
+    public Button retryButton; // 다시하기 버튼
+
+    [Header("Play HUD (모래시계/타이머박스/쓰레기봉투 묶음)")]
+    public GameObject playHudPanel;
+
+    [Header("쓰레기 팝업 (터치할 때마다 1~5 중 랜덤 등장)")]
+    public Sprite[] trashSprites;
+    public RectTransform trashPopupParent;
+    public Vector2 trashPopupSize = new Vector2(80f, 80f);
+    public float trashPopupDuration = 2f;
+    public float trashPopupOvershootScale = 1.2f;
+    public int trashPopupSortingOrder = 10;
+
+    [Header("오디오")]
+    public AudioSource bgmSource;
+    public AudioSource sfxSource;
+    public AudioClip buttonSfx;
+    public AudioClip trashSfx;
+
+    [Header("Fade")]
+    public CanvasGroup fadePanel;
+    public float fadeDuration = 0.25f;
+
+    [Header("결과 패널 등장 딜레이")]
+    public float resultPanelDelay = 1f; // 실수 클릭 방지를 위한 결과 패널 등장 지연 시간
 
     private MiniGame01Phase currentPhase;
     private int targetCount;
@@ -45,6 +70,9 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (touchToStartText != null)
             blinkCoroutine = StartCoroutine(BlinkText());
+
+        StartCoroutine(FadeIn());
+        if (bgmSource != null) bgmSource.Play();
     }
 
     void Update()
@@ -67,6 +95,43 @@ public class MiniGame01Controller : MonoBehaviour
         }
     }
 
+    void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null)
+            sfxSource.PlayOneShot(clip);
+    }
+
+    IEnumerator FadeIn()
+    {
+        if (fadePanel == null) yield break;
+        fadePanel.alpha = 1f;
+        fadePanel.blocksRaycasts = true;
+        float t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            fadePanel.alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
+            yield return null;
+        }
+        fadePanel.alpha = 0f;
+        fadePanel.blocksRaycasts = false;
+    }
+
+    IEnumerator FadeOut()
+    {
+        if (fadePanel == null) yield break;
+        fadePanel.alpha = 0f;
+        fadePanel.blocksRaycasts = true;
+        float t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            fadePanel.alpha = Mathf.Lerp(0f, 1f, t / fadeDuration);
+            yield return null;
+        }
+        fadePanel.alpha = 1f;
+    }
+
     IEnumerator BlinkText()
     {
         while (true)
@@ -83,7 +148,6 @@ public class MiniGame01Controller : MonoBehaviour
     {
         if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
 
-        // 화면 Flash 효과
         if (flashPanel != null)
         {
             Image flashImage = flashPanel.GetComponent<Image>();
@@ -100,7 +164,6 @@ public class MiniGame01Controller : MonoBehaviour
             flashPanel.SetActive(false);
         }
 
-        // 조상신 대사 화면(Ready)으로 이동 + 목표 개수 산정
         currentPhase = MiniGame01Phase.Ready;
         targetCount = Random.Range(minTarget, maxTarget + 1);
 
@@ -143,27 +206,100 @@ public class MiniGame01Controller : MonoBehaviour
     void UpdatePlaying()
     {
         remainingTime -= Time.deltaTime;
-
-        if (timerText != null) timerText.text = remainingTime.ToString("F2");
-        if (timerBar != null) timerBar.value = remainingTime / timeLimit;
+        UpdateTimerUI();
 
         if (Input.GetMouseButtonDown(0))
         {
             currentCount++;
             UpdateCollectUI();
+            SpawnTrashPopup(Input.mousePosition);
+            PlaySfx(trashSfx);
         }
 
         if (remainingTime <= 0)
         {
             remainingTime = 0;
+            UpdateTimerUI();
             EndGame(false);
+        }
+    }
+
+    void UpdateTimerUI()
+    {
+        if (timerText != null)
+        {
+            int seconds = Mathf.FloorToInt(remainingTime);
+            int centiseconds = Mathf.FloorToInt((remainingTime - seconds) * 100f);
+            timerText.text = $"{seconds:00}:{centiseconds:00}";
         }
     }
 
     void UpdateCollectUI()
     {
         if (collectCountText != null)
-            collectCountText.text = $"{currentCount}개";
+            collectCountText.text = $"주운 쓰레기 <size=140%>{currentCount}</size>개";
+    }
+
+    void SpawnTrashPopup(Vector2 screenPosition)
+    {
+        if (trashSprites == null || trashSprites.Length == 0 || trashPopupParent == null)
+            return;
+
+        GameObject popup = new GameObject("TrashPopup", typeof(RectTransform), typeof(Image));
+        RectTransform rt = popup.GetComponent<RectTransform>();
+        rt.SetParent(trashPopupParent, false);
+
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = trashPopupSize;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            trashPopupParent, screenPosition, GetCanvasCamera(trashPopupParent), out Vector2 localPoint);
+        rt.anchoredPosition = localPoint;
+
+        Image img = popup.GetComponent<Image>();
+        img.sprite = trashSprites[Random.Range(0, trashSprites.Length)];
+        img.raycastTarget = false;
+
+        Canvas canvas = popup.AddComponent<Canvas>();
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = trashPopupSortingOrder;
+
+        StartCoroutine(AnimateTrashPopup(rt));
+    }
+
+    Camera GetCanvasCamera(RectTransform parent)
+    {
+        Canvas canvas = parent.GetComponentInParent<Canvas>();
+        if (canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+            return null;
+
+        return canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
+    }
+
+    IEnumerator AnimateTrashPopup(RectTransform rt)
+    {
+        rt.localScale = Vector3.zero;
+
+        const float overshootPoint = 0.6f;
+        float t = 0f;
+
+        while (t < trashPopupDuration)
+        {
+            t += Time.deltaTime;
+            float ratio = Mathf.Clamp01(t / trashPopupDuration);
+
+            float scale = ratio < overshootPoint
+                ? Mathf.Lerp(0f, trashPopupOvershootScale, ratio / overshootPoint)
+                : Mathf.Lerp(trashPopupOvershootScale, 1f, (ratio - overshootPoint) / (1f - overshootPoint));
+
+            rt.localScale = Vector3.one * scale;
+            yield return null;
+        }
+
+        if (rt != null)
+            Destroy(rt.gameObject);
     }
 
     void EndGame(bool naturalEnd)
@@ -176,36 +312,67 @@ public class MiniGame01Controller : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.RecordMiniGameResult(1, isSuccess);
-        }
-
-        if (AchievementManager.Instance != null)
-        {
-            AchievementManager.Instance.OnMiniGameResult(MiniGameKind.PickTrash, isSuccess);
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.PickTrash, isSuccess);
         }
 
         int merit = isSuccess
             ? currentCount + successBonus
             : Mathf.RoundToInt(currentCount * failPenaltyRate);
 
-        ShowPanel(resultPanel);
-
-        if (resultReasonText != null)
-            resultReasonText.text = isSuccess ? "SUCCESS" : "FAIL";
+        if (successImage != null) successImage.SetActive(isSuccess);
+        if (failImage != null) failImage.SetActive(!isSuccess);
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"조상신이 주우라고 한 쓰레기 수: {targetCount}개\n" +
-                $"주인공이 주운 쓰레기 수: {currentCount}개";
+                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
+                $"주운 쓰레기 개수:  <size=130%><color=#FFC756>{currentCount}</color></size> 개";
 
         if (meritText != null)
-            meritText.text = $"획득 공덕: {merit}P";
+            meritText.text = $"얻은 공덕 포인트:  <color=#FF69F3>{merit}</color> <size=50>P</size>";
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
 
-        if (GameManager.Instance.IsPendingEndingTransition())
+        bool willAutoReturn = GameManager.Instance.IsPendingEndingTransition();
+
+        if (retryButton != null)
+            retryButton.gameObject.SetActive(!willAutoReturn);
+
+        // 결과 패널은 실수 클릭 방지를 위해 딜레이 후 등장
+        StartCoroutine(ShowResultPanelDelayed(resultPanelDelay));
+    }
+
+    IEnumerator ShowResultPanelDelayed(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        ShowPanel(resultPanel);
+        StartCoroutine(ResultPanelPopRoutine());
+    }
+
+    // 결과 패널이 가운데에서 튀어나오듯 작아졌다 커지는 연출 (미니게임2와 동일한 Back-Ease)
+    IEnumerator ResultPanelPopRoutine()
+    {
+        if (resultPanel == null) yield break;
+
+        Transform panel = resultPanel.transform;
+        panel.localScale = Vector3.zero;
+
+        float time = 0f;
+        float duration = 0.4f;
+
+        while (time < duration)
         {
-            StartCoroutine(AutoReturnToLobbyAfterDelay());
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            float overshoot = 1.70158f;
+            float backT = t - 1f;
+            t = backT * backT * ((overshoot + 1f) * backT + overshoot) + 1f;
+
+            panel.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
+            yield return null;
         }
+
+        panel.localScale = Vector3.one;
     }
 
     void ShowPanel(GameObject target)
@@ -214,29 +381,29 @@ public class MiniGame01Controller : MonoBehaviour
         if (readyPanel != null) readyPanel.SetActive(target == readyPanel);
         if (countdownPanel != null) countdownPanel.SetActive(target == countdownPanel);
         if (resultPanel != null) resultPanel.SetActive(target == resultPanel);
+        if (playHudPanel != null) playHudPanel.SetActive(target == null);
     }
 
     public void OnClickRetry()
     {
-        SceneLoader.Instance.LoadScene("MiniGame_01");
+        PlaySfx(buttonSfx);
+        StartCoroutine(FadeOut());
+        StartCoroutine(LoadAfterFade("MiniGame_01"));
     }
 
     public void OnClickReturnToLobby()
     {
-        GameManager.Instance.ReturnToLobby();
+        PlaySfx(buttonSfx);
+        StartCoroutine(FadeOut());
+        StartCoroutine(LoadAfterFade(null));
     }
 
-    IEnumerator AutoReturnToLobbyAfterDelay()
+    IEnumerator LoadAfterFade(string sceneName)
     {
-        yield return new WaitForSeconds(2f);
-        GameManager.Instance.ReturnToLobby();
-    }
-
-    void OnGUI()
-    {
-        GUI.Label(new Rect(10, 10, 300, 30), $"Phase: {currentPhase}");
-        GUI.Label(new Rect(10, 40, 300, 30), $"Target: {targetCount}");
-        GUI.Label(new Rect(10, 70, 300, 30), $"Count: {currentCount}");
-        GUI.Label(new Rect(10, 100, 300, 30), $"Time: {remainingTime:F2}");
+        yield return new WaitForSeconds(fadeDuration);
+        if (sceneName != null)
+            SceneLoader.Instance.LoadScene(sceneName);
+        else
+            GameManager.Instance.ReturnToLobby();
     }
 }

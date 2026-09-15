@@ -14,17 +14,21 @@ public class Game3Manager : MonoBehaviour
 
     [Header("게임 UI")]
     public Transform wordPanel;
-    public Transform answerPanel;
+    public TMP_Text attackButtonText;
 
     [Header("시작 화면")]
     public GameObject ReadyPanel;
     public Button readyButton;
+    public TMP_Text touchToStart;
+
+    private Coroutine blinkCoroutine;
 
     private bool gameStarted = false;
-    
+
     [Header("결과 화면")]
     public GameObject resultPanel;
-    public TMP_Text resultTitleText;
+    public Image successImage;
+    public Image failImage;
     public TMP_Text pointText;
     public Button retryButton;
     public Button returnButton;
@@ -32,10 +36,18 @@ public class Game3Manager : MonoBehaviour
     [Header("거리 씬 이름")]
     public string streetSceneName = "Lobby";
 
+    [Header("화면 Flash")]
+    public GameObject flashPanel;
+
+    [Header("결과 버튼 효과음")]
+    public AudioSource audioSource;
+    public AudioClip buttonSfx;
+
     private List<char> selectedChars = new List<char>();
+
     private bool gameEnded = false;
     public bool IsGameEnded => gameEnded;
-    
+
     private void Awake()
     {
         Instance = this;
@@ -48,43 +60,73 @@ public class Game3Manager : MonoBehaviour
 
         if (ReadyPanel != null)
             ReadyPanel.SetActive(true);
-        
+
         if (resultPanel != null)
             resultPanel.SetActive(false);
 
-        AnswerManager.Instance.Clear();
+        if (AnswerManager.Instance != null)
+            AnswerManager.Instance.Clear();
 
         if (readyButton != null)
             readyButton.onClick.AddListener(StartGame);
 
         if (retryButton != null)
+        {
             retryButton.onClick.AddListener(RetryGame);
 
+            Image retryImage = retryButton.GetComponent<Image>();
+
+            if (retryImage != null)
+                retryImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
+
         if (returnButton != null)
+        {
             returnButton.onClick.AddListener(ReturnToStreet);
+
+            Image returnImage = returnButton.GetComponent<Image>();
+
+            if (returnImage != null)
+                returnImage.alphaHitTestMinimumThreshold = 0.1f;
+        }
+
+        if (touchToStart != null)
+            blinkCoroutine = StartCoroutine(BlinkText());
     }
 
-    // 글자 선택
+    //터치하여 시작하기 깜빡임
+    IEnumerator BlinkText()
+    {
+        while (true)
+        {
+            float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
+            Color c = touchToStart.color;
+            c.a = alpha;
+            touchToStart.color = c;
+            yield return null;
+        }
+    }
+
+    //단어 버튼 글자 선택 저장
     public void SelectChar(char c)
     {
         if (!gameStarted || gameEnded)
             return;
 
         selectedChars.Add(c);
-
-        Debug.Log(new string(selectedChars.ToArray()));
     }
 
-    // 공격 버튼
+    //공격 버튼
     public void Attack()
     {
         if (!gameStarted || gameEnded)
             return;
 
-        string playerAnswer = new string(selectedChars.ToArray());
+        if (attackButtonText != null)
+            attackButtonText.gameObject.SetActive(false);
 
-        string correctAnswer =
-            ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
+        string playerAnswer = new string(selectedChars.ToArray());
+        string correctAnswer = ProblemManager.Instance.currentProblem.answer.Replace(" ", "");
 
         if (playerAnswer == correctAnswer)
         {
@@ -92,8 +134,8 @@ public class Game3Manager : MonoBehaviour
 
             enemy.Damage(20);
 
-           if (!gameEnded)
-            ProblemManager.Instance.NextProblem();
+            if (!gameEnded)
+                ProblemManager.Instance.NextProblem();
         }
         else
         {
@@ -103,18 +145,13 @@ public class Game3Manager : MonoBehaviour
         selectedChars.Clear();
     }
 
-    // 성공 처리
+    //성공 처리
     public void GameSuccess()
     {
-        // 로비에서 정상적으로 들어온 경우에만 저장 및 업적 처리
         if (GameManager.Instance != null)
         {
             GameManager.Instance.CompleteMiniGame3(true);
-
-            if (AchievementManager.Instance != null)
-            {
-                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,true);
-            }
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.LogicFortress, true);
         }
         else
         {
@@ -124,19 +161,13 @@ public class Game3Manager : MonoBehaviour
         ShowResult(true, 700);
     }
 
-
-    // 실패 처리
+    //실패 처리
     public void GameFail()
     {
-        // 로비에서 정상적으로 들어온 경우에만 저장 및 업적 처리
         if (GameManager.Instance != null)
         {
             GameManager.Instance.CompleteMiniGame3(false);
-
-            if (AchievementManager.Instance != null)
-            {
-                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.LogicFortress,false);
-            }
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.LogicFortress, false);
         }
         else
         {
@@ -146,6 +177,7 @@ public class Game3Manager : MonoBehaviour
         ShowResult(false, 0);
     }
 
+    //결과창
     private void ShowResult(bool isSuccess, int earnedPoint)
     {
         if (gameEnded)
@@ -153,87 +185,158 @@ public class Game3Manager : MonoBehaviour
 
         gameEnded = true;
 
+        //전역 타이머 일시정지
         if (GameManager.Instance != null)
         {
             GameManager.Instance.PauseTimer();
         }
 
-        ClearWordButtons();
+        if (attackButtonText != null)
+            attackButtonText.gameObject.SetActive(false);
 
-        if (resultPanel != null)
-            resultPanel.SetActive(true);
+        if (successImage != null)
+            successImage.gameObject.SetActive(isSuccess);
 
-        if (resultTitleText != null)
-            resultTitleText.text = isSuccess ? "성공!" : "실패!";
+        if (failImage != null)
+            failImage.gameObject.SetActive(!isSuccess);
 
         if (pointText != null)
-            pointText.text = "획득 공덕포인트\n" + earnedPoint;
+            pointText.text = earnedPoint.ToString(); ;
 
         Time.timeScale = 0f;
 
-        if (GameManager.Instance != null &&
-        GameManager.Instance.IsPendingEndingTransition())
-    {
-        StartCoroutine(AutoReturnToLobbyAfterDelay());
-    }
+        // 자동 복귀 예정이면(전역 타이머가 미니게임 도중 끝난 경우) 다시하기 버튼만 비활성화
+        // - 미니게임1과 동일하게, 자동으로 로비 복귀하지 않고 사용자가 "거리로 돌아가기"를 눌러야 넘어감
+        bool willAutoReturn = GameManager.Instance != null && GameManager.Instance.IsPendingEndingTransition();
+        if (retryButton != null)
+            retryButton.gameObject.SetActive(!willAutoReturn);
+
+        // 결과 패널은 1초 후 등장
+        StartCoroutine(ShowResultPanelAfterDelay());
     }
 
-    private void ClearWordButtons()
-{
-    if (AnswerManager.Instance != null)
-        AnswerManager.Instance.Clear();
-
-    if (wordPanel)
+    // 결과 패널 1초 후 표시
+    private IEnumerator ShowResultPanelAfterDelay()
     {
-        for (int i = wordPanel.childCount - 1; i >= 0; i--)
+        yield return new WaitForSecondsRealtime(1f);
+
+        if (resultPanel != null)
         {
-            Transform child = wordPanel.GetChild(i);
-
-            if (child != null && child.GetComponent<WordButton>() != null)
-                Destroy(child.gameObject);
+            resultPanel.SetActive(true);
+            StartCoroutine(ResultPanelPopRoutine());
         }
     }
 
-    if (answerPanel)
+    // 결과 패널이 가운데에서 튀어나오듯 작아졌다 커지는 연출 (미니게임2와 동일한 Back-Ease)
+    // Time.timeScale이 0인 상태에서도 재생되어야 하므로 unscaledDeltaTime 사용
+    IEnumerator ResultPanelPopRoutine()
     {
-        for (int i = answerPanel.childCount - 1; i >= 0; i--)
+        if (resultPanel == null) yield break;
+
+        Transform panel = resultPanel.transform;
+        panel.localScale = Vector3.zero;
+
+        float time = 0f;
+        float duration = 0.4f;
+
+        while (time < duration)
         {
-            Transform child = answerPanel.GetChild(i);
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
 
-            if (child != null && child.GetComponent<WordButton>() != null)
-                Destroy(child.gameObject);
+            float overshoot = 1.70158f;
+            float backT = t - 1f;
+            t = backT * backT * ((overshoot + 1f) * backT + overshoot) + 1f;
+
+            panel.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, t);
+            yield return null;
         }
-    }
-}
 
+        panel.localScale = Vector3.one;
+    }
+
+    //다시 하기 버튼 눌렀을 때
     private void RetryGame()
     {
+        StartCoroutine(RetryGameRoutine());
+    }
+
+    private IEnumerator RetryGameRoutine()
+    {
+        if (audioSource != null && buttonSfx != null)
+            audioSource.PlayOneShot(buttonSfx);
+
+        yield return new WaitForSecondsRealtime(0.2f);
+
         Time.timeScale = 1f;
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    //거리로 돌아가기 버튼 눌렀을 때
     private void ReturnToStreet()
     {
+        StartCoroutine(ReturnToStreetRoutine());
+    }
+
+    private IEnumerator ReturnToStreetRoutine()
+    {
+        if (audioSource != null && buttonSfx != null)
+            audioSource.PlayOneShot(buttonSfx);
+
+        yield return new WaitForSecondsRealtime(0.2f);
+
+        // 로딩 화면 애니메이션이 정상 재생되도록 timeScale 복구
         Time.timeScale = 1f;
 
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ReturnToLobby();
-            return;
+            yield break;
         }
 
         SceneManager.LoadScene(streetSceneName);
     }
 
-    IEnumerator AutoReturnToLobbyAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(2f);
-        GameManager.Instance.ReturnToLobby();
-    }
-
+    //게임 시작할 때
     private void StartGame()
     {
+        StartCoroutine(FlashThenStart());
+    }
+
+    //터치하여 시작하기 버튼 눌렀을 때
+    IEnumerator FlashThenStart()
+    {
+        // 터치하여 시작하기 텍스트 깜빡임 멈추기
+        if (blinkCoroutine != null)
+        {
+            StopCoroutine(blinkCoroutine);
+            blinkCoroutine = null;
+        }
+
+        // 화면 Flash 효과
+        if (flashPanel != null)
+        {
+            Image flashImage = flashPanel.GetComponent<Image>();
+
+            flashPanel.SetActive(true);
+            flashImage.color = new Color(1, 1, 1, 1);
+
+            float t = 0f;
+
+            while (t < 0.3f)
+            {
+                t += Time.unscaledDeltaTime;
+
+                flashImage.color = new Color(1, 1, 1, Mathf.Lerp(1, 0, t / 0.3f));
+
+                yield return null;
+            }
+
+            flashPanel.SetActive(false);
+        }
+
+        //Flash 끝난 후 게임 시작
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnMiniGameStart();
@@ -245,10 +348,13 @@ public class Game3Manager : MonoBehaviour
         if (ReadyPanel != null)
             ReadyPanel.SetActive(false);
 
+        if (AnswerManager.Instance != null && AnswerManager.Instance.heroThinkText != null)
+        {
+            AnswerManager.Instance.heroThinkText.text = "";
+        }
+
         ProblemManager.Instance.NextProblem();
-        
+
         Time.timeScale = 1f;
     }
-
-    
 }
