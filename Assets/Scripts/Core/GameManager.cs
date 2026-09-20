@@ -313,7 +313,7 @@ public class GameManager : MonoBehaviour
 
     public void CompleteMiniGame3(bool isSuccess)
     {
-        int earnedPoint = isSuccess ? 700 : 0;
+        int earnedPoint = isSuccess ? 650 : 0;
         gameData.miniGame3Score += earnedPoint;
 
         addMeritPoint(earnedPoint);
