@@ -14,7 +14,8 @@ public class CommonEndingManager : MonoBehaviour
     public TMP_Text titleText;
     public TMP_Text meritPointText;
     public TMP_Text ptText;
-    public TMP_Text pointText;
+    public TMP_Text nameText;
+    public TMP_Text scoreText;
 
     [Header("Signboard Animation")]
     public RectTransform signboard;
@@ -63,9 +64,12 @@ public class CommonEndingManager : MonoBehaviour
         if (meritPointText != null)
             meritPointText.gameObject.SetActive(false);
 
-        if (pointText != null)
-            pointText.gameObject.SetActive(false);
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
 
+        if (scoreText != null)
+            scoreText.gameObject.SetActive(false);
+        
         if (ptText != null)
             ptText.gameObject.SetActive(false);
 
@@ -224,7 +228,7 @@ public class CommonEndingManager : MonoBehaviour
         if (titleText != null)
         {
             titleText.text =
-                totalPlayCount + "번째... 플레이 모은 공덕 포인트";
+                totalPlayCount + "번째 플레이...모은 공덕 포인트";
 
             titleText.gameObject.SetActive(true);
         }
@@ -302,18 +306,30 @@ public class CommonEndingManager : MonoBehaviour
 
         isScoreInfoPlaying = false;
         scoreInfoFinished = true;
-    }
+    }    
 
     private void ShowFullPointText(GameData gameData)
     {
-        if (pointText != null)
+        if (nameText != null)
         {
-            pointText.text =
-                "이걸 안 비켜?<pos=75%>" + gameData.miniGame2Score + "\n" +
-                "출격! 논리요새<pos=75%>" + gameData.miniGame3Score + "\n" +
-                "주워줘, 쓰레기!<pos=75%>" + gameData.miniGame1Score;
+            nameText.text =
+                "이걸 안 비켜?\n" +
+                "출격! 논리요새\n" +
+                "주워줘, 쓰레기!";
 
-            pointText.gameObject.SetActive(true);
+            nameText.alignment = TextAlignmentOptions.Left;
+            nameText.gameObject.SetActive(true);
+        }
+
+        if (scoreText != null)
+        {
+            scoreText.text =
+                gameData.miniGame2Score + "\n" +
+                gameData.miniGame3Score + "\n" +
+                gameData.miniGame1Score;
+
+            scoreText.alignment = TextAlignmentOptions.Right;
+            scoreText.gameObject.SetActive(true);
         }
     }
 
