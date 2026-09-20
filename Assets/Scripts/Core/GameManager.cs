@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
     private string pendingEndingId = null;
 
     // 가방(RecordBookPanel)에서 엔딩을 "다시보기"로 재생할 때 true
-    // - 엔딩 씬에서 이 값을 보고 "다시하기" 버튼 대신 자동으로 로비+가방 복귀 처리
     public bool IsEndingReplay { get; private set; } = false;
 
     // PlayerPrefs 저장용 키 값 정의
@@ -110,8 +109,6 @@ public class GameManager : MonoBehaviour
         }
 
         // playedGames(각 미니게임을 이번 회차에 플레이했는지 여부)도 저장
-        // - 이게 저장 안 되면 앱 종료 후 재실행 시 false로 초기화되어
-        //   "중간에 나갔다 들어오면 이전에 플레이한 게임이 안 한 것으로 처리"되는 버그가 생김
         for (int i = 0; i < gameData.playedGames.Length; i++)
         {
             PlayerPrefs.SetInt($"PlayedGames_{i}", gameData.playedGames[i] ? 1 : 0);
@@ -291,8 +288,8 @@ public class GameManager : MonoBehaviour
     public void CompleteMiniGame1(int collectedCount, int targetCount)
     {
         int earnedPoint = (collectedCount >= targetCount)
-            ? (collectedCount + 50)
-            : Mathf.RoundToInt(collectedCount * 0.5f);
+            ? (collectedCount + 100)
+            : collectedCount;
 
         gameData.miniGame1Score += earnedPoint;
 
@@ -407,9 +404,6 @@ public class GameManager : MonoBehaviour
     }
 
     // 가방(RecordBookPanel)에서 엔딩 "다시보기" 진입 시 호출
-    // - Fade Out(0.25초) -> 씬 전환 -> Fade In(0.25초)
-    // - 리플레이 중에는 각 엔딩 씬에서 IsEndingReplay를 보고 "다시하기" 버튼 대신
-    //   자동으로 로비 + 가방으로 복귀하도록 처리해야 함
     public void StartEndingReplay(string sceneName)
     {
         IsEndingReplay = true;
