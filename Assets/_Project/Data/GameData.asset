@@ -15,12 +15,12 @@ MonoBehaviour:
   miniGame1Score: 0
   miniGame2Score: 0
   miniGame3Score: 0
-  playedGames: 000000
-  playCount: 000000000000000000000000
+  playedGames: 000001
+  playCount: 000000000000000003000000
   successGames: 000000
-  failGames: 000000
+  failGames: 010000
   consecutiveSuccess: 000000000000000000000000
-  consecutiveFail: 000000000000000000000000
+  consecutiveFail: 010000000200000000000000
   tutorialNoButtonCount: 0
   meritPoint: 0
   tutorialDone: 1

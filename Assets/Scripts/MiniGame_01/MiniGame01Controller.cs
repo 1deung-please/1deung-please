@@ -12,7 +12,7 @@ public class MiniGame01Controller : MonoBehaviour
     public int minTarget = 150;
     public int maxTarget = 200;
     public float timeLimit = 10f;
-    public int successBonus = 50;
+    public int successBonus = 100;
     public float failPenaltyRate = 0.5f;
     public int countdownSeconds = 3;
 
@@ -317,7 +317,7 @@ public class MiniGame01Controller : MonoBehaviour
 
         int merit = isSuccess
             ? currentCount + successBonus
-            : Mathf.RoundToInt(currentCount * failPenaltyRate);
+            : currentCount;
 
         if (successImage != null) successImage.SetActive(isSuccess);
         if (failImage != null) failImage.SetActive(!isSuccess);
@@ -348,7 +348,6 @@ public class MiniGame01Controller : MonoBehaviour
         StartCoroutine(ResultPanelPopRoutine());
     }
 
-    // 결과 패널이 가운데에서 튀어나오듯 작아졌다 커지는 연출 (미니게임2와 동일한 Back-Ease)
     IEnumerator ResultPanelPopRoutine()
     {
         if (resultPanel == null) yield break;

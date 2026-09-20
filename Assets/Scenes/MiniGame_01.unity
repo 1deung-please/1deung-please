@@ -2818,8 +2818,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uD130\uCE58\uD558\uC5EC \uC2DC\uC791\uD558\uAE30"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1dccc5361182e284eaa2a990ecabfa82, type: 2}
-  m_sharedMaterial: {fileID: 5381866873377084355, guid: 1dccc5361182e284eaa2a990ecabfa82, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
+  m_sharedMaterial: {fileID: -6140352266110376839, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
