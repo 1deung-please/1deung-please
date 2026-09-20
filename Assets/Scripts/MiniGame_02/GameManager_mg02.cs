@@ -7,6 +7,13 @@ using TMPro;
 
 public class GameManager_mg02 : MonoBehaviour
 {
+    [Header("Player Settings")]
+    public Image playerImage;                
+    public Sprite[] playerIdleFrames;       
+    public Sprite[] playerExhaustedFrames;   
+    public float playerFrameRate = 0.2f;
+    public float exhaustedWaitTime = 0.1f;
+
     [Header("UI Panels")]
     public GameObject titlePanel;
     public GameObject resultPanel;
@@ -36,13 +43,13 @@ public class GameManager_mg02 : MonoBehaviour
 
     Coroutine blinkCoroutine;
     Coroutine idleCoroutine;
-    Coroutine punchScaleCoroutine; // PunchScale 중첩 제어용 변수
+    Coroutine playerAnimCoroutine;
+    Coroutine punchScaleCoroutine; 
 
     private readonly Vector3 baseScale = Vector3.one; // NPC의 기준 크기 고정
 
     [Header("Sound")]
     public AudioSource audioSource;
-
     public AudioClip buttonSound;
     public AudioClip correctSound;
     public AudioClip wrongSound;
@@ -90,6 +97,7 @@ public class GameManager_mg02 : MonoBehaviour
             flashPanel.color = color;
             flashPanel.gameObject.SetActive(false);
         }
+        PlayPlayerAnimation(playerIdleFrames, true);
     }
 
     public void StartGame()
@@ -129,8 +137,9 @@ public class GameManager_mg02 : MonoBehaviour
         }
 
         updateMeritUI();
-
         StartCoroutine(FlashRoutine());
+
+        PlayPlayerAnimation(playerIdleFrames, true);
 
         spawnPassenger();
     }
@@ -197,6 +206,61 @@ public class GameManager_mg02 : MonoBehaviour
         else if (currentGameTime <= 0)
         {
             gameOver(true);
+        }
+    }
+
+    void PlayPlayerAnimation(Sprite[] frames, bool loop, System.Action onComplete = null)
+    {
+        if (playerImage == null || frames == null || frames.Length == 0) return;
+
+        if (playerAnimCoroutine != null)
+        {
+            StopCoroutine(playerAnimCoroutine);
+        }
+        playerAnimCoroutine = StartCoroutine(PlayerAnimRoutine(frames, loop, onComplete));
+    }
+
+    IEnumerator PlayerAnimRoutine(Sprite[] frames, bool loop, System.Action onComplete)
+    {
+        int index = 0;
+        while (true)
+        {
+            playerImage.sprite = frames[index];
+            playerImage.SetNativeSize();
+            index++;
+
+            if (index >= frames.Length)
+            {
+                if (loop)
+                {
+                    index = 0;
+                }
+                else
+                {
+                    onComplete?.Invoke();
+                    yield break;
+                }
+            }
+
+            yield return new WaitForSeconds(playerFrameRate);
+        }
+    }
+
+    void OnWrongChoiceEffect()
+    {
+        PlayPlayerAnimation(playerExhaustedFrames, false, () =>
+        {
+            StartCoroutine(WaitAndReturnToIdle());
+        });
+    }
+
+    IEnumerator WaitAndReturnToIdle()
+    {
+        yield return new WaitForSeconds(exhaustedWaitTime);
+
+        if (!isGameOver)
+        {
+            PlayPlayerAnimation(playerIdleFrames, true);
         }
     }
 
@@ -281,7 +345,7 @@ public class GameManager_mg02 : MonoBehaviour
 
         if (needSeat)
         {
-            currentHealth += 15f;
+            currentHealth += 10f;
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
@@ -292,6 +356,8 @@ public class GameManager_mg02 : MonoBehaviour
             wrongCount++;
             audioSource.PlayOneShot(wrongSound);
             StartCoroutine(ShakeRoutine(passengerImage.GetComponent<RectTransform>()));
+
+            OnWrongChoiceEffect();
         }
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -310,7 +376,7 @@ public class GameManager_mg02 : MonoBehaviour
 
         if (!needSeat)
         {
-            currentHealth += 15f;
+            currentHealth += 10f;
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
@@ -325,6 +391,7 @@ public class GameManager_mg02 : MonoBehaviour
                     passengerImage.GetComponent<RectTransform>()
                 )
             );
+            OnWrongChoiceEffect();
         }
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
