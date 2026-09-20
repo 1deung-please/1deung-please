@@ -4086,8 +4086,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "[\uD29C\uD1A0\uB9AC\uC5BC\uC5D0\uC11C NO \uBC84\uD2BC 10\uD68C \uC774\uC0C1
-    \uC120\uD0DD]"
+  m_text: "[\uC81C\uD55C\uC2DC\uAC04 \uB3D9\uC548 \uC544\uBB34 \uBBF8\uB2C8\uAC8C\uC784\uB3C4
+    \uD50C\uB808\uC774\uD558\uC9C0 \uC54A\uC74C]"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: c82c0627ca423104c8ecff5f14bba169, type: 2}
@@ -4150,7 +4150,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -44.06317, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4180,7 +4180,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -13.5, y: 74.5}
+  m_AnchoredPosition: {x: -44, y: 74.5}
   m_SizeDelta: {x: 783, y: 47}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1680512253
