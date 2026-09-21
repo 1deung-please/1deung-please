@@ -8,12 +8,14 @@ public class CommonEndingManager : MonoBehaviour
     [Header("Dialogue UI (조상신 대화)")]
     public GameObject dialoguePanel;
     public TMP_Text dialogueText;
+    public GameObject dialogueUI;
 
     [Header("Ending UI")]
     public TMP_Text titleText;
     public TMP_Text meritPointText;
     public TMP_Text ptText;
-    public TMP_Text pointText;
+    public TMP_Text nameText;
+    public TMP_Text scoreText;
 
     [Header("Signboard Animation")]
     public RectTransform signboard;
@@ -37,9 +39,9 @@ public class CommonEndingManager : MonoBehaviour
     {
         "그래... 처음 보는구나.",
         "내가 바로 네 조상이다.",
-        "내가 널 참 오랫동안 지켜보고 있었지... 갓난아기일 때부터 회사에 치이는 지금까지...",
-        "얼마나 고생이 많았느냐. 난 널 도와주러 온 사람이야.",
-        "그럼 어디, 지난 시간동안 얼마나 공덕을 쌓아왔는지 볼까."
+        "내가 널 참 오랫동안 지켜보고 있었지..\n갓난아기일 때부터 회사에 치이는 지금까지...",
+        "얼마나 고생이 많았느냐. \n난 널 도와주러 온 사람이야.",
+        "그럼 어디, 지난 시간동안 \n얼마나 공덕을 쌓아왔는지 볼까."
     };
     private int dialogueIndex = 0;
     private bool isDialogueEnding = false;
@@ -62,11 +64,17 @@ public class CommonEndingManager : MonoBehaviour
         if (meritPointText != null)
             meritPointText.gameObject.SetActive(false);
 
-        if (pointText != null)
-            pointText.gameObject.SetActive(false);
+        if (nameText != null)
+            nameText.gameObject.SetActive(false);
 
+        if (scoreText != null)
+            scoreText.gameObject.SetActive(false);
+        
         if (ptText != null)
             ptText.gameObject.SetActive(false);
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
 
         if (signboard != null)
         {
@@ -108,6 +116,10 @@ public class CommonEndingManager : MonoBehaviour
 
             dialogueText.text = currentSentence;
             isTyping = false;
+
+            if (dialogueUI != null)
+                dialogueUI.SetActive(true);
+
             return;
         }
 
@@ -120,6 +132,8 @@ public class CommonEndingManager : MonoBehaviour
         else
         {
             isDialogueEnding = true;
+
+            if (dialogueUI != null) dialogueUI.SetActive(false);
             if (dialoguePanel != null) dialoguePanel.SetActive(false);
 
             if (signboard != null)
@@ -131,6 +145,9 @@ public class CommonEndingManager : MonoBehaviour
 
     private void ShowNextDialogue()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (dialogueText != null)
         {
             currentSentence = ancestorDialogues[dialogueIndex];
@@ -154,6 +171,9 @@ public class CommonEndingManager : MonoBehaviour
         }
 
         isTyping = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
     }
 
     private IEnumerator MoveSignboard()
@@ -208,7 +228,7 @@ public class CommonEndingManager : MonoBehaviour
         if (titleText != null)
         {
             titleText.text =
-                totalPlayCount + "번째... 플레이 모은 공덕 포인트";
+                totalPlayCount + "번째 플레이...모은 공덕 포인트";
 
             titleText.gameObject.SetActive(true);
         }
@@ -286,18 +306,30 @@ public class CommonEndingManager : MonoBehaviour
 
         isScoreInfoPlaying = false;
         scoreInfoFinished = true;
-    }
+    }    
 
     private void ShowFullPointText(GameData gameData)
     {
-        if (pointText != null)
+        if (nameText != null)
         {
-            pointText.text =
-                "이걸 안 비켜?<pos=75%>" + gameData.miniGame2Score + "\n" +
-                "출격! 논리요새<pos=75%>" + gameData.miniGame3Score + "\n" +
-                "주워줘, 쓰레기!<pos=75%>" + gameData.miniGame1Score;
+            nameText.text =
+                "이걸 안 비켜?\n" +
+                "출격! 논리요새\n" +
+                "주워줘, 쓰레기!";
 
-            pointText.gameObject.SetActive(true);
+            nameText.alignment = TextAlignmentOptions.Left;
+            nameText.gameObject.SetActive(true);
+        }
+
+        if (scoreText != null)
+        {
+            scoreText.text =
+                gameData.miniGame2Score + "\n" +
+                gameData.miniGame3Score + "\n" +
+                gameData.miniGame1Score;
+
+            scoreText.alignment = TextAlignmentOptions.Right;
+            scoreText.gameObject.SetActive(true);
         }
     }
 

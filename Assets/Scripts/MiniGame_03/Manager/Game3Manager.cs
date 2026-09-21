@@ -158,7 +158,7 @@ public class Game3Manager : MonoBehaviour
             Debug.Log("미니게임 재시작 상태: 결과 저장과 업적 처리를 생략합니다.");
         }
 
-        ShowResult(true, 700);
+        ShowResult(true, 650);
     }
 
     //실패 처리
