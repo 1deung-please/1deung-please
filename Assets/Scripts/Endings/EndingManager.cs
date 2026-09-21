@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class EndingManager : MonoBehaviour
@@ -18,10 +19,10 @@ public class EndingManager : MonoBehaviour
 
     public enum EndingType
     {
-        Ending_Shallow,       // 얄팍한 속셈
-        Ending_Unqualified,   // 자격 미달
-        Ending_HalfSuccess,   // 절반의 성공
-        Ending_TrueBenefactor // 진정한 귀인
+        Ending_Shallow,
+        Ending_Unqualified,
+        Ending_HalfSuccess,
+        Ending_TrueBenefactor
     }
 
     private void Awake()
@@ -69,7 +70,6 @@ public class EndingManager : MonoBehaviour
             gameData.playedGames[1] &&
             gameData.playedGames[2];
 
-        // 기본 엔딩 결정
         if (!allPlayed)
         {
             endingId = "자격미달";
@@ -96,7 +96,11 @@ public class EndingManager : MonoBehaviour
             }
         }
 
-        // 히든 엔딩 조건
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnEndingConfirmed(endingId);
+        }
+
         if (AchievementStorage.IsUnlocked(14)
             && AchievementStorage.IsUnlocked(15)
             && AchievementStorage.IsUnlocked(16)
@@ -106,15 +110,15 @@ public class EndingManager : MonoBehaviour
             sceneName = "Ending_Hidden";
 
             Debug.Log("히든 엔딩 조건 달성!");
+
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnEndingConfirmed(endingId);
+            }
         }
 
         Debug.Log("선택된 엔딩: " + endingId);
         Debug.Log("이동할 씬: " + sceneName);
-
-        if (AchievementManager.Instance != null)
-        {
-            AchievementManager.Instance.OnEndingConfirmed(endingId);
-        }
 
         EndingStorage.Unlock(endingId);
 
