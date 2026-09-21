@@ -263,6 +263,18 @@ public class UnqualifiedManager : MonoBehaviour
     // 업적/엔딩 팝업이 메인메뉴 전환 완료 후 표시됨
     public void GoToMainMenu()
     {
+        bool allNormalEndings =
+            EndingStorage.IsUnlocked("자격미달") &&
+            EndingStorage.IsUnlocked("절반의성공") &&
+            EndingStorage.IsUnlocked("진정한귀인");
+
+        if (allNormalEndings)
+        {
+            Debug.Log("일반 엔딩 3개 확인 완료 → 히든 엔딩으로 이동");
+            SceneManager.LoadScene("Ending_Hidden");
+            return;
+        }
+
         if (GameManager.Instance != null)
             GameManager.Instance.ReturnToMainMenuFromEnding();
         else
