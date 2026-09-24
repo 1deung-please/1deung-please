@@ -259,22 +259,10 @@ public class UnqualifiedManager : MonoBehaviour
             tryAgainButton.gameObject.SetActive(true);
     }
 
-    // 엔딩 씬 종료 후 메인메뉴로 돌아갈 때 - GameManager를 통해 전환하면
-    // 업적/엔딩 팝업이 메인메뉴 전환 완료 후 표시됨
+    // 엔딩 씬 종료 후 메인메뉴(또는 히든 엔딩)로 돌아갈 때 - GameManager가 이미
+    // 업적 14~17 기반으로 히든 엔딩 진입 여부를 정확히 판단하므로 여기서 직접 체크하지 않음
     public void GoToMainMenu()
     {
-        bool allNormalEndings =
-            EndingStorage.IsUnlocked("자격미달") &&
-            EndingStorage.IsUnlocked("절반의성공") &&
-            EndingStorage.IsUnlocked("진정한귀인");
-
-        if (allNormalEndings)
-        {
-            Debug.Log("일반 엔딩 3개 확인 완료 → 히든 엔딩으로 이동");
-            SceneManager.LoadScene("Ending_Hidden");
-            return;
-        }
-
         if (GameManager.Instance != null)
             GameManager.Instance.ReturnToMainMenuFromEnding();
         else
