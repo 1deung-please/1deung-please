@@ -160,24 +160,17 @@ public class TrueBenefactorManager : MonoBehaviour
         StartStoryBackground();
 
         yield return Dialogue(
-            "조상신",
-            "어린 나이에 집안에 빨간 딱지가 붙어 펑펑 울 때도,",
-            ancestorGod,
+            "주인공",
+            "...",
+            player,
             EndingAnimation.None
         );
 
         ChangeBackground(endingStory2);
 
         yield return Dialogue(
-            "조상신",
-            "돈이 없어 삼각김밥 하나로 하루를 버틸 때도...",
-            ancestorGod,
-            EndingAnimation.None
-        );
-
-        yield return Dialogue(
             "주인공",
-            "...끙",
+            "....",
             player,
             EndingAnimation.None
         );
@@ -185,13 +178,34 @@ public class TrueBenefactorManager : MonoBehaviour
         ChangeBackground(endingStory3);
 
         yield return Dialogue(
-            "조상신",
-            "그리고 매일 회사에서 치이며 '다 때려치고 싶다'고 소리 없는 비명을 지를 때도...",
-            ancestorGod,
+            "주인공",
+            "끙...",
+            player,
             EndingAnimation.None
         );
 
         RestoreBackgroundAnimation(EndingAnimation.Animation1);
+
+        yield return Dialogue(
+            "조상신",
+            "어린 나이에 집안에 빨간 딱지가 붙어 펑펑 울 때도,",
+            ancestorGod,
+            EndingAnimation.Animation1
+        );
+
+        yield return Dialogue(
+            "조상신",
+            "돈이 없어 삼각김밥 하나로 하루를 버틸 때도...",
+            ancestorGod,
+            EndingAnimation.Animation1
+        );
+
+        yield return Dialogue(
+            "조상신",
+            "그리고 매일 회사에서 치이며 '다 때려치고 싶다'고 소리 없는 비명을 지를 때도...",
+            ancestorGod,
+            EndingAnimation.Animation1
+        );
 
         yield return Dialogue(
             "조상신",
@@ -526,18 +540,6 @@ public class TrueBenefactorManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        bool allNormalEndings =
-            EndingStorage.IsUnlocked("자격미달") &&
-            EndingStorage.IsUnlocked("절반의성공") &&
-            EndingStorage.IsUnlocked("진정한귀인");
-
-        if (allNormalEndings)
-        {
-            Debug.Log("일반 엔딩 3개 확인 완료 → 히든 엔딩으로 이동");
-            SceneManager.LoadScene("Ending_Hidden");
-            return;
-        }
-
         if (GameManager.Instance != null)
             GameManager.Instance.ReturnToMainMenuFromEnding();
         else

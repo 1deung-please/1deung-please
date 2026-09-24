@@ -381,4 +381,20 @@ public class AchievementManager : MonoBehaviour
 
         Debug.Log("[AchievementManager] 모든 엔딩 테스트용 해금 완료");
     }
+
+    // [테스트용] 4개 일반 엔딩 중 3개만 해금 (얄팍한속셈/자격미달/절반의성공)
+    [ContextMenu("Test - Unlock 3 Endings (진정한귀인 제외)")]
+    public void TestUnlockThreeEndings()
+    {
+        string[] threeEndings = { "얄팍한속셈", "자격미달", "절반의성공" };
+        int[] linkedAchievementIds = { 14, 15, 16 };
+
+        for (int i = 0; i < threeEndings.Length; i++)
+        {
+            EndingStorage.Unlock(threeEndings[i]);
+            AchievementStorage.Unlock(linkedAchievementIds[i]);
+        }
+
+        Debug.Log("[AchievementManager] 엔딩 3개(얄팍한속셈/자격미달/절반의성공) 테스트용 해금 완료 - 진정한귀인만 남음");
+    }
 }

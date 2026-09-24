@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     private string pendingEndingId = null;
 
     // 가방(RecordBookPanel)에서 엔딩을 "다시보기"로 재생할 때 true
+    // - 엔딩 씬에서 이 값을 보고 "다시하기" 버튼 대신 자동으로 로비+가방 복귀 처리
     public bool IsEndingReplay { get; private set; } = false;
 
     // PlayerPrefs 저장용 키 값 정의
@@ -109,6 +110,8 @@ public class GameManager : MonoBehaviour
         }
 
         // playedGames(각 미니게임을 이번 회차에 플레이했는지 여부)도 저장
+        // - 이게 저장 안 되면 앱 종료 후 재실행 시 false로 초기화되어
+        //   "중간에 나갔다 들어오면 이전에 플레이한 게임이 안 한 것으로 처리"되는 버그가 생김
         for (int i = 0; i < gameData.playedGames.Length; i++)
         {
             PlayerPrefs.SetInt($"PlayedGames_{i}", gameData.playedGames[i] ? 1 : 0);
@@ -310,7 +313,7 @@ public class GameManager : MonoBehaviour
 
     public void CompleteMiniGame3(bool isSuccess)
     {
-        int earnedPoint = isSuccess ? 650 : 0;
+        int earnedPoint = isSuccess ? 700 : 0;
         gameData.miniGame3Score += earnedPoint;
 
         addMeritPoint(earnedPoint);
@@ -404,6 +407,9 @@ public class GameManager : MonoBehaviour
     }
 
     // 가방(RecordBookPanel)에서 엔딩 "다시보기" 진입 시 호출
+    // - Fade Out(0.25초) -> 씬 전환 -> Fade In(0.25초)
+    // - 리플레이 중에는 각 엔딩 씬에서 IsEndingReplay를 보고 "다시하기" 버튼 대신
+    //   자동으로 로비 + 가방으로 복귀하도록 처리해야 함
     public void StartEndingReplay(string sceneName)
     {
         IsEndingReplay = true;
@@ -498,9 +504,12 @@ public class GameManager : MonoBehaviour
 
         // 히든 엔딩 조건: 4개 엔딩(얄팍한속셈/자격미달/절반의성공/진정한귀인)을 모두 봤고
         // 아직 히든 엔딩을 안 봤으면, 메인메뉴로 가지 않고 곧바로 히든 엔딩으로 이동
+        // 업적(14~17)은 OnEndingConfirmed()가 씬 전환 콜백에서 실행돼야 unlock되므로,
+        // 방금 막 확정된 엔딩(endingIdToConfirm)의 업적은 이 시점에 아직 false일 수 있음.
+        // 대신 EndingStorage(DetermineEnding에서 이미 Unlock 처리됨)를 기준으로 판단
         bool hiddenReady =
-            AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15)
-            && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17)
+            EndingStorage.IsUnlocked("얄팍한속셈") && EndingStorage.IsUnlocked("자격미달")
+            && EndingStorage.IsUnlocked("절반의성공") && EndingStorage.IsUnlocked("진정한귀인")
             && !EndingStorage.IsUnlocked("히든");
 
         if (hiddenReady)
