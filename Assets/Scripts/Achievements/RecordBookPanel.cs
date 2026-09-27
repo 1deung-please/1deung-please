@@ -135,7 +135,7 @@ public class RecordBookPanel : MonoBehaviour
         if (achievementPopupPanel == null) return;
 
         if (popupBackgroundImage != null) popupBackgroundImage.sprite = info.popupImage;
-        if (popupTitleText != null) popupTitleText.text = info.title;
+        if (popupTitleText != null) popupTitleText.text = $"No.{info.id} {info.title}";
         if (popupDescriptionText != null) popupDescriptionText.text = info.description;
 
         achievementPopupPanel.SetActive(true);

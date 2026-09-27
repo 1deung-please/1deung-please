@@ -11,10 +11,7 @@ public class GameManager : MonoBehaviour
 
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
-    private bool hasPendingAchievementCheck = false;
-    private MiniGameKind pendingAchievementKind;
-    private bool pendingAchievementSuccess;
-    private string pendingEndingId = null;
+    private readonly List<(MiniGameKind kind, bool success)> pendingAchievementChecks = new List<(MiniGameKind, bool)>();
 
     // 가방(RecordBookPanel)에서 엔딩을 "다시보기"로 재생할 때 true
     // - 엔딩 씬에서 이 값을 보고 "다시하기" 버튼 대신 자동으로 로비+가방 복귀 처리
@@ -36,9 +33,9 @@ public class GameManager : MonoBehaviour
 
     public void SetPendingAchievementCheck(MiniGameKind kind, bool success)
     {
-        hasPendingAchievementCheck = true;
-        pendingAchievementKind = kind;
-        pendingAchievementSuccess = success;
+        // 예약을 덮어쓰지 않고 큐에 쌓는다 - "다시하기"를 여러 번 눌러도
+        // 실제로 로비에 도착할 때까지 그동안의 모든 결과가 순서대로 유지된다.
+        pendingAchievementChecks.Add((kind, success));
     }
 
     void Awake()
@@ -345,23 +342,25 @@ public class GameManager : MonoBehaviour
             SaveGameData();
 
             // 업적/엔딩 팝업은 로딩 화면이 완전히 끝난 뒤(씬 전환 완료 후)에만 표시
-            bool hadPendingAchievement = hasPendingAchievementCheck;
-            hasPendingAchievementCheck = false;
+            var checksToProcess = new List<(MiniGameKind kind, bool success)>(pendingAchievementChecks);
+            pendingAchievementChecks.Clear();
 
             SceneLoader.Instance.LoadSceneWithLoadingScreen("NightLobby", () =>
             {
-                if (hadPendingAchievement && AchievementManager.Instance != null)
-                    AchievementManager.Instance.OnMiniGameResult(pendingAchievementKind, pendingAchievementSuccess);
-
                 if (AchievementManager.Instance != null)
+                {
+                    foreach (var check in checksToProcess)
+                        AchievementManager.Instance.OnMiniGameResult(check.kind, check.success);
+
                     AchievementManager.Instance.OnGlobalTimerEnd();
+                }
             });
             return;
         }
 
-        // 미니게임 결과에 따른 업적 체크는 로비 씬 전환이 완료된 뒤 처리
-        bool hadPendingAchievementLobby = hasPendingAchievementCheck;
-        hasPendingAchievementCheck = false;
+        // 미니게임 결과에 따른 업적 체크는 로비 씬 전환이 완료된 뒤, 쌓인 순서대로 처리
+        var checksToProcessLobby = new List<(MiniGameKind kind, bool success)>(pendingAchievementChecks);
+        pendingAchievementChecks.Clear();
 
         if (!gameData.isTimeOver)
         {
@@ -371,8 +370,11 @@ public class GameManager : MonoBehaviour
         SaveGameData();
         SceneLoader.Instance.LoadScene("Lobby", () =>
         {
-            if (hadPendingAchievementLobby && AchievementManager.Instance != null)
-                AchievementManager.Instance.OnMiniGameResult(pendingAchievementKind, pendingAchievementSuccess);
+            if (AchievementManager.Instance != null)
+            {
+                foreach (var check in checksToProcessLobby)
+                    AchievementManager.Instance.OnMiniGameResult(check.kind, check.success);
+            }
         });
     }
 
@@ -441,25 +443,20 @@ public class GameManager : MonoBehaviour
         string endingId;
         string sceneName;
 
-        int unplayedCount = 0;
-        foreach (bool played in gameData.playedGames)
-        {
-            if (!played)
-            {
-                unplayedCount++;
-            }
-        }
+        int playedCount = 0;
+        if (gameData.playedGames[0]) playedCount++;
+        if (gameData.playedGames[1]) playedCount++;
+        if (gameData.playedGames[2]) playedCount++;
 
-        bool noneAtAllPlayed = unplayedCount == gameData.playedGames.Length;
-        bool hasUnplayedGame = unplayedCount > 0;
-
-        if (noneAtAllPlayed)
+        if (playedCount == 0)
         {
+            // 예외: 미니게임을 하나도 플레이하지 않았으면 얄팍한속셈이 아니라 자격미달
             endingId = "자격미달";
             sceneName = "Ending_Unqualified";
         }
-        else if (hasUnplayedGame)
+        else if (playedCount < 3)
         {
+            // 1~2개만 플레이했으면 얄팍한속셈
             endingId = "얄팍한속셈";
             sceneName = "Ending_Shallow";
         }
@@ -484,18 +481,13 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15) && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17) && !EndingStorage.IsUnlocked("히든"))
-        {
-            endingId = "히든";
-            sceneName = "Ending_Hidden";
-
-            Debug.Log("히든 엔딩 조건 달성!");
-        }
+        // 히든 엔딩 판정은 여기서 하지 않음 - DetermineEnding()은 항상 4개 일반 엔딩 중 하나만 반환해야 함.
+        // 히든 엔딩으로의 전환은 ReturnToMainMenuFromEnding()의 hiddenReady 로직이 전담한다.
+        // (여기서도 판정하면, 업적 14~17이 한 번 unlock된 이후 영구적으로 남아있기 때문에
+        //  히든 엔딩을 이미 본 뒤에도 매번 히든만 반복 출력되는 버그가 생김)
 
         Debug.Log("선택된 엔딩: " + endingId);
         Debug.Log("이동할 씬: " + sceneName);
-
-        pendingEndingId = endingId;
 
         EndingStorage.Unlock(endingId);
 
@@ -508,19 +500,14 @@ public class GameManager : MonoBehaviour
         SceneLoader.Instance.LoadScene(sceneName);
     }
 
-    // 각 엔딩 매니저(Shallow/Unqualified/HalfSuccess/TrueBenefactor 등)의
-    // "메인메뉴로" 버튼에서 SceneManager.LoadScene("MainMenu") 대신 이 함수를 호출하면
-    // 메인메뉴 전환이 끝난 뒤 업적/엔딩 팝업이 표시됨
+    // 각 엔딩 매니저(Shallow/Unqualified/HalfSuccess/TrueBenefactor/Hidden)의
+    // "메인메뉴로" 버튼에서 SceneManager.LoadScene("MainMenu") 대신 이 함수를 호출한다.
+    // 엔딩/업적 팝업(OnEndingConfirmed 호출)은 각 엔딩 씬이 대사 종료 직후 직접 처리하고
+    // 완전히 닫힌 뒤에야 이 함수를 호출하므로, 여기서는 씬 라우팅(메인메뉴 vs 히든 엔딩)만 담당한다.
     public void ReturnToMainMenuFromEnding()
     {
-        string endingIdToConfirm = pendingEndingId;
-        pendingEndingId = null;
-
         // 히든 엔딩 조건: 4개 엔딩(얄팍한속셈/자격미달/절반의성공/진정한귀인)을 모두 봤고
         // 아직 히든 엔딩을 안 봤으면, 메인메뉴로 가지 않고 곧바로 히든 엔딩으로 이동
-        // 업적(14~17)은 OnEndingConfirmed()가 씬 전환 콜백에서 실행돼야 unlock되므로,
-        // 방금 막 확정된 엔딩(endingIdToConfirm)의 업적은 이 시점에 아직 false일 수 있음.
-        // 대신 EndingStorage(DetermineEnding에서 이미 Unlock 처리됨)를 기준으로 판단
         bool hiddenReady =
             EndingStorage.IsUnlocked("얄팍한속셈") && EndingStorage.IsUnlocked("자격미달")
             && EndingStorage.IsUnlocked("절반의성공") && EndingStorage.IsUnlocked("진정한귀인")
@@ -528,16 +515,8 @@ public class GameManager : MonoBehaviour
 
         if (hiddenReady)
         {
-            // 직전 엔딩(endingIdToConfirm)의 업적/엔딩 팝업은 히든 엔딩 씬 진입 후 처리
-            // 히든 엔딩 자체의 팝업은 여기서 unlock 처리하고, 히든 씬을 나갈 때(메인메뉴 복귀 시) 표시
             EndingStorage.Unlock("히든");
-            pendingEndingId = "히든";
-
-            SceneLoader.Instance.LoadScene("Ending_Hidden", () =>
-            {
-                if (!string.IsNullOrEmpty(endingIdToConfirm) && AchievementManager.Instance != null)
-                    AchievementManager.Instance.OnEndingConfirmed(endingIdToConfirm);
-            });
+            SceneLoader.Instance.LoadScene("Ending_Hidden");
             return;
         }
 
@@ -545,11 +524,7 @@ public class GameManager : MonoBehaviour
         // (가방의 "다시 도전하기"와 동일하게 전역 타이머/데이터를 리셋)
         ResetCycleData();
 
-        SceneLoader.Instance.LoadScene("MainMenu", () =>
-        {
-            if (!string.IsNullOrEmpty(endingIdToConfirm) && AchievementManager.Instance != null)
-                AchievementManager.Instance.OnEndingConfirmed(endingIdToConfirm);
-        });
+        SceneLoader.Instance.LoadScene("MainMenu");
     }
 
     // 새 회차 시작을 위한 데이터 리셋만 수행 (씬 전환은 호출하는 쪽에서 처리)
