@@ -441,25 +441,20 @@ public class GameManager : MonoBehaviour
         string endingId;
         string sceneName;
 
-        int unplayedCount = 0;
-        foreach (bool played in gameData.playedGames)
-        {
-            if (!played)
-            {
-                unplayedCount++;
-            }
-        }
+        int playedCount = 0;
+        if (gameData.playedGames[0]) playedCount++;
+        if (gameData.playedGames[1]) playedCount++;
+        if (gameData.playedGames[2]) playedCount++;
 
-        bool noneAtAllPlayed = unplayedCount == gameData.playedGames.Length;
-        bool hasUnplayedGame = unplayedCount > 0;
-
-        if (noneAtAllPlayed)
+        if (playedCount == 0)
         {
+            // 예외: 미니게임을 하나도 플레이하지 않았으면 얄팍한속셈이 아니라 자격미달
             endingId = "자격미달";
             sceneName = "Ending_Unqualified";
         }
-        else if (hasUnplayedGame)
+        else if (playedCount < 3)
         {
+            // 1~2개만 플레이했으면 얄팍한속셈
             endingId = "얄팍한속셈";
             sceneName = "Ending_Shallow";
         }
@@ -484,17 +479,15 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15) && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17) && !EndingStorage.IsUnlocked("히든"))
-        {
-            endingId = "히든";
-            sceneName = "Ending_Hidden";
-
-            Debug.Log("히든 엔딩 조건 달성!");
-        }
+        // 히든 엔딩 판정은 여기서 하지 않음 - DetermineEnding()은 항상 4개 일반 엔딩 중 하나만 반환해야 함.
+        // 히든 엔딩으로의 전환은 ReturnToMainMenuFromEnding()의 hiddenReady 로직이 전담한다.
+        // (여기서도 판정하면, 업적 14~17이 한 번 unlock된 이후 영구적으로 남아있기 때문에
+        //  히든 엔딩을 이미 본 뒤에도 매번 히든만 반복 출력되는 버그가 생김)
 
         Debug.Log("선택된 엔딩: " + endingId);
         Debug.Log("이동할 씬: " + sceneName);
 
+        // 업적/엔딩 팝업은 이 엔딩 씬이 끝나고 메인메뉴로 돌아갈 때 표시 (ReturnToMainMenuFromEnding 참고)
         pendingEndingId = endingId;
 
         EndingStorage.Unlock(endingId);
