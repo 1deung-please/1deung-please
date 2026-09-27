@@ -34,6 +34,9 @@ public class HiddenManager : MonoBehaviour
     [SerializeField] private float creditsStartY = -800f;
     [SerializeField] private float creditsEndY = 1500f;
 
+    // 이 씬이 담당하는 엔딩 ID - AchievementManager.OnEndingConfirmed에 그대로 전달됨
+    private const string EndingId = "히든";
+
     private bool isTyping = false;
     private bool clickRequested = false;
     private bool endingFinished = false;
@@ -345,6 +348,16 @@ public class HiddenManager : MonoBehaviour
         }
 
         yield return StartCoroutine(ScrollCredits());
+
+        bool isReplay = GameManager.Instance != null && GameManager.Instance.IsEndingReplay;
+
+        // 리플레이가 아닐 때만 엔딩/업적 팝업을 배경(크레딧 종료 화면) 위에 띄우고,
+        // 전부 닫힐 때까지 대기한 뒤 자동으로 복귀한다.
+        if (!isReplay && AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnEndingConfirmed(EndingId);
+            yield return new WaitUntil(() => !AchievementManager.Instance.HasPendingPopups);
+        }
 
         if (GameManager.Instance != null)
         {
