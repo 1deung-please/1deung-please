@@ -260,28 +260,37 @@ public class ShallowManager : MonoBehaviour
 
     private string GetMostPlayedGame()
     {
-        int max = gameData.playCount[0];
-        int index = 0;
+        // 우선순위 순서대로 index 나열: 주워줘 쓰레기(2) > 이걸 안 비켜(0) > 출격 논리요새(1)
+        int[] priorityOrder = { 2, 0, 1 };
 
-        for (int i = 1; i < gameData.playCount.Length; i++)
+        int maxCount = -1;
+
+        // 1) 플레이한 게임들 중 최대 플레이 횟수 구하기
+        for (int i = 0; i < gameData.playCount.Length; i++)
         {
-            if (gameData.playCount[i] > max)
+            if (gameData.playedGames[i] && gameData.playCount[i] > maxCount)
             {
-                max = gameData.playCount[i];
-                index = i;
+                maxCount = gameData.playCount[i];
             }
         }
 
-        switch (index)
+        // 2) 최대 횟수와 같은 게임들 중, 우선순위가 가장 높은 것을 선택
+        foreach (int index in priorityOrder)
         {
-            case 0:
-                return "이걸 안 비켜?";
+            if (gameData.playedGames[index] && gameData.playCount[index] == maxCount)
+            {
+                switch (index)
+                {
+                    case 0:
+                        return "이걸 안 비켜?";
 
-            case 1:
-                return "출격! 논리요새";
+                    case 1:
+                        return "출격! 논리요새";
 
-            case 2:
-                return "주워줘, 쓰레기";
+                    case 2:
+                        return "주워줘, 쓰레기";
+                }
+            }
         }
 
         return "";

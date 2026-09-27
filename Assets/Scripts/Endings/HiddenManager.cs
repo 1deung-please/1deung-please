@@ -11,6 +11,7 @@ public class HiddenManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject dialogueUI;
 
     [Header("Portrait")]
     [SerializeField] private Image portraitImage;
@@ -39,6 +40,9 @@ public class HiddenManager : MonoBehaviour
 
     private void Start()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(false);
@@ -179,6 +183,9 @@ public class HiddenManager : MonoBehaviour
 
     private IEnumerator FirstDialogue()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (nameText != null)
         {
             nameText.text = "???";
@@ -212,6 +219,9 @@ public class HiddenManager : MonoBehaviour
 
         isTyping = false;
 
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
+
         clickRequested = false;
 
         yield return new WaitUntil(() => clickRequested);
@@ -233,6 +243,9 @@ public class HiddenManager : MonoBehaviour
             portraitImage.gameObject.SetActive(false);
         }
 
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         yield return new WaitUntil(() => clickRequested);
 
         clickRequested = false;
@@ -242,6 +255,9 @@ public class HiddenManager : MonoBehaviour
 
     private IEnumerator Dialogue(string speaker, string text, Sprite portrait)
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (nameText != null)
         {
             nameText.text = speaker;
@@ -283,15 +299,25 @@ public class HiddenManager : MonoBehaviour
         }
 
         isTyping = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
+
         clickRequested = false;
 
         yield return new WaitUntil(() => clickRequested);
 
         clickRequested = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
     }
 
     private IEnumerator StartCredits()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (dialogueText != null)
         {
             dialogueText.text = "";

@@ -763,8 +763,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 5200b92a43deb1a45ad9154745bce8df, type: 2}
-  m_sharedMaterial: {fileID: 5648831293251242938, guid: 5200b92a43deb1a45ad9154745bce8df, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
+  m_sharedMaterial: {fileID: -6140352266110376839, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1279,6 +1279,7 @@ MonoBehaviour:
   gameData: {fileID: 11400000, guid: 5e04b0731a56a9e4bb6fe24675231b40, type: 2}
   dialogueText: {fileID: 454496546}
   nameText: {fileID: 815326755}
+  dialogueUI: {fileID: 379056868}
   portraitImage: {fileID: 980825939}
   ancestorGod: {fileID: 21300000, guid: 24f653b4cc22efe48980794c6ac21df5, type: 3}
   player: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}

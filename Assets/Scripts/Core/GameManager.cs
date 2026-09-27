@@ -441,9 +441,24 @@ public class GameManager : MonoBehaviour
         string endingId;
         string sceneName;
 
-        bool allPlayed = gameData.playedGames[0] && gameData.playedGames[1] && gameData.playedGames[2];
+        int unplayedCount = 0;
+        foreach (bool played in gameData.playedGames)
+        {
+            if (!played)
+            {
+                unplayedCount++;
+            }
+        }
 
-        if (!allPlayed)
+        bool noneAtAllPlayed = unplayedCount == gameData.playedGames.Length;
+        bool hasUnplayedGame = unplayedCount > 0;
+
+        if (noneAtAllPlayed)
+        {
+            endingId = "자격미달";
+            sceneName = "Ending_Unqualified";
+        }
+        else if (hasUnplayedGame)
         {
             endingId = "얄팍한속셈";
             sceneName = "Ending_Shallow";
@@ -469,7 +484,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15) && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17))
+        if (AchievementStorage.IsUnlocked(14) && AchievementStorage.IsUnlocked(15) && AchievementStorage.IsUnlocked(16) && AchievementStorage.IsUnlocked(17) && !EndingStorage.IsUnlocked("히든"))
         {
             endingId = "히든";
             sceneName = "Ending_Hidden";
@@ -480,7 +495,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("선택된 엔딩: " + endingId);
         Debug.Log("이동할 씬: " + sceneName);
 
-        // 업적/엔딩 팝업은 이 엔딩 씬이 끝나고 메인메뉴로 돌아갈 때 표시 (ReturnToMainMenuFromEnding 참고)
         pendingEndingId = endingId;
 
         EndingStorage.Unlock(endingId);
