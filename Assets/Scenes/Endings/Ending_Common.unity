@@ -602,7 +602,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC870\uC0C1\uC2E0"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5200b92a43deb1a45ad9154745bce8df, type: 2}
   m_sharedMaterial: {fileID: 5648831293251242938, guid: 5200b92a43deb1a45ad9154745bce8df, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -627,8 +627,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
