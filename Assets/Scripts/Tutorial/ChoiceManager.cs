@@ -94,13 +94,6 @@ public class ChoiceManager : MonoBehaviour
             domitGirlPortrait,
             begging + "운명 한 번 맡겨보시겠어요?");
         // ↑ 타이핑이 끝나도 바로 버튼이 뜨지 않고, 클릭을 한 번 더 기다린 뒤 버튼만 노출됨
-
-        if (dialoguePanel != null)
-        {
-            Vector2 pos = dialoguePanel.anchoredPosition;
-            pos.x = dialogueX;
-            dialoguePanel.anchoredPosition = pos;
-        }
     }
 
     // 10번째 NO: 암전 -> 업적 unlock/팝업 -> 팝업이 닫힐 때까지 대기 -> Fade In -> YES만 노출
