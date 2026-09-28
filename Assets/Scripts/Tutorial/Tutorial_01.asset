@@ -598,7 +598,7 @@ MonoBehaviour:
     isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uB3C4\uBBFF\uAC78"
-    text: "'\uC8FC\uC5B4\uC9C4 \uC2DC\uAC04'\uC774 \uB05D\uB098\uAC8C \uB41C\uB2E4\uBA74\u2026
+    text: "'\uC8FC\uC5B4\uC9C4 \uC2DC\uAC04'\uC774 \uB05D\uB098\uAC8C \uB41C\uB2E4\uBA74...
       \uC54C\uAC8C \uB420 \uAC81\uB2C8\uB2E4."
     portrait: {fileID: 21300000, guid: 161cdc3e0e79b1b42b7ecf8b3d226207, type: 3}
     dialogueEvent: 0
@@ -607,7 +607,7 @@ MonoBehaviour:
     isNormalDialogue: 0
     maxNoCount: 10
   - speaker: "\uC8FC\uC778\uACF5"
-    text: "\u2026?"
+    text: ...?
     portrait: {fileID: 21300000, guid: 7103a035ed37c124a983f300b1877ac9, type: 3}
     dialogueEvent: 0
     animEvent: 1

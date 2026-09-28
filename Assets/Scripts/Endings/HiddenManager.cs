@@ -125,13 +125,13 @@ public class HiddenManager : MonoBehaviour
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "사실 이 게임에서 가장 얻기 어려운 건 1등 당첨이 아니라...",
             ancestorGod
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "엔딩 4개를 모두 보는 것이었답니다!",
             ancestorGod
         );
@@ -149,7 +149,7 @@ public class HiddenManager : MonoBehaviour
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "언젠가 현실에서도 좋은 일이 찾아오길 바랍니다.",
             ancestorGod
         );
