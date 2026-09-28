@@ -324,11 +324,11 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
-                $"주운 쓰레기 개수:  <size=130%><color=#FFC756>{currentCount}</color></size> 개";
+                $"목표: <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
+                $"주운 쓰레기 개수: <size=130%><color=#FFC756>{currentCount}</color></size> 개";
 
         if (meritText != null)
-            meritText.text = $"얻은 공덕 포인트:  <color=#FF69F3>{merit}</color> <size=50>P</size>";
+            meritText.text = $"얻은 공덕 포인트: <color=#FF69F3>{merit}</color> <size=50>P</size>";
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
 
