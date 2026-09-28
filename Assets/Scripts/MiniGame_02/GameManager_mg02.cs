@@ -8,9 +8,9 @@ using TMPro;
 public class GameManager_mg02 : MonoBehaviour
 {
     [Header("Player Settings")]
-    public Image playerImage;                
-    public Sprite[] playerIdleFrames;       
-    public Sprite[] playerExhaustedFrames;   
+    public Image playerImage;
+    public Sprite[] playerIdleFrames;
+    public Sprite[] playerExhaustedFrames;
     public float playerFrameRate = 0.2f;
     public float exhaustedWaitTime = 0.1f;
 
@@ -44,7 +44,7 @@ public class GameManager_mg02 : MonoBehaviour
     Coroutine blinkCoroutine;
     Coroutine idleCoroutine;
     Coroutine playerAnimCoroutine;
-    Coroutine punchScaleCoroutine; 
+    Coroutine punchScaleCoroutine;
 
     private readonly Vector3 baseScale = Vector3.one; // NPC의 기준 크기 고정
 
@@ -448,8 +448,10 @@ public class GameManager_mg02 : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-            if (AchievementManager.Instance != null)
-                AchievementManager.Instance.OnMiniGameResult(MiniGameKind.DontMove, isSuccess);
+
+            // 업적/엔딩 팝업은 다른 미니게임들과 동일하게 로비(또는 다시하기 소비 시점)에서 표시되도록
+            // 예약만 해둔다 (기존에는 여기서 즉시 AchievementManager를 호출했음)
+            GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.DontMove, isSuccess);
         }
 
         if (resultPanel != null)
