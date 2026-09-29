@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public GameData gameData;
 
-    private const int MAX_MERIT_POINT = 10000;
+    private const int MAX_MERIT_POINT = 99999;
 
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
@@ -528,14 +528,11 @@ public class GameManager : MonoBehaviour
     }
 
     // 새 회차 시작을 위한 데이터 리셋만 수행 (씬 전환은 호출하는 쪽에서 처리)
+    // 업적 19번(3분 이상 플레이 후 "다시 시작하기" 5회) 카운트는 여기서 올리지 않는다 -
+    // 엔딩을 보고 자연스럽게 메인메뉴로 돌아가는 경우(ReturnToMainMenuFromEnding)도
+    // 이 함수를 거치는데, 그건 "다시 시작하기"를 누른 게 아니므로 카운트 대상이 아님.
     private void ResetCycleData()
     {
-        bool playedOver3Min = gameData.globalTimeRemaining <= 120f;
-        if (playedOver3Min)
-        {
-            PersistentStats.IncrementResetCycleCount();
-        }
-
         gameData.playCycle++;
 
         // 새 회차 시작 시 기기 내부 세이브 파일 초기화
@@ -555,8 +552,16 @@ public class GameManager : MonoBehaviour
     }
 
     // 가방의 "다시 도전하기" 버튼 등에서 호출: 리셋 + 메인메뉴로 즉시 전환
+    // "다시 시작하기"를 명시적으로 눌렀을 때만 업적 19번 카운트 대상이므로,
+    // 리셋 직전(globalTimeRemaining이 아직 리셋되기 전)에 여기서 판정하고 카운트한다.
     public void ResetCycle()
     {
+        bool playedOver3Min = gameData.globalTimeRemaining <= 120f;
+        if (playedOver3Min)
+        {
+            PersistentStats.IncrementResetCycleCount();
+        }
+
         ResetCycleData();
         SceneLoader.Instance.LoadScene("MainMenu");
     }
