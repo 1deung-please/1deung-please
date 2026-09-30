@@ -1301,8 +1301,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ShallowManager, Assembly-CSharp
+      - m_Target: {fileID: 1045309438}
+        m_TargetAssemblyTypeName: UnqualifiedManager, Assembly-CSharp
         m_MethodName: GoToMainMenu
         m_Mode: 1
         m_Arguments:
