@@ -423,7 +423,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB85C\uB610 \uB2F9\uCCA8\uB420 \uC0AC\uB78C\uB4E4\n\n\uAE30\uD68D\n\uC548\uC1A1\uC5F0\n\uC774\uC2B9\uD604\n\n\uAC1C\uBC1C\n\uAE40\uBBFC\uC815\n\uC2EC\uC18C\uC5F0\n\uC6D0\uC720\uACBD\n\uD669\uC9C0\uC6B0\n\n\uB514\uC790\uC778\n\uC774\uBA85\uC9C4\n\uAE40\uC218\uBBFC"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5200b92a43deb1a45ad9154745bce8df, type: 2}
   m_sharedMaterial: {fileID: -6140352266110376839, guid: 94f058d098335e54fb300bcc86dff154, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -487,7 +487,7 @@ MonoBehaviour:
   m_margin: {x: -1.036789, y: 0, z: -0.000038127306, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &664037511
