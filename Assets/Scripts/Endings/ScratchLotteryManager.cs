@@ -42,6 +42,7 @@ public class ScratchLotteryManager : MonoBehaviour
 
     private Coroutine guideTextCoroutine;
     private bool wasGuideTextVisible = false;
+    private Vector2? lastMousePosition = null;
 
     private void Start()
     {
@@ -145,19 +146,40 @@ public class ScratchLotteryManager : MonoBehaviour
             HideGuideText();
 
             UpdateCoinPosition();
-            ScratchAtMouse();
+            ScratchAtMouse(Input.mousePosition);
+            lastMousePosition = Input.mousePosition;
         }
 
         if (Input.GetMouseButton(0) && isDragging)
         {
             HideGuideText();
             UpdateCoinPosition();
-            ScratchAtMouse();
+
+            if (lastMousePosition.HasValue)
+            {
+                float distance = Vector2.Distance(lastMousePosition.Value, Input.mousePosition);
+                float step = Mathf.Max(1f, brushSize * 0.25f);
+                int steps = Mathf.CeilToInt(distance / step);
+
+                for (int i = 0; i <= steps; i++)
+                {
+                    float t = (steps == 0) ? 0f : (float)i / steps;
+                    Vector2 samplePoint = Vector2.Lerp(lastMousePosition.Value, Input.mousePosition, t);
+                    ScratchAtMouse(samplePoint);
+                }
+            }
+            else
+            {
+                ScratchAtMouse(Input.mousePosition);
+            }
+
+            lastMousePosition = Input.mousePosition;
         }
 
         if (Input.GetMouseButtonUp(0))
         {
             isDragging = false;
+            lastMousePosition = null;
         }
     }
 
@@ -224,13 +246,13 @@ public class ScratchLotteryManager : MonoBehaviour
         }
     }
 
-    private void ScratchAtMouse()
+    private void ScratchAtMouse(Vector2 screenPos)
     {
         if (runtimeTexture == null || scratchGrayRect == null) return;
 
         Camera cam = (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay) ? parentCanvas.worldCamera : null;
 
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(scratchGrayRect, Input.mousePosition, cam, out Vector2 localPosition))
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(scratchGrayRect, screenPos, cam, out Vector2 localPosition))
         {
             float width = scratchGrayRect.rect.width;
             float height = scratchGrayRect.rect.height;
