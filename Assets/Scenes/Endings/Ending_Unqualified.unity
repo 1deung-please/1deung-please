@@ -1388,7 +1388,7 @@ MonoBehaviour:
   tryAgainButton: {fileID: 1013626870}
   typingSpeed: 0.05
   backgroundAnimObject: {fileID: 392593042}
-  bgmSource: {fileID: 0}
+  bgmSource: {fileID: 1007720171}
   bgmFadeInDuration: 4
 --- !u!4 &1045309439
 Transform:
