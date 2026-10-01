@@ -163,17 +163,24 @@ public class TrueBenefactorManager : MonoBehaviour
         StartStoryBackground();
 
         yield return Dialogue(
-            "주인공",
-            "...",
-            player,
+            "조상신",
+            "어린 나이에 집안에 빨간 딱지가 붙어 펑펑 울 때도,",
+            ancestorGod,
             EndingAnimation.None
         );
 
         ChangeBackground(endingStory2);
 
         yield return Dialogue(
+            "조상신",
+            "돈이 없어 삼각김밥 하나로 하루를 버틸 때도..",
+            ancestorGod,
+            EndingAnimation.None
+        );
+
+        yield return Dialogue(
             "주인공",
-            "....",
+            "...끙",
             player,
             EndingAnimation.None
         );
@@ -181,35 +188,14 @@ public class TrueBenefactorManager : MonoBehaviour
         ChangeBackground(endingStory3);
 
         yield return Dialogue(
-            "주인공",
-            "끙...",
-            player,
+            "조상신",
+            "그리고 매일 회사에서 치이며 '다 때려치고 싶다'고 소리 없는 비명을 지를 때도...",
+            ancestorGod,
             EndingAnimation.None
         );
 
         RestoreBackgroundAnimation(EndingAnimation.Animation1);
-
-        yield return Dialogue(
-            "조상신",
-            "어린 나이에 집안에 빨간 딱지가 붙어 펑펑 울 때도,",
-            ancestorGod,
-            EndingAnimation.Animation1
-        );
-
-        yield return Dialogue(
-            "조상신",
-            "돈이 없어 삼각김밥 하나로 하루를 버틸 때도...",
-            ancestorGod,
-            EndingAnimation.Animation1
-        );
-
-        yield return Dialogue(
-            "조상신",
-            "그리고 매일 회사에서 치이며 '다 때려치고 싶다'고 소리 없는 비명을 지를 때도...",
-            ancestorGod,
-            EndingAnimation.Animation1
-        );
-
+        
         yield return Dialogue(
             "조상신",
             "난 늘 네 곁에서 가슴을 쥐어짜며 함께 울고 있었다.",
