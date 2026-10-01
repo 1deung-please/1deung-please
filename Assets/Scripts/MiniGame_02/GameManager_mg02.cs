@@ -56,6 +56,8 @@ public class GameManager_mg02 : MonoBehaviour
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
+    public float survivalTargetTime = 15f;
+
     float currentGameTime;
     public float maxHealth = 100f;
     float currentHealth;
@@ -181,7 +183,7 @@ public class GameManager_mg02 : MonoBehaviour
             decreaseSpeed = 25f;
         }
 
-        if (currentGameTime <= 14f && currentGameTime > 10f)
+        /*if (currentGameTime <= 14f && currentGameTime > 10f)
         {
             decreaseSpeed = 15f;
         }
@@ -192,7 +194,7 @@ public class GameManager_mg02 : MonoBehaviour
         else if (currentGameTime <= 4f)
         {
             decreaseSpeed = 25f;
-        }
+        }*/
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -211,13 +213,17 @@ public class GameManager_mg02 : MonoBehaviour
 
         updateCpsData();
 
+        float survivedTime = maxGameTime - currentGameTime;
+
         if (currentHealth <= 0)
         {
             gameOver(false);
         }
         else if (currentGameTime <= 0)
         {
-            gameOver(true);
+            currentGameTime = 0;
+            bool isSuccess = survivedTime >= survivalTargetTime;
+            gameOver(isSuccess);
         }
     }
 
