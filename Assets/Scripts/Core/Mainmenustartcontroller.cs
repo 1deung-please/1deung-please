@@ -88,6 +88,9 @@ public class MainMenuStartController : MonoBehaviour
         }
     }
 
+    // 아래 연출(슬라이드/대기/번쩍임/깜빡임)은 전부 unscaled 시간을 쓴다.
+    // 종료 팝업이 떠서 Time.timeScale이 0이 되어도 메인메뉴 연출은 멈추지 않고 끝까지 함께 진행되게 하기 위함.
+    // (메인메뉴에는 멈춰야 할 게임 진행이 없고, 일부만 멈추면 슬라이드는 서 있는데 깜빡임만 도는 식으로 어긋남)
     IEnumerator IntroSequence()
     {
         // BGM 시작과 동시에 배경 슬라이드인
@@ -96,7 +99,7 @@ public class MainMenuStartController : MonoBehaviour
         yield return StartCoroutine(SlideIn());
 
         // titleDelay초 대기 후 타이포 번쩍 등장
-        yield return new WaitForSeconds(titleDelay);
+        yield return new WaitForSecondsRealtime(titleDelay);
 
         yield return StartCoroutine(FlashTitle());
 
@@ -122,7 +125,10 @@ public class MainMenuStartController : MonoBehaviour
 
         while (elapsed < slideDuration)
         {
-            elapsed += Time.deltaTime;
+            // 씬이 막 로드된 첫 프레임은 델타타임이 매우 클 수 있다(로딩 시간이 통째로 들어옴).
+            // unscaledDeltaTime을 그대로 더하면 첫 프레임에 슬라이드가 끝나버려 부드럽게 들어오지 않으므로
+            // 프레임당 증가량에 상한을 둔다. (평소 프레임에서는 상한에 안 걸려 deltaTime과 똑같이 동작)
+            elapsed += Mathf.Min(Time.unscaledDeltaTime, 0.05f);
             float t = Mathf.SmoothStep(0f, 1f, elapsed / slideDuration); // 부드럽게
             Vector2 pos = backgroundPanel.anchoredPosition;
             pos.x = Mathf.Lerp(startX, endX, t);
@@ -142,9 +148,9 @@ public class MainMenuStartController : MonoBehaviour
         for (int i = 0; i < flashCount; i++)
         {
             titleImage.alpha = 1f;
-            yield return new WaitForSeconds(flashInterval);
+            yield return new WaitForSecondsRealtime(flashInterval);
             titleImage.alpha = 0f;
-            yield return new WaitForSeconds(flashInterval);
+            yield return new WaitForSecondsRealtime(flashInterval);
         }
         titleImage.alpha = 1f; // 마지막엔 완전히 켜진 상태로 고정
     }
@@ -153,7 +159,7 @@ public class MainMenuStartController : MonoBehaviour
     {
         while (true)
         {
-            float alpha = Mathf.PingPong(Time.time * blinkSpeed, 1f);
+            float alpha = Mathf.PingPong(Time.unscaledTime * blinkSpeed, 1f);
             Color c = touchToStartText.color;
             c.a = alpha;
             touchToStartText.color = c;

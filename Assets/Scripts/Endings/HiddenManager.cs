@@ -71,6 +71,9 @@ public class HiddenManager : MonoBehaviour
 
     private void Update()
     {
+        if (UIInputGate.IsBlocked)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;

@@ -1457,9 +1457,8 @@ MonoBehaviour:
   loadingMessages:
   - "\uB85C\uB529 \uC911..."
   - "\uB85C\uB610 \uC0AC\uB7EC \uAC00\uB294 \uC911..."
-  - "\uB85C\uB610 \uAE01\uB294 \uC911..."
-  messageInterval: 5
-  minLoadingDuration: 7
+  messageInterval: 3
+  minLoadingDuration: 6
   shortFadePanel: {fileID: 2070522826}
   shortFadeDuration: 0.25
 --- !u!4 &1158759478

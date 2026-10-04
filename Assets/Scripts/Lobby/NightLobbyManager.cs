@@ -5,10 +5,10 @@ using TMPro;
 public class NightLobbyManager : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private GameObject dialoguePanel;   
-    [SerializeField] private GameObject dialogueUI;      
-    [SerializeField] private TextMeshProUGUI nameText;     
-    [SerializeField] private TextMeshProUGUI dialogueText; 
+    [SerializeField] private GameObject dialoguePanel;
+    [SerializeField] private GameObject dialogueUI;
+    [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private TextMeshProUGUI dialogueText;
 
     [Header("Typing Settings")]
     [SerializeField] private float typingSpeed = 0.05f;
@@ -65,10 +65,10 @@ public class NightLobbyManager : MonoBehaviour
 
             while (isTyping)
             {
-                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
+                if (!UIInputGate.IsBlocked && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)))
                 {
                     StopCoroutine(typing);
-                    dialogueText.text = text; 
+                    dialogueText.text = text;
                     isTyping = false;
                     yield return null;
                     break;
@@ -79,12 +79,12 @@ public class NightLobbyManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        while (!Input.GetMouseButtonDown(0) && !Input.GetKeyDown(KeyCode.Space))
+        while (UIInputGate.IsBlocked || (!Input.GetMouseButtonDown(0) && !Input.GetKeyDown(KeyCode.Space)))
         {
             yield return null;
         }
 
-        yield return null; 
+        yield return null;
     }
 
     private IEnumerator TypeText(string text, System.Action onComplete)

@@ -89,6 +89,9 @@ public class DialogueManager : MonoBehaviour
         if (dialogueFullyEnded)
             return;
 
+        if (UIInputGate.IsBlocked)
+            return;
+
         if (TutorialManager.Instance != null)
         {
             if (TutorialManager.Instance.IsFading())
