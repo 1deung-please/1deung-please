@@ -35,6 +35,12 @@ public class ExitPopupManager : MonoBehaviour
         {
             exitConfirmPopup.SetActive(false);
         }
+
+        // 종료 취소 시 타이머 다시 시작
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResumeTimer();
+        }
     }
 
     public void ConfirmExit()
