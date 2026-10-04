@@ -36,6 +36,9 @@ public static class UIInputGate
         if (ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive)
             return true;
 
+        if (ResumePopupManager.Instance != null && ResumePopupManager.Instance.IsPopupActive)
+            return true;
+
         if (AchievementManager.Instance != null && AchievementManager.Instance.HasPendingPopups)
             return true;
 

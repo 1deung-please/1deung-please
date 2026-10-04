@@ -272,23 +272,39 @@ public class GameManager : MonoBehaviour
         if (gameData == null)
             return;
 
-        // 전역 타이머가 이미 끝났으면 무조건 나이트 로비
+        // 전역 타이머가 이미 끝났으면 무조건 나이트 로비 (이어하기 팝업 없음)
         if (gameData.isTimeOver)
         {
             SceneLoader.Instance.LoadScene("NightLobby");
             return;
         }
 
-        // 튜토리얼을 이미 완료/스킵했다면 로비
+        // 튜토리얼을 이미 완료/스킵했다면 = 전역 타이머가 흘러가던 진행 중인 게임
+        // -> 로비로 가서 "진행 중인 게임이 있습니다" 팝업을 띄운다
+        // (튜토리얼 도중 나갔다 온 경우는 아래에서 튜토리얼로 가므로 팝업 없음)
         if (gameData.tutorialDone)
         {
-            ResumeTimer();
-            SceneLoader.Instance.LoadScene("Lobby");
+            LoadWithResumePopup("Lobby");
             return;
         }
 
         // 아직 튜토리얼을 완료하지 않았다면 튜토리얼
         SceneLoader.Instance.LoadScene("Tutorial");
+    }
+
+    // 진행 중이던 게임을 이어서 시작: 씬이 로드된 뒤 "진행 중인 게임이 있습니다" 팝업을 띄우고,
+    // 팝업이 닫힐 때까지 타이머가 흐르지 않게 한다. (닫을 때 ResumePopupManager가 타이머를 다시 재개)
+    private void LoadWithResumePopup(string sceneName)
+    {
+        PauseTimer();
+
+        SceneLoader.Instance.LoadScene(sceneName, () =>
+        {
+            if (ResumePopupManager.Instance != null)
+                ResumePopupManager.Instance.Show();
+            else
+                ResumeTimer(); // 팝업이 없으면 예전처럼 바로 이어서 진행
+        });
     }
 
     public void OnTutorialComplete()
