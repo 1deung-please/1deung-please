@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour
         {
             if (ExitPopupManager.Instance != null)
             {
+                PauseTimer();  // 종료 팝업이 떠 있는 동안 타이머 정지
                 ExitPopupManager.Instance.ShowPopup();
             }
 

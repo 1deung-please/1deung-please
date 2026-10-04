@@ -35,6 +35,22 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus && hpSlider != null)
+        {
+            hpSlider.value = currentHp;
+        }
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (!pauseStatus && hpSlider != null)
+        {
+            hpSlider.value = currentHp;
+        }
+    }
+
     //데미지 입었을 때
     public void Damage(int amount)
     {
