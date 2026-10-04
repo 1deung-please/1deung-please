@@ -140,6 +140,16 @@ public class ScratchLotteryManager : MonoBehaviour
 
         if (endingStarted || scratchPanel == null || !scratchPanel.activeSelf) return;
 
+        // 종료 팝업/업적·엔딩 팝업이 떠 있는 동안에는 터치를 긁기/동전 이동/안내 문구 숨김으로 처리하지 않는다.
+        // 드래그 상태와 마지막 위치를 비워서, 팝업을 닫은 뒤 처음 긁을 때
+        // 팝업 열기 전 위치에서 현재 위치까지 한 번에 긁히지 않게 한다.
+        if (UIInputGate.IsBlocked)
+        {
+            isDragging = false;
+            lastMousePosition = null;
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             isDragging = true;

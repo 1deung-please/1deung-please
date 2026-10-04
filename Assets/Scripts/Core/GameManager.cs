@@ -11,6 +11,13 @@ public class GameManager : MonoBehaviour
 
     private bool isMiniGamePlaying = false;
     private bool pendingEndingTransition = false;
+
+    // 종료 팝업(Esc)을 열기 직전에 타이머가 이미 멈춰 있었는지 기억해둔다.
+    // (메인메뉴/튜토리얼/결과 화면/가방처럼 원래 멈춰 있어야 하는 곳에서
+    //  팝업을 취소했을 때 타이머가 멋대로 다시 돌지 않게 하기 위함)
+    private bool wasTimerFrozenBeforeExitPopup = false;
+    private float timeScaleBeforeExitPopup = 1f; // 팝업을 열기 전 Time.timeScale (Game3 대기 화면처럼 원래 0인 경우도 그대로 복구)
+    private bool exitPopupPauseActive = false;   // 지금 종료 팝업 때문에 일시정지 중인지
     private readonly List<(MiniGameKind kind, bool success)> pendingAchievementChecks = new List<(MiniGameKind, bool)>();
 
     // 가방(RecordBookPanel)에서 엔딩을 "다시보기"로 재생할 때 true
@@ -56,12 +63,31 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // 종료 팝업이 어떤 경로로든 닫혔는데 아직 일시정지 상태라면 자동으로 복구
+        // (닫기 버튼이 HidePopup()을 거치지 않고 SetActive(false)만 하는 경우에도
+        //  게임이 멈춘 채로 남지 않게 하는 안전장치)
+        if (exitPopupPauseActive &&
+            (ExitPopupManager.Instance == null || !ExitPopupManager.Instance.IsPopupActive))
+        {
+            ResumeTimerAfterExitPopup();
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (ExitPopupManager.Instance != null)
             {
-                PauseTimer();  // 종료 팝업이 떠 있는 동안 타이머 정지
-                ExitPopupManager.Instance.ShowPopup();
+                if (ExitPopupManager.Instance.IsPopupActive)
+                {
+                    // 팝업이 떠 있을 때 뒤로가기(Esc)를 다시 누르면 "아니오(취소)"와 똑같이 닫는다
+                    // (HidePopup 안에서 일시정지/클릭 판정/타이머가 열기 전 상태로 복구됨)
+                    ExitPopupManager.Instance.HidePopup();
+                }
+                else
+                {
+                    // 팝업이 처음 열릴 때만 일시정지
+                    BeginExitPopupPause();
+                    ExitPopupManager.Instance.ShowPopup();
+                }
             }
 
             return;
@@ -209,29 +235,76 @@ public class GameManager : MonoBehaviour
             gameData.isTimerFrozen = false;
     }
 
+    // 종료 팝업이 열릴 때: 전역 타이머 정지 + 게임 전체 일시정지(Time.timeScale = 0)
+    // - 미니게임 안의 타이머/체력 감소/코루틴(WaitForSeconds)/애니메이션은 모두 Time.deltaTime 기반이라
+    //   timeScale을 0으로 두면 한꺼번에 멈춘다.
+    // - 팝업을 열기 전 상태(타이머가 멈춰 있었는지, timeScale이 얼마였는지)를 기억해뒀다가
+    //   닫을 때 그대로 되돌린다. (Game3 시작 대기 화면처럼 원래 timeScale이 0인 곳도 안전)
+    private void BeginExitPopupPause()
+    {
+        if (exitPopupPauseActive) return;
+        exitPopupPauseActive = true;
+
+        wasTimerFrozenBeforeExitPopup = gameData != null && gameData.isTimerFrozen;
+        timeScaleBeforeExitPopup = Time.timeScale;
+
+        if (gameData != null)
+            PauseTimer();
+
+        Time.timeScale = 0f;
+    }
+
+    // 종료 팝업을 취소했을 때 호출: 열기 전 상태로 복구한다. (여러 번 불려도 한 번만 동작)
+    public void ResumeTimerAfterExitPopup()
+    {
+        if (!exitPopupPauseActive) return;
+        exitPopupPauseActive = false;
+
+        Time.timeScale = timeScaleBeforeExitPopup;
+
+        if (!wasTimerFrozenBeforeExitPopup)
+            ResumeTimer();
+    }
+
     // 메인 메뉴 시작 버튼 호출 메서드
     public void OnStartGame()
     {
         if (gameData == null)
             return;
 
-        // 전역 타이머가 이미 끝났으면 무조건 나이트 로비
+        // 전역 타이머가 이미 끝났으면 무조건 나이트 로비 (이어하기 팝업 없음)
         if (gameData.isTimeOver)
         {
             SceneLoader.Instance.LoadScene("NightLobby");
             return;
         }
 
-        // 튜토리얼을 이미 완료/스킵했다면 로비
+        // 튜토리얼을 이미 완료/스킵했다면 = 전역 타이머가 흘러가던 진행 중인 게임
+        // -> 로비로 가서 "진행 중인 게임이 있습니다" 팝업을 띄운다
+        // (튜토리얼 도중 나갔다 온 경우는 아래에서 튜토리얼로 가므로 팝업 없음)
         if (gameData.tutorialDone)
         {
-            ResumeTimer();
-            SceneLoader.Instance.LoadScene("Lobby");
+            LoadWithResumePopup("Lobby");
             return;
         }
 
         // 아직 튜토리얼을 완료하지 않았다면 튜토리얼
         SceneLoader.Instance.LoadScene("Tutorial");
+    }
+
+    // 진행 중이던 게임을 이어서 시작: 씬이 로드된 뒤 "진행 중인 게임이 있습니다" 팝업을 띄우고,
+    // 팝업이 닫힐 때까지 타이머가 흐르지 않게 한다. (닫을 때 ResumePopupManager가 타이머를 다시 재개)
+    private void LoadWithResumePopup(string sceneName)
+    {
+        PauseTimer();
+
+        SceneLoader.Instance.LoadScene(sceneName, () =>
+        {
+            if (ResumePopupManager.Instance != null)
+                ResumePopupManager.Instance.Show();
+            else
+                ResumeTimer(); // 팝업이 없으면 예전처럼 바로 이어서 진행
+        });
     }
 
     public void OnTutorialComplete()
