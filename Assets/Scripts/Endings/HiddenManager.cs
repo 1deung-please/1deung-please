@@ -28,13 +28,10 @@ public class HiddenManager : MonoBehaviour
     [SerializeField] private AudioSource bgmSource;
     [SerializeField] private float bgmFadeInDuration = 4f;
 
-    [Header("Credits")]
-    [SerializeField] private RectTransform creditsText;
-    [SerializeField] private float creditsSpeed = 50f;
-    [SerializeField] private float creditsStartY = -800f;
-    [SerializeField] private float creditsEndY = 1500f;
+    [Header("Credits Image")]
+    [SerializeField] private Image creditsImage;
+    [SerializeField] private float creditsSpeed = 100f;
 
-    // 이 씬이 담당하는 엔딩 ID - AchievementManager.OnEndingConfirmed에 그대로 전달됨
     private const string EndingId = "히든";
 
     private bool isTyping = false;
@@ -47,24 +44,16 @@ public class HiddenManager : MonoBehaviour
             dialogueUI.SetActive(false);
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         if (nameText != null)
-        {
             nameText.text = "";
-        }
 
-        if (creditsText != null)
-        {
-            creditsText.gameObject.SetActive(false);
-        }
+        if (creditsImage != null)
+            creditsImage.gameObject.SetActive(false);
 
         StartCoroutine(EndingStart());
     }
@@ -82,13 +71,9 @@ public class HiddenManager : MonoBehaviour
                 if (GameManager.Instance != null)
                 {
                     if (GameManager.Instance.IsEndingReplay)
-                    {
                         GameManager.Instance.EndEndingReplay();
-                    }
                     else
-                    {
                         GameManager.Instance.ReturnToMainMenuFromEnding();
-                    }
                 }
             }
         }
@@ -99,7 +84,6 @@ public class HiddenManager : MonoBehaviour
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(true);
-
             Color color = fadeImage.color;
             color.a = 1f;
             fadeImage.color = color;
@@ -190,9 +174,7 @@ public class HiddenManager : MonoBehaviour
             dialogueUI.SetActive(false);
 
         if (nameText != null)
-        {
             nameText.text = "???";
-        }
 
         if (portraitImage != null)
         {
@@ -204,9 +186,7 @@ public class HiddenManager : MonoBehaviour
         }
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         clickRequested = false;
         isTyping = true;
@@ -215,7 +195,8 @@ public class HiddenManager : MonoBehaviour
 
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            if (dialogueText != null)
+                dialogueText.text += c;
 
             yield return new WaitForSeconds(0.05f);
         }
@@ -232,19 +213,13 @@ public class HiddenManager : MonoBehaviour
         clickRequested = false;
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         if (nameText != null)
-        {
             nameText.text = "";
-        }
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
 
         if (dialogueUI != null)
             dialogueUI.SetActive(false);
@@ -262,9 +237,7 @@ public class HiddenManager : MonoBehaviour
             dialogueUI.SetActive(false);
 
         if (nameText != null)
-        {
             nameText.text = speaker;
-        }
 
         if (portraitImage != null)
         {
@@ -280,9 +253,7 @@ public class HiddenManager : MonoBehaviour
         }
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         isTyping = true;
         clickRequested = false;
@@ -291,12 +262,15 @@ public class HiddenManager : MonoBehaviour
         {
             if (clickRequested)
             {
-                dialogueText.text = text;
+                if (dialogueText != null)
+                    dialogueText.text = text;
+
                 clickRequested = false;
                 break;
             }
 
-            dialogueText.text += c;
+            if (dialogueText != null)
+                dialogueText.text += c;
 
             yield return new WaitForSeconds(0.05f);
         }
@@ -322,62 +296,87 @@ public class HiddenManager : MonoBehaviour
             dialogueUI.SetActive(false);
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         if (nameText != null)
-        {
             nameText.text = "";
-        }
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
 
         yield return StartCoroutine(FadeToBlack());
 
-        if (creditsText != null)
+        if (creditsImage != null)
         {
-            creditsText.gameObject.SetActive(true);
-
-            Vector2 position = creditsText.anchoredPosition;
-            position.y = creditsStartY;
-            creditsText.anchoredPosition = position;
+            creditsImage.gameObject.SetActive(true);
+            ConfigureCreditsImage();
         }
 
         yield return StartCoroutine(ScrollCredits());
 
-        bool isReplay = GameManager.Instance != null && GameManager.Instance.IsEndingReplay;
+        bool isReplay =
+            GameManager.Instance != null &&
+            GameManager.Instance.IsEndingReplay;
 
-        // 리플레이가 아닐 때만 엔딩/업적 팝업을 배경(크레딧 종료 화면) 위에 띄우고,
-        // 전부 닫힐 때까지 대기한 뒤 자동으로 복귀한다.
         if (!isReplay && AchievementManager.Instance != null)
         {
             AchievementManager.Instance.OnEndingConfirmed(EndingId);
-            yield return new WaitUntil(() => !AchievementManager.Instance.HasPendingPopups);
+
+            yield return new WaitUntil(
+                () => !AchievementManager.Instance.HasPendingPopups
+            );
         }
 
         if (GameManager.Instance != null)
         {
             if (GameManager.Instance.IsEndingReplay)
-            {
                 GameManager.Instance.EndEndingReplay();
-            }
             else
-            {
                 GameManager.Instance.ReturnToMainMenuFromEnding();
-            }
         }
+    }
+
+    private void ConfigureCreditsImage()
+    {
+        if (creditsImage == null)
+            return;
+
+        RectTransform rect = creditsImage.rectTransform;
+        RectTransform parentRect = rect.parent as RectTransform;
+
+        if (parentRect == null)
+            return;
+
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+
+        rect.offsetMin = new Vector2(0f, rect.offsetMin.y);
+        rect.offsetMax = new Vector2(0f, rect.offsetMax.y);
+
+        if (creditsImage.sprite != null)
+        {
+            float imageWidth = parentRect.rect.width;
+
+            float aspectRatio =
+                creditsImage.sprite.rect.height /
+                creditsImage.sprite.rect.width;
+
+            float imageHeight = imageWidth * aspectRatio;
+
+            rect.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Vertical,
+                imageHeight
+            );
+        }
+
+        creditsImage.preserveAspect = true;
     }
 
     private IEnumerator FadeToBlack()
     {
         if (fadeImage == null)
-        {
             yield break;
-        }
 
         fadeImage.gameObject.SetActive(true);
 
@@ -409,9 +408,7 @@ public class HiddenManager : MonoBehaviour
     private IEnumerator FadeInFromBlack()
     {
         if (fadeImage == null)
-        {
             yield break;
-        }
 
         fadeImage.gameObject.SetActive(true);
 
@@ -444,18 +441,29 @@ public class HiddenManager : MonoBehaviour
 
     private IEnumerator ScrollCredits()
     {
-        if (creditsText == null)
-        {
+        if (creditsImage == null)
             yield break;
-        }
 
-        while (creditsText.anchoredPosition.y < creditsEndY)
+        RectTransform rect = creditsImage.rectTransform;
+        RectTransform parentRect = rect.parent as RectTransform;
+
+        if (parentRect == null)
+            yield break;
+
+        float viewportHeight = parentRect.rect.height;
+        float imageHeight = rect.rect.height;
+
+        Vector2 position = rect.anchoredPosition;
+        position.y = -viewportHeight;
+
+        rect.anchoredPosition = position;
+
+        while (rect.anchoredPosition.y < imageHeight)
         {
-            Vector2 position = creditsText.anchoredPosition;
-
+            position = rect.anchoredPosition;
             position.y += creditsSpeed * Time.deltaTime;
 
-            creditsText.anchoredPosition = position;
+            rect.anchoredPosition = position;
 
             yield return null;
         }
@@ -464,9 +472,7 @@ public class HiddenManager : MonoBehaviour
     private void PlayBGM()
     {
         if (bgmSource == null)
-        {
             return;
-        }
 
         bgmSource.volume = 0f;
         bgmSource.Play();
@@ -495,8 +501,6 @@ public class HiddenManager : MonoBehaviour
         }
 
         if (bgmSource != null)
-        {
             bgmSource.volume = 1f;
-        }
     }
 }
