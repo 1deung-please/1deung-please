@@ -31,17 +31,14 @@ public class HiddenManager : MonoBehaviour
     [Header("Credits Image")]
     [SerializeField] private Image creditsImage;
     [SerializeField] private float creditsSpeed = 100f;
+    [SerializeField] private float mouseWheelSpeed = 3000f;   // PC 휠 스크롤 감도 (선택)
+    [SerializeField] private float resumeDelay = 0f;
 
     private const string EndingId = "히든";
 
     private bool isTyping = false;
     private bool clickRequested = false;
     private bool endingFinished = false;
-
-    // 크레딧 수동 드래그 조작을 위한 변수
-    private bool isUserDragging = false;
-    private Vector3 lastMousePosition;
-    private RectTransform creditsRect;
 
     private void Start()
     {
@@ -58,48 +55,13 @@ public class HiddenManager : MonoBehaviour
             nameText.text = "";
 
         if (creditsImage != null)
-        {
             creditsImage.gameObject.SetActive(false);
-            creditsRect = creditsImage.rectTransform;
-        }
 
         StartCoroutine(EndingStart());
     }
 
     private void Update()
     {
-        if (UIInputGate.IsBlocked)
-            return;
-
-        // 크레딧 재생 중일 때 마우스/터치 드래그로 수동 스크롤 처리
-        if (creditsImage != null && creditsImage.gameObject.activeSelf)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                isUserDragging = true;
-                lastMousePosition = Input.mousePosition;
-            }
-            else if (Input.GetMouseButton(0) && isUserDragging)
-            {
-                Vector3 delta = Input.mousePosition - lastMousePosition;
-                lastMousePosition = Input.mousePosition;
-
-                if (creditsRect != null)
-                {
-                    Vector2 position = creditsRect.anchoredPosition;
-                    position.y += delta.y; // 위로 드래그하면 크레딧이 위로, 아래로 드래그하면 아래로 이동
-                    creditsRect.anchoredPosition = position;
-                }
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                isUserDragging = false;
-            }
-
-            return; // 크레딧 재생 중에는 아래의 일반 대화 클릭 입력을 무시함
-        }
-
-        // 일반 대화 진행 중 클릭 처리
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;
@@ -490,23 +452,88 @@ public class HiddenManager : MonoBehaviour
         if (parentRect == null)
             yield break;
 
+        Canvas canvas = parentRect.GetComponentInParent<Canvas>();
+        Camera uiCamera = null;
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            uiCamera = canvas.worldCamera;
+
         float viewportHeight = parentRect.rect.height;
         float imageHeight = rect.rect.height;
 
-        Vector2 position = rect.anchoredPosition;
-        position.y = -viewportHeight;
+        float minY = -viewportHeight;   // 크레딧이 화면 아래에 막 걸쳐 있는 위치
+        float maxY = imageHeight;       // 크레딧이 화면 위로 완전히 사라진 위치
 
+        Vector2 position = rect.anchoredPosition;
+        position.y = minY;
         rect.anchoredPosition = position;
 
-        // 크레딧이 다 올라갈 때까지 반복
-        while (rect.anchoredPosition.y < imageHeight)
+        bool isDragging = false;
+        Vector2 lastLocalPoint = Vector2.zero;
+        float resumeTimer = 0f;
+
+        while (true)
         {
-            // 유저가 드래그 중이 아닐 때만 자동으로 위로 올라감
-            if (!isUserDragging)
+            // 드래그 시작 (터치도 Input.GetMouseButton으로 처리됨)
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        parentRect, Input.mousePosition, uiCamera, out lastLocalPoint))
+                {
+                    isDragging = true;
+                }
+            }
+
+            // 드래그 중: 손가락을 따라 이동
+            if (isDragging && Input.GetMouseButton(0))
+            {
+                Vector2 currentLocalPoint;
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        parentRect, Input.mousePosition, uiCamera, out currentLocalPoint))
+                {
+                    float deltaY = currentLocalPoint.y - lastLocalPoint.y;
+                    lastLocalPoint = currentLocalPoint;
+
+                    position = rect.anchoredPosition;
+                    position.y = Mathf.Clamp(position.y + deltaY, minY, maxY);
+                    rect.anchoredPosition = position;
+                }
+            }
+            // 드래그 종료
+            else if (isDragging)
+            {
+                isDragging = false;
+                resumeTimer = resumeDelay;
+            }
+
+            // 마우스 휠 (PC) - 휠 위로 = 내용 아래로, 휠 아래로 = 내용 위로
+            float wheel = Input.mouseScrollDelta.y;
+            if (!isDragging && Mathf.Abs(wheel) > 0.01f)
             {
                 position = rect.anchoredPosition;
-                position.y += creditsSpeed * Time.deltaTime;
+                position.y = Mathf.Clamp(
+                    position.y - wheel * mouseWheelSpeed * Time.deltaTime,
+                    minY, maxY);
                 rect.anchoredPosition = position;
+                resumeTimer = resumeDelay;
+            }
+
+            // 드래그 중이 아닐 때만 자동 스크롤
+            if (!isDragging)
+            {
+                if (resumeTimer > 0f)
+                {
+                    resumeTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    position = rect.anchoredPosition;
+                    position.y += creditsSpeed * Time.deltaTime;
+                    rect.anchoredPosition = position;
+
+                    // 끝까지 올라가면 종료
+                    if (position.y >= maxY)
+                        break;
+                }
             }
 
             yield return null;
