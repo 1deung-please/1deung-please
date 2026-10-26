@@ -38,6 +38,11 @@ public class HiddenManager : MonoBehaviour
     private bool clickRequested = false;
     private bool endingFinished = false;
 
+    // 크레딧 수동 드래그 조작을 위한 변수
+    private bool isUserDragging = false;
+    private Vector3 lastMousePosition;
+    private RectTransform creditsRect;
+
     private void Start()
     {
         if (dialogueUI != null)
@@ -53,7 +58,10 @@ public class HiddenManager : MonoBehaviour
             nameText.text = "";
 
         if (creditsImage != null)
+        {
             creditsImage.gameObject.SetActive(false);
+            creditsRect = creditsImage.rectTransform;
+        }
 
         StartCoroutine(EndingStart());
     }
@@ -63,6 +71,35 @@ public class HiddenManager : MonoBehaviour
         if (UIInputGate.IsBlocked)
             return;
 
+        // 크레딧 재생 중일 때 마우스/터치 드래그로 수동 스크롤 처리
+        if (creditsImage != null && creditsImage.gameObject.activeSelf)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                isUserDragging = true;
+                lastMousePosition = Input.mousePosition;
+            }
+            else if (Input.GetMouseButton(0) && isUserDragging)
+            {
+                Vector3 delta = Input.mousePosition - lastMousePosition;
+                lastMousePosition = Input.mousePosition;
+
+                if (creditsRect != null)
+                {
+                    Vector2 position = creditsRect.anchoredPosition;
+                    position.y += delta.y; // 위로 드래그하면 크레딧이 위로, 아래로 드래그하면 아래로 이동
+                    creditsRect.anchoredPosition = position;
+                }
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                isUserDragging = false;
+            }
+
+            return; // 크레딧 재생 중에는 아래의 일반 대화 클릭 입력을 무시함
+        }
+
+        // 일반 대화 진행 중 클릭 처리
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;
@@ -461,12 +498,16 @@ public class HiddenManager : MonoBehaviour
 
         rect.anchoredPosition = position;
 
+        // 크레딧이 다 올라갈 때까지 반복
         while (rect.anchoredPosition.y < imageHeight)
         {
-            position = rect.anchoredPosition;
-            position.y += creditsSpeed * Time.deltaTime;
-
-            rect.anchoredPosition = position;
+            // 유저가 드래그 중이 아닐 때만 자동으로 위로 올라감
+            if (!isUserDragging)
+            {
+                position = rect.anchoredPosition;
+                position.y += creditsSpeed * Time.deltaTime;
+                rect.anchoredPosition = position;
+            }
 
             yield return null;
         }
