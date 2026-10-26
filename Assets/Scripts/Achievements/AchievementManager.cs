@@ -51,6 +51,10 @@ public class AchievementManager : MonoBehaviour
     private bool isShowingPopup = false;
     public bool IsPopupActive => isShowingPopup;
 
+    // 큐에 남은 팝업이 있거나 지금 뭔가 표시 중이면 true.
+    // 엔딩 씬 등에서 "엔딩/업적 팝업이 전부 닫힐 때까지 대기"할 때 사용.
+    public bool HasPendingPopups => isShowingPopup || pendingQueue.Count > 0;
+
     void Awake()
     {
         if (Instance == null)
@@ -71,6 +75,8 @@ public class AchievementManager : MonoBehaviour
         data.tutorialNoButtonCount = noCount;
         if (data.tutorialNoButtonCount >= 10)
             TryUnlock(1);
+
+        TryProcessNext();
     }
 
     public void OnMiniGameResult(MiniGameKind kind, bool success)
@@ -102,6 +108,8 @@ public class AchievementManager : MonoBehaviour
                 if (kind == MiniGameKind.LogicFortress) TryUnlock(4);
             }
         }
+
+        TryProcessNext();
     }
 
     public void OnGlobalTimerEnd()
@@ -117,6 +125,8 @@ public class AchievementManager : MonoBehaviour
         if (onlyTrash) TryUnlock(6);
         if (onlyLogic) TryUnlock(7);
         if (onlyDontMove) TryUnlock(8);
+
+        TryProcessNext();
     }
 
     public void OnEndingConfirmed(string endingId)
@@ -144,15 +154,44 @@ public class AchievementManager : MonoBehaviour
         {
             TryUnlock(12);
         }
+
+        // 이 이벤트에서 해금된 엔딩/업적이 전부 큐에 들어간 뒤, 정렬된 순서(엔딩 > 업적 우선순위)대로
+        // 한 번에 처리 시작 - 중간에 개별적으로 먼저 튀어나가는 것을 방지
+        TryProcessNext();
     }
 
-    public void TryUnlockPublic(int id) => TryUnlock(id);
+    public void TryUnlockPublic(int id)
+    {
+        TryUnlock(id);
+        TryProcessNext();
+    }
 
     bool TryUnlock(int id)
     {
-        if (AchievementStorage.IsUnlocked(id)) return false;
+        if (AchievementStorage.IsUnlocked(id))
+        {
+            Debug.Log($"[Achievement] ID {id} 는 이미 해금되어 있어 팝업을 띄우지 않음");
+            return false;
+        }
+
+        Debug.Log($"[Achievement] ID {id} 신규 해금 -> 큐에 추가");
         AchievementStorage.Unlock(id);
         EnqueueAchievement(id);
+
+        // 20번(1~19 모두 달성) 자체는 여기서 재귀 체크하지 않음 - id가 20이면 아래 조건이 항상 false
+        if (id != 20 && IsAllOfFirst19Unlocked())
+            TryUnlock(20);
+
+        return true;
+    }
+
+    bool IsAllOfFirst19Unlocked()
+    {
+        for (int i = 1; i <= 19; i++)
+        {
+            if (!AchievementStorage.IsUnlocked(i))
+                return false;
+        }
         return true;
     }
 
@@ -162,14 +201,12 @@ public class AchievementManager : MonoBehaviour
     {
         pendingQueue.Add(new PopupRequest { isEnding = false, achievementId = id });
         SortQueue();
-        TryProcessNext();
     }
 
     void EnqueueEnding(string endingId)
     {
         pendingQueue.Add(new PopupRequest { isEnding = true, endingId = endingId });
         SortQueue();
-        TryProcessNext();
     }
 
     // 엔딩 > 업적, 엔딩끼리는 지정된 순서, 업적끼리는 id 오름차순
@@ -214,6 +251,7 @@ public class AchievementManager : MonoBehaviour
     {
         if (achievementPopup == null)
         {
+            Debug.LogWarning("[Achievement] achievementPopup 참조가 비어있어 팝업을 표시할 수 없음");
             OnPopupFinished();
             return;
         }
@@ -221,6 +259,8 @@ public class AchievementManager : MonoBehaviour
         var info = GetAchievementInfo(id);
         if (info == null)
         {
+            Debug.LogWarning($"[Achievement] ID {id}에 해당하는 AchievementInfo를 achievementList에서 찾지 못함 -> 팝업 스킵됨. " +
+                              $"achievementList 에셋에 id={id} 항목이 있는지 확인 필요");
             OnPopupFinished();
             return;
         }
@@ -234,7 +274,7 @@ public class AchievementManager : MonoBehaviour
         }
 
         if (achievementTitleText != null)
-            achievementTitleText.text = info.title;
+            achievementTitleText.text = $"No.{id} {info.title}";
 
         if (achievementDescriptionText != null)
             achievementDescriptionText.text = info.description;
@@ -246,6 +286,7 @@ public class AchievementManager : MonoBehaviour
             sfxSource.PlayOneShot(achievementSfx);
 
         achievementPopup.SetActive(true);
+        Debug.Log($"[Achievement] ID {id} 팝업 표시됨 (No.{id} {info.title})");
 
         // 자동 닫힘 없이, 화면 터치(팝업 버튼/오버레이 클릭)로만 닫힘 - CloseAchievementPopup() 참고
     }
@@ -300,7 +341,11 @@ public class AchievementManager : MonoBehaviour
 
     AchievementInfo GetAchievementInfo(int id)
     {
-        if (achievementList == null) return null;
+        if (achievementList == null)
+        {
+            Debug.LogWarning("[Achievement] achievementList 참조가 비어있음 (인스펙터에서 AchievementListData 할당 필요)");
+            return null;
+        }
         foreach (var info in achievementList.achievements)
             if (info.id == id) return info;
         return null;
@@ -380,5 +425,21 @@ public class AchievementManager : MonoBehaviour
         }
 
         Debug.Log("[AchievementManager] 모든 엔딩 테스트용 해금 완료");
+    }
+
+    // [테스트용] 4개 일반 엔딩 중 3개만 해금 (얄팍한속셈/자격미달/절반의성공)
+    [ContextMenu("Test - Unlock 3 Endings (진정한귀인 제외)")]
+    public void TestUnlockThreeEndings()
+    {
+        string[] threeEndings = { "얄팍한속셈", "자격미달", "절반의성공" };
+        int[] linkedAchievementIds = { 14, 15, 16 };
+
+        for (int i = 0; i < threeEndings.Length; i++)
+        {
+            EndingStorage.Unlock(threeEndings[i]);
+            AchievementStorage.Unlock(linkedAchievementIds[i]);
+        }
+
+        Debug.Log("[AchievementManager] 엔딩 3개(얄팍한속셈/자격미달/절반의성공) 테스트용 해금 완료 - 진정한귀인만 남음");
     }
 }

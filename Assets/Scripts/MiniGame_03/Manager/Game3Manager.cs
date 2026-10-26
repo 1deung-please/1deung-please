@@ -24,6 +24,7 @@ public class Game3Manager : MonoBehaviour
     private Coroutine blinkCoroutine;
 
     private bool gameStarted = false;
+    private bool isStarting = false;
 
     [Header("결과 화면")]
     public GameObject resultPanel;
@@ -301,6 +302,16 @@ public class Game3Manager : MonoBehaviour
     //게임 시작할 때
     private void StartGame()
     {
+         // 이미 시작 중이거나 게임이 시작됐으면 추가 터치 무시
+        if (isStarting || gameStarted)
+            return;
+
+        isStarting = true;
+
+        // 시작 버튼도 즉시 비활성화
+        if (readyButton != null)
+            readyButton.interactable = false;
+
         StartCoroutine(FlashThenStart());
     }
 
@@ -344,6 +355,7 @@ public class Game3Manager : MonoBehaviour
         }
 
         gameStarted = true;
+        isStarting = false;
 
         if (ReadyPanel != null)
             ReadyPanel.SetActive(false);

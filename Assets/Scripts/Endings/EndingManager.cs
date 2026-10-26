@@ -65,15 +65,27 @@ public class EndingManager : MonoBehaviour
         string endingId;
         string sceneName;
 
-        bool allPlayed =
-            gameData.playedGames[0] &&
-            gameData.playedGames[1] &&
-            gameData.playedGames[2];
+        int unplayedCount = 0;
+        foreach (bool played in gameData.playedGames)
+        {
+            if (!played)
+            {
+                unplayedCount++;
+            }
+        }
 
-        if (!allPlayed)
+        bool noneAtAllPlayed = unplayedCount == gameData.playedGames.Length; // 전부 미플레이
+        bool hasUnplayedGame = unplayedCount > 0;                            // 하나라도 미플레이
+
+        if (noneAtAllPlayed)
         {
             endingId = "자격미달";
             sceneName = "Ending_Unqualified";
+        }
+        else if (hasUnplayedGame)
+        {
+            endingId = "얄팍한속셈";
+            sceneName = "Ending_Shallow";
         }
         else
         {
@@ -104,7 +116,8 @@ public class EndingManager : MonoBehaviour
         if (AchievementStorage.IsUnlocked(14)
             && AchievementStorage.IsUnlocked(15)
             && AchievementStorage.IsUnlocked(16)
-            && AchievementStorage.IsUnlocked(17))
+            && AchievementStorage.IsUnlocked(17)
+            && !EndingStorage.IsUnlocked("히든"))
         {
             endingId = "히든";
             sceneName = "Ending_Hidden";

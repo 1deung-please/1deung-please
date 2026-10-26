@@ -247,11 +247,27 @@ public class ShallowManager : MonoBehaviour
         if (portraitImage != null)
             portraitImage.gameObject.SetActive(false);
 
-        // 가방에서 "다시보기"로 재생한 경우: 버튼 없이 자동으로 로비+가방으로 복귀
+        // 가방에서 "다시보기"로 재생한 경우: 팝업 없이 곧바로 로비+가방으로 자동 복귀
         if (GameManager.Instance != null && GameManager.Instance.IsEndingReplay)
         {
             GameManager.Instance.EndEndingReplay();
             return;
+        }
+
+        // 배경만 남은 지금 상태에서 엔딩/업적 팝업을 띄우고,
+        // 전부 닫힐 때까지 기다린 뒤에야 "다시 도전하기" 버튼을 노출한다.
+        StartCoroutine(ConfirmEndingThenShowRetryButton());
+    }
+
+    private const string EndingId = "얄팍한속셈";
+
+    private IEnumerator ConfirmEndingThenShowRetryButton()
+    {
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnEndingConfirmed(EndingId);
+
+            yield return new WaitUntil(() => !AchievementManager.Instance.HasPendingPopups);
         }
 
         if (tryAgainButton != null)
@@ -260,49 +276,48 @@ public class ShallowManager : MonoBehaviour
 
     private string GetMostPlayedGame()
     {
-        int max = gameData.playCount[0];
-        int index = 0;
+        // 우선순위: 주워줘 쓰레기(0) > 이걸 안 비켜(1) > 출격 논리요새(2)
+        int[] priorityOrder = { 0, 1, 2 };
 
-        for (int i = 1; i < gameData.playCount.Length; i++)
+        int maxCount = -1;
+
+        // 1) 플레이한 게임 중 최대 플레이 횟수
+        for (int i = 0; i < gameData.playCount.Length; i++)
         {
-            if (gameData.playCount[i] > max)
+            if (gameData.playedGames[i] && gameData.playCount[i] > maxCount)
             {
-                max = gameData.playCount[i];
-                index = i;
+                maxCount = gameData.playCount[i];
             }
         }
 
-        switch (index)
+        // 2) 최대 횟수와 같은 게임 중 우선순위가 가장 높은 것 선택
+        foreach (int index in priorityOrder)
         {
-            case 0:
-                return "이걸 안 비켜?";
-
-            case 1:
-                return "출격! 논리요새";
-
-            case 2:
-                return "주워줘, 쓰레기";
+            if (gameData.playedGames[index] && gameData.playCount[index] == maxCount)
+            {
+                return GetGameName(index);
+            }
         }
 
         return "";
     }
 
-    // 엔딩 씬 종료 후 메인메뉴로 돌아갈 때 - GameManager를 통해 전환하면
-    // 업적/엔딩 팝업이 메인메뉴 전환 완료 후 표시됨
-    public void GoToMainMenu()
+    private string GetGameName(int index)
     {
-        bool allNormalEndings =
-            EndingStorage.IsUnlocked("자격미달") &&
-            EndingStorage.IsUnlocked("절반의성공") &&
-            EndingStorage.IsUnlocked("진정한귀인");
-
-        if (allNormalEndings)
+        switch (index)
         {
-            Debug.Log("일반 엔딩 3개 확인 완료 → 히든 엔딩으로 이동");
-            SceneManager.LoadScene("Ending_Hidden");
-            return;
+            case 0: return "주워줘, 쓰레기";
+            case 1: return "이걸 안 비켜?";
+            case 2: return "출격! 논리요새";
         }
 
+        return "";
+    }
+
+    // 엔딩 씬 종료 후 메인메뉴(또는 히든 엔딩)로 돌아갈 때
+    // - 엔딩/업적 팝업은 이미 위에서 다 처리했으므로, GameManager는 씬 라우팅만 담당
+    public void GoToMainMenu()
+    {
         if (GameManager.Instance != null)
             GameManager.Instance.ReturnToMainMenuFromEnding();
         else

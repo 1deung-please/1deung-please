@@ -22,7 +22,7 @@ public class ScratchLotteryManager : MonoBehaviour
 
     [Header("Ending Fade")]
     [SerializeField] private CanvasGroup fadePanel;
-    [SerializeField] private float fadeDuration = 1.0f;  
+    [SerializeField] private float fadeDuration = 1.0f;
 
     private Texture2D runtimeTexture;
     private RectTransform scratchGrayRect;
@@ -40,11 +40,14 @@ public class ScratchLotteryManager : MonoBehaviour
     private bool endingStarted = false;
     private Canvas parentCanvas;
 
+    private Coroutine guideTextCoroutine;
+    private bool wasGuideTextVisible = false;
+    private Vector2? lastMousePosition = null;
+
     private void Start()
     {
         if (scratchPanel != null) scratchPanel.SetActive(false);
 
-        // 1. FadePanel 초기화
         if (fadePanel != null)
         {
             fadePanel.gameObject.SetActive(true);
@@ -52,7 +55,6 @@ public class ScratchLotteryManager : MonoBehaviour
             fadePanel.blocksRaycasts = false;
         }
 
-        // 2. 가이드 글자 Raycast 해제
         if (scratchGuideText != null)
         {
             Graphic guideGraphic = scratchGuideText.GetComponent<Graphic>();
@@ -78,7 +80,6 @@ public class ScratchLotteryManager : MonoBehaviour
 
         scratchGrayRect = scratchGray.GetComponent<RectTransform>();
 
-        // 런타임용 텍스처 생성 및 원본 복사
         runtimeTexture = new Texture2D(original.width, original.height, TextureFormat.RGBA32, false);
         Color[] sourcePixels = original.GetPixels();
 
@@ -103,7 +104,6 @@ public class ScratchLotteryManager : MonoBehaviour
         ApplyRuntimeTexture();
         scratchAfter.SetActive(true);
 
-        // 시작 시 초기 위치 설정
         ResetCoinPosition();
     }
 
@@ -136,34 +136,77 @@ public class ScratchLotteryManager : MonoBehaviour
 
     private void Update()
     {
+        CheckGuideTextVisibility();
+
         if (endingStarted || scratchPanel == null || !scratchPanel.activeSelf) return;
 
-        // 터치/마우스 누름 시작
         if (Input.GetMouseButtonDown(0))
         {
             isDragging = true;
             HideGuideText();
 
             UpdateCoinPosition();
-            ScratchAtMouse();
+            ScratchAtMouse(Input.mousePosition);
+            lastMousePosition = Input.mousePosition;
         }
 
-        // 터치/마우스 드래그 중
         if (Input.GetMouseButton(0) && isDragging)
         {
             HideGuideText();
             UpdateCoinPosition();
-            ScratchAtMouse();
+
+            if (lastMousePosition.HasValue)
+            {
+                float distance = Vector2.Distance(lastMousePosition.Value, Input.mousePosition);
+                float step = Mathf.Max(1f, brushSize * 0.25f);
+                int steps = Mathf.CeilToInt(distance / step);
+
+                for (int i = 0; i <= steps; i++)
+                {
+                    float t = (steps == 0) ? 0f : (float)i / steps;
+                    Vector2 samplePoint = Vector2.Lerp(lastMousePosition.Value, Input.mousePosition, t);
+                    ScratchAtMouse(samplePoint);
+                }
+            }
+            else
+            {
+                ScratchAtMouse(Input.mousePosition);
+            }
+
+            lastMousePosition = Input.mousePosition;
         }
 
-        // 터치/마우스 뗌 (되돌아가지 않고 현재 위치에 가만히 둠)
         if (Input.GetMouseButtonUp(0))
         {
             isDragging = false;
+            lastMousePosition = null;
         }
     }
 
-    // 동전 UI 위치를 터치/마우스 좌표로 이동
+    // scratchGuideText가 (부모 포함해서) 실제로 화면에 보이기 시작하는 순간을 감지해
+    // 그 순간부터 1.5초 자동 숨김 타이머를 시작한다.
+    private void CheckGuideTextVisibility()
+    {
+        if (scratchGuideText == null) return;
+
+        bool isVisibleNow = scratchGuideText.activeInHierarchy;
+
+        if (isVisibleNow && !wasGuideTextVisible)
+        {
+            Debug.Log("[Lottery] 가이드텍스트가 실제로 화면에 보이기 시작함 -> 자동 숨김 타이머 시작");
+            if (guideTextCoroutine != null) StopCoroutine(guideTextCoroutine);
+            guideTextCoroutine = StartCoroutine(HideGuideTextAfterDelay(1.5f));
+        }
+        else if (!isVisibleNow && guideTextCoroutine != null)
+        {
+            // 보이지 않게 된 상태(예: 패널이 다시 꺼짐)라면 진행 중이던 타이머는 정리
+            StopCoroutine(guideTextCoroutine);
+            guideTextCoroutine = null;
+        }
+
+        wasGuideTextVisible = isVisibleNow;
+    }
+
     private void UpdateCoinPosition()
     {
         if (coinUI == null || parentCanvas == null) return;
@@ -180,7 +223,6 @@ public class ScratchLotteryManager : MonoBehaviour
         }
     }
 
-    // 초기 실행 시 혹은 복권 창을 열 때 설정된 지정 위치로 동전 배치
     private void ResetCoinPosition()
     {
         if (coinUI != null)
@@ -192,19 +234,25 @@ public class ScratchLotteryManager : MonoBehaviour
 
     public void HideGuideText()
     {
+        if (guideTextCoroutine != null)
+        {
+            StopCoroutine(guideTextCoroutine);
+            guideTextCoroutine = null;
+        }
+
         if (scratchGuideText != null && scratchGuideText.activeSelf)
         {
             scratchGuideText.SetActive(false);
         }
     }
 
-    private void ScratchAtMouse()
+    private void ScratchAtMouse(Vector2 screenPos)
     {
         if (runtimeTexture == null || scratchGrayRect == null) return;
 
         Camera cam = (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay) ? parentCanvas.worldCamera : null;
 
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(scratchGrayRect, Input.mousePosition, cam, out Vector2 localPosition))
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(scratchGrayRect, screenPos, cam, out Vector2 localPosition))
         {
             float width = scratchGrayRect.rect.width;
             float height = scratchGrayRect.rect.height;
@@ -269,12 +317,17 @@ public class ScratchLotteryManager : MonoBehaviour
 
     public void ShowLottery()
     {
+        Debug.Log($"[Lottery] ShowLottery 호출됨. 시각={Time.realtimeSinceStartup:F2}, 활성상태={gameObject.activeInHierarchy}");
+
         if (scratchPanel == null) return;
 
         scratchPanel.SetActive(true);
 
         if (scratchGuideText != null)
+        {
             scratchGuideText.SetActive(true);
+            // 자동 숨김 타이머는 Update()의 CheckGuideTextVisibility()가 처리함
+        }
 
         if (scratchAfter != null)
             scratchAfter.SetActive(true);
@@ -286,6 +339,21 @@ public class ScratchLotteryManager : MonoBehaviour
             fadePanel.alpha = 0f;
 
         ResetCoinPosition();
+    }
+
+    private IEnumerator HideGuideTextAfterDelay(float delay)
+    {
+        float startTime = Time.realtimeSinceStartup;
+        // Time.timeScale이 0이어도 멈추지 않도록 실시간 기준으로 대기
+        yield return new WaitForSecondsRealtime(delay);
+
+        Debug.Log($"[Lottery] {delay}초 대기 완료 (실제 경과: {Time.realtimeSinceStartup - startTime:F2}초). 가이드텍스트를 끕니다.");
+
+        if (scratchGuideText != null)
+        {
+            scratchGuideText.SetActive(false);
+        }
+        guideTextCoroutine = null;
     }
 
     private void StartEnding()

@@ -51,6 +51,9 @@ public class TrueBenefactorManager : MonoBehaviour
     [SerializeField] private AudioSource bgmSource;
     [SerializeField] private float bgmFadeInDuration = 4f;
 
+    // 이 씬이 담당하는 엔딩 ID - AchievementManager.OnEndingConfirmed에 그대로 전달됨
+    private const string EndingId = "진정한귀인";
+
     private bool clickRequested = false;
     private Coroutine typingCoroutine;
 
@@ -170,7 +173,7 @@ public class TrueBenefactorManager : MonoBehaviour
 
         yield return Dialogue(
             "조상신",
-            "돈이 없어 삼각김밥 하나로 하루를 버틸 때도...",
+            "돈이 없어 삼각김밥 하나로 하루를 버틸 때도..",
             ancestorGod,
             EndingAnimation.None
         );
@@ -192,7 +195,7 @@ public class TrueBenefactorManager : MonoBehaviour
         );
 
         RestoreBackgroundAnimation(EndingAnimation.Animation1);
-
+        
         yield return Dialogue(
             "조상신",
             "난 늘 네 곁에서 가슴을 쥐어짜며 함께 울고 있었다.",
@@ -513,31 +516,35 @@ public class TrueBenefactorManager : MonoBehaviour
         if (portraitImage != null)
             portraitImage.gameObject.SetActive(false);
 
-        // 가방에서 "다시보기"로 재생한 경우: 버튼 없이 자동으로 로비+가방으로 복귀
+        // 가방에서 "다시보기"로 재생한 경우: 팝업 없이 곧바로 로비+가방으로 자동 복귀
         if (GameManager.Instance != null && GameManager.Instance.IsEndingReplay)
         {
             GameManager.Instance.EndEndingReplay();
             return;
         }
 
+        // 배경만 남은 지금 상태에서 엔딩/업적 팝업을 띄우고,
+        // 전부 닫힐 때까지 기다린 뒤에야 "다시 도전하기" 버튼을 노출한다.
+        StartCoroutine(ConfirmEndingThenShowRetryButton());
+    }
+
+    private IEnumerator ConfirmEndingThenShowRetryButton()
+    {
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnEndingConfirmed(EndingId);
+
+            yield return new WaitUntil(() => !AchievementManager.Instance.HasPendingPopups);
+        }
+
         if (tryAgainButton != null)
             tryAgainButton.gameObject.SetActive(true);
     }
 
+    // 엔딩 씬 종료 후 메인메뉴(또는 히든 엔딩)로 돌아갈 때
+    // - 엔딩/업적 팝업은 이미 위에서 다 처리했으므로, GameManager는 씬 라우팅만 담당
     public void GoToMainMenu()
     {
-        bool allNormalEndings =
-            EndingStorage.IsUnlocked("자격미달") &&
-            EndingStorage.IsUnlocked("절반의성공") &&
-            EndingStorage.IsUnlocked("진정한귀인");
-
-        if (allNormalEndings)
-        {
-            Debug.Log("일반 엔딩 3개 확인 완료 → 히든 엔딩으로 이동");
-            SceneManager.LoadScene("Ending_Hidden");
-            return;
-        }
-
         if (GameManager.Instance != null)
             GameManager.Instance.ReturnToMainMenuFromEnding();
         else

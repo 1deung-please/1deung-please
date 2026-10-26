@@ -11,6 +11,7 @@ public class HiddenManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject dialogueUI;
 
     [Header("Portrait")]
     [SerializeField] private Image portraitImage;
@@ -27,11 +28,13 @@ public class HiddenManager : MonoBehaviour
     [SerializeField] private AudioSource bgmSource;
     [SerializeField] private float bgmFadeInDuration = 4f;
 
-    [Header("Credits")]
-    [SerializeField] private RectTransform creditsText;
-    [SerializeField] private float creditsSpeed = 50f;
-    [SerializeField] private float creditsStartY = -800f;
-    [SerializeField] private float creditsEndY = 1500f;
+    [Header("Credits Image")]
+    [SerializeField] private Image creditsImage;
+    [SerializeField] private float creditsSpeed = 100f;
+    [SerializeField] private float mouseWheelSpeed = 3000f;   // PC 휠 스크롤 감도 (선택)
+    [SerializeField] private float resumeDelay = 0f;
+
+    private const string EndingId = "히든";
 
     private bool isTyping = false;
     private bool clickRequested = false;
@@ -39,25 +42,20 @@ public class HiddenManager : MonoBehaviour
 
     private void Start()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         if (nameText != null)
-        {
             nameText.text = "";
-        }
 
-        if (creditsText != null)
-        {
-            creditsText.gameObject.SetActive(false);
-        }
+        if (creditsImage != null)
+            creditsImage.gameObject.SetActive(false);
 
         StartCoroutine(EndingStart());
     }
@@ -75,13 +73,9 @@ public class HiddenManager : MonoBehaviour
                 if (GameManager.Instance != null)
                 {
                     if (GameManager.Instance.IsEndingReplay)
-                    {
                         GameManager.Instance.EndEndingReplay();
-                    }
                     else
-                    {
                         GameManager.Instance.ReturnToMainMenuFromEnding();
-                    }
                 }
             }
         }
@@ -92,7 +86,6 @@ public class HiddenManager : MonoBehaviour
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(true);
-
             Color color = fadeImage.color;
             color.a = 1f;
             fadeImage.color = color;
@@ -121,13 +114,13 @@ public class HiddenManager : MonoBehaviour
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "사실 이 게임에서 가장 얻기 어려운 건 1등 당첨이 아니라...",
             ancestorGod
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "엔딩 4개를 모두 보는 것이었답니다!",
             ancestorGod
         );
@@ -145,7 +138,7 @@ public class HiddenManager : MonoBehaviour
         );
 
         yield return Dialogue(
-            "조상님",
+            "조상신",
             "언젠가 현실에서도 좋은 일이 찾아오길 바랍니다.",
             ancestorGod
         );
@@ -179,10 +172,11 @@ public class HiddenManager : MonoBehaviour
 
     private IEnumerator FirstDialogue()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (nameText != null)
-        {
             nameText.text = "???";
-        }
 
         if (portraitImage != null)
         {
@@ -194,9 +188,7 @@ public class HiddenManager : MonoBehaviour
         }
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         clickRequested = false;
         isTyping = true;
@@ -205,12 +197,16 @@ public class HiddenManager : MonoBehaviour
 
         foreach (char c in text)
         {
-            dialogueText.text += c;
+            if (dialogueText != null)
+                dialogueText.text += c;
 
             yield return new WaitForSeconds(0.05f);
         }
 
         isTyping = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
 
         clickRequested = false;
 
@@ -219,19 +215,16 @@ public class HiddenManager : MonoBehaviour
         clickRequested = false;
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         if (nameText != null)
-        {
             nameText.text = "";
-        }
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
 
         yield return new WaitUntil(() => clickRequested);
 
@@ -242,10 +235,11 @@ public class HiddenManager : MonoBehaviour
 
     private IEnumerator Dialogue(string speaker, string text, Sprite portrait)
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (nameText != null)
-        {
             nameText.text = speaker;
-        }
 
         if (portraitImage != null)
         {
@@ -261,9 +255,7 @@ public class HiddenManager : MonoBehaviour
         }
 
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         isTyping = true;
         clickRequested = false;
@@ -272,73 +264,121 @@ public class HiddenManager : MonoBehaviour
         {
             if (clickRequested)
             {
-                dialogueText.text = text;
+                if (dialogueText != null)
+                    dialogueText.text = text;
+
                 clickRequested = false;
                 break;
             }
 
-            dialogueText.text += c;
+            if (dialogueText != null)
+                dialogueText.text += c;
 
             yield return new WaitForSeconds(0.05f);
         }
 
         isTyping = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(true);
+
         clickRequested = false;
 
         yield return new WaitUntil(() => clickRequested);
 
         clickRequested = false;
+
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
     }
 
     private IEnumerator StartCredits()
     {
+        if (dialogueUI != null)
+            dialogueUI.SetActive(false);
+
         if (dialogueText != null)
-        {
             dialogueText.text = "";
-        }
 
         if (nameText != null)
-        {
             nameText.text = "";
-        }
 
         if (portraitImage != null)
-        {
             portraitImage.gameObject.SetActive(false);
-        }
 
         yield return StartCoroutine(FadeToBlack());
 
-        if (creditsText != null)
+        if (creditsImage != null)
         {
-            creditsText.gameObject.SetActive(true);
-
-            Vector2 position = creditsText.anchoredPosition;
-            position.y = creditsStartY;
-            creditsText.anchoredPosition = position;
+            creditsImage.gameObject.SetActive(true);
+            ConfigureCreditsImage();
         }
 
         yield return StartCoroutine(ScrollCredits());
 
+        bool isReplay =
+            GameManager.Instance != null &&
+            GameManager.Instance.IsEndingReplay;
+
+        if (!isReplay && AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnEndingConfirmed(EndingId);
+
+            yield return new WaitUntil(
+                () => !AchievementManager.Instance.HasPendingPopups
+            );
+        }
+
         if (GameManager.Instance != null)
         {
             if (GameManager.Instance.IsEndingReplay)
-            {
                 GameManager.Instance.EndEndingReplay();
-            }
             else
-            {
                 GameManager.Instance.ReturnToMainMenuFromEnding();
-            }
         }
+    }
+
+    private void ConfigureCreditsImage()
+    {
+        if (creditsImage == null)
+            return;
+
+        RectTransform rect = creditsImage.rectTransform;
+        RectTransform parentRect = rect.parent as RectTransform;
+
+        if (parentRect == null)
+            return;
+
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+
+        rect.offsetMin = new Vector2(0f, rect.offsetMin.y);
+        rect.offsetMax = new Vector2(0f, rect.offsetMax.y);
+
+        if (creditsImage.sprite != null)
+        {
+            float imageWidth = parentRect.rect.width;
+
+            float aspectRatio =
+                creditsImage.sprite.rect.height /
+                creditsImage.sprite.rect.width;
+
+            float imageHeight = imageWidth * aspectRatio;
+
+            rect.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Vertical,
+                imageHeight
+            );
+        }
+
+        creditsImage.preserveAspect = true;
     }
 
     private IEnumerator FadeToBlack()
     {
         if (fadeImage == null)
-        {
             yield break;
-        }
 
         fadeImage.gameObject.SetActive(true);
 
@@ -370,9 +410,7 @@ public class HiddenManager : MonoBehaviour
     private IEnumerator FadeInFromBlack()
     {
         if (fadeImage == null)
-        {
             yield break;
-        }
 
         fadeImage.gameObject.SetActive(true);
 
@@ -405,18 +443,98 @@ public class HiddenManager : MonoBehaviour
 
     private IEnumerator ScrollCredits()
     {
-        if (creditsText == null)
-        {
+        if (creditsImage == null)
             yield break;
-        }
 
-        while (creditsText.anchoredPosition.y < creditsEndY)
+        RectTransform rect = creditsImage.rectTransform;
+        RectTransform parentRect = rect.parent as RectTransform;
+
+        if (parentRect == null)
+            yield break;
+
+        Canvas canvas = parentRect.GetComponentInParent<Canvas>();
+        Camera uiCamera = null;
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            uiCamera = canvas.worldCamera;
+
+        float viewportHeight = parentRect.rect.height;
+        float imageHeight = rect.rect.height;
+
+        float minY = -viewportHeight;   // 크레딧이 화면 아래에 막 걸쳐 있는 위치
+        float maxY = imageHeight;       // 크레딧이 화면 위로 완전히 사라진 위치
+
+        Vector2 position = rect.anchoredPosition;
+        position.y = minY;
+        rect.anchoredPosition = position;
+
+        bool isDragging = false;
+        Vector2 lastLocalPoint = Vector2.zero;
+        float resumeTimer = 0f;
+
+        while (true)
         {
-            Vector2 position = creditsText.anchoredPosition;
+            // 드래그 시작 (터치도 Input.GetMouseButton으로 처리됨)
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        parentRect, Input.mousePosition, uiCamera, out lastLocalPoint))
+                {
+                    isDragging = true;
+                }
+            }
 
-            position.y += creditsSpeed * Time.deltaTime;
+            // 드래그 중: 손가락을 따라 이동
+            if (isDragging && Input.GetMouseButton(0))
+            {
+                Vector2 currentLocalPoint;
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                        parentRect, Input.mousePosition, uiCamera, out currentLocalPoint))
+                {
+                    float deltaY = currentLocalPoint.y - lastLocalPoint.y;
+                    lastLocalPoint = currentLocalPoint;
 
-            creditsText.anchoredPosition = position;
+                    position = rect.anchoredPosition;
+                    position.y = Mathf.Clamp(position.y + deltaY, minY, maxY);
+                    rect.anchoredPosition = position;
+                }
+            }
+            // 드래그 종료
+            else if (isDragging)
+            {
+                isDragging = false;
+                resumeTimer = resumeDelay;
+            }
+
+            // 마우스 휠 (PC) - 휠 위로 = 내용 아래로, 휠 아래로 = 내용 위로
+            float wheel = Input.mouseScrollDelta.y;
+            if (!isDragging && Mathf.Abs(wheel) > 0.01f)
+            {
+                position = rect.anchoredPosition;
+                position.y = Mathf.Clamp(
+                    position.y - wheel * mouseWheelSpeed * Time.deltaTime,
+                    minY, maxY);
+                rect.anchoredPosition = position;
+                resumeTimer = resumeDelay;
+            }
+
+            // 드래그 중이 아닐 때만 자동 스크롤
+            if (!isDragging)
+            {
+                if (resumeTimer > 0f)
+                {
+                    resumeTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    position = rect.anchoredPosition;
+                    position.y += creditsSpeed * Time.deltaTime;
+                    rect.anchoredPosition = position;
+
+                    // 끝까지 올라가면 종료
+                    if (position.y >= maxY)
+                        break;
+                }
+            }
 
             yield return null;
         }
@@ -425,9 +543,7 @@ public class HiddenManager : MonoBehaviour
     private void PlayBGM()
     {
         if (bgmSource == null)
-        {
             return;
-        }
 
         bgmSource.volume = 0f;
         bgmSource.Play();
@@ -456,8 +572,6 @@ public class HiddenManager : MonoBehaviour
         }
 
         if (bgmSource != null)
-        {
             bgmSource.volume = 1f;
-        }
     }
 }

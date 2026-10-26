@@ -58,6 +58,7 @@ public class MiniGame01Controller : MonoBehaviour
     public float resultPanelDelay = 1f; // 실수 클릭 방지를 위한 결과 패널 등장 지연 시간
 
     private MiniGame01Phase currentPhase;
+    private bool isTransitioning = false; // Flash 연출 중 연타로 다음 단계가 조기 트리거되는 것 방지
     private int targetCount;
     private int currentCount;
     private float remainingTime;
@@ -80,7 +81,7 @@ public class MiniGame01Controller : MonoBehaviour
         switch (currentPhase)
         {
             case MiniGame01Phase.Start:
-                if (Input.GetMouseButtonDown(0))
+                if (!isTransitioning && Input.GetMouseButtonDown(0))
                     StartCoroutine(FlashThenReady());
                 break;
 
@@ -146,6 +147,12 @@ public class MiniGame01Controller : MonoBehaviour
 
     IEnumerator FlashThenReady()
     {
+        // Flash 연출이 끝나기 전에 또 클릭이 들어와 이 코루틴이 중복 실행되는 것을 막는다.
+        // (currentPhase를 여기서 바로 Ready로 바꾸면, 연출이 채 안 끝났는데 연타된 클릭이
+        //  Ready 케이스로 들어가 CountdownRoutine이 너무 일찍 시작되고, readyPanel이 그 뒤에
+        //  뒤늦게 떠서 화면이 도로 덮이는 부작용이 생겨서 별도 플래그로 가드한다.)
+        isTransitioning = true;
+
         if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
 
         if (flashPanel != null)
@@ -164,13 +171,16 @@ public class MiniGame01Controller : MonoBehaviour
             flashPanel.SetActive(false);
         }
 
-        currentPhase = MiniGame01Phase.Ready;
         targetCount = Random.Range(minTarget, maxTarget + 1);
 
         if (targetText != null)
             targetText.text = $"흠... {targetCount}개 이상 쓰레기를 줍거라!";
 
         ShowPanel(readyPanel);
+
+        // readyPanel이 실제로 화면에 뜬 뒤에야 Ready 상태로 전환 - 이때부터 클릭하면 카운트다운 시작
+        currentPhase = MiniGame01Phase.Ready;
+        isTransitioning = false;
     }
 
     IEnumerator CountdownRoutine()
@@ -324,11 +334,11 @@ public class MiniGame01Controller : MonoBehaviour
 
         if (resultRecordText != null)
             resultRecordText.text =
-                $"목표:  <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
-                $"주운 쓰레기 개수:  <size=130%><color=#FFC756>{currentCount}</color></size> 개";
+                $"목표: <size=130%><color=#FFC756>{targetCount}</color></size> 개\n" +
+                $"주운 쓰레기 개수: <size=130%><color=#FFC756>{currentCount}</color></size> 개";
 
         if (meritText != null)
-            meritText.text = $"얻은 공덕 포인트:  <color=#FF69F3>{merit}</color> <size=50>P</size>";
+            meritText.text = $"얻은 공덕 포인트: <color=#FF69F3>{merit}</color> <size=50>P</size>";
 
         GameManager.Instance.CompleteMiniGame1(currentCount, targetCount);
 
