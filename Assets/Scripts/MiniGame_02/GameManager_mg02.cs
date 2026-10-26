@@ -56,7 +56,7 @@ public class GameManager_mg02 : MonoBehaviour
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
-    public float survivalTargetTime = 15f;
+    public float survivalTargetTime = 15f; // 기존 생존 시간 조건 (현재는 사용하지 않음)
 
     float currentGameTime;
     public float maxHealth = 100f;
@@ -191,19 +191,6 @@ public class GameManager_mg02 : MonoBehaviour
             decreaseSpeed = 25f;
         }
 
-        /*if (currentGameTime <= 14f && currentGameTime > 10f)
-        {
-            decreaseSpeed = 15f;
-        }
-        else if (currentGameTime <= 9f && currentGameTime > 5f)
-        {
-            decreaseSpeed = 20f;
-        }
-        else if (currentGameTime <= 4f)
-        {
-            decreaseSpeed = 25f;
-        }*/
-
         currentHealth -= decreaseSpeed * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
@@ -221,8 +208,6 @@ public class GameManager_mg02 : MonoBehaviour
 
         updateCpsData();
 
-        float survivedTime = maxGameTime - currentGameTime;
-
         if (currentHealth <= 0)
         {
             gameOver(false);
@@ -230,7 +215,7 @@ public class GameManager_mg02 : MonoBehaviour
         else if (currentGameTime <= 0)
         {
             currentGameTime = 0;
-            bool isSuccess = survivedTime >= survivalTargetTime;
+            bool isSuccess = correctCount >= 20;
             gameOver(isSuccess);
         }
     }
@@ -463,8 +448,6 @@ public class GameManager_mg02 : MonoBehaviour
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
 
-            // 업적/엔딩 팝업은 다른 미니게임들과 동일하게 로비(또는 다시하기 소비 시점)에서 표시되도록
-            // 예약만 해둔다 (기존에는 여기서 즉시 AchievementManager를 호출했음)
             GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.DontMove, isSuccess);
         }
 
@@ -542,7 +525,6 @@ public class GameManager_mg02 : MonoBehaviour
 
         while (!isGameStarted)
         {
-            // 종료 팝업이 떠서 Time.timeScale이 0이어도 계속 깜빡이도록 unscaledTime 사용
             float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
 
             Color color = startImage.color;
@@ -607,7 +589,6 @@ public class GameManager_mg02 : MonoBehaviour
         passenger.anchoredPosition = originalPosition;
     }
 
-    // 수정된 Punch Scale (고정된 baseScale 기준 연출)
     IEnumerator PunchScaleRoutine(Transform target)
     {
         if (target == null) yield break;

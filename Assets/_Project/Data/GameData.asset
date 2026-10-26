@@ -12,21 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f2fe4894faec964b94399bc7e9547a0, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  miniGame1Score: 0
-  miniGame2Score: 0
+  miniGame1Score: 361
+  miniGame2Score: 1880
   miniGame3Score: 0
-  playedGames: 000000
-  playCount: 000000000000000000000000
-  successGames: 000000
-  failGames: 000000
-  consecutiveSuccess: 000000000000000000000000
+  playedGames: 010100
+  playCount: 030000000600000000000000
+  successGames: 010100
+  failGames: 000100
+  consecutiveSuccess: 0b0000000900000000000000
   consecutiveFail: 000000000000000000000000
   tutorialNoButtonCount: 0
-  meritPoint: 0
-  tutorialDone: 0
-  tutorialSkipAvailable: 1
-  globalTimeRemaining: 300
+  meritPoint: 2241
+  tutorialDone: 1
+  tutorialSkipAvailable: 0
+  globalTimeRemaining: 97.82539
   isTimerFrozen: 1
   lotteryRoomUnlocked: 0
   isTimeOver: 0
-  playCycle: 35
+  playCycle: 41
