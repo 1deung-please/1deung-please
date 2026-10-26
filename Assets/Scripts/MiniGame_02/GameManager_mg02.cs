@@ -190,6 +190,19 @@ public class GameManager_mg02 : MonoBehaviour
             decreaseSpeed = 25f;
         }
 
+        /*if (currentGameTime <= 14f && currentGameTime > 10f)
+        {
+            decreaseSpeed = 15f;
+        }
+        else if (currentGameTime <= 9f && currentGameTime > 5f)
+        {
+            decreaseSpeed = 20f;
+        }
+        else if (currentGameTime <= 4f)
+        {
+            decreaseSpeed = 25f;
+        }*/
+
         currentHealth -= decreaseSpeed * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
@@ -452,7 +465,6 @@ public class GameManager_mg02 : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-
             GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.DontMove, isSuccess);
         }
 
@@ -530,6 +542,7 @@ public class GameManager_mg02 : MonoBehaviour
 
         while (!isGameStarted)
         {
+            // 종료 팝업이 떠서 Time.timeScale이 0이어도 계속 깜빡이도록 unscaledTime 사용
             float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
 
             Color color = startImage.color;
@@ -594,6 +607,7 @@ public class GameManager_mg02 : MonoBehaviour
         passenger.anchoredPosition = originalPosition;
     }
 
+    // 수정된 Punch Scale (고정된 baseScale 기준 연출)
     IEnumerator PunchScaleRoutine(Transform target)
     {
         if (target == null) yield break;
