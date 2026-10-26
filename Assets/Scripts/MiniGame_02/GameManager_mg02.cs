@@ -224,12 +224,6 @@ public class GameManager_mg02 : MonoBehaviour
         {
             gameOver(false);
         }
-        else if (currentGameTime <= 0)
-        {
-            currentGameTime = 0;
-            bool isSuccess = correctCount >= 20;
-            gameOver(isSuccess);
-        }
     }
 
     void PlayPlayerAnimation(Sprite[] frames, bool loop, System.Action onComplete = null)
