@@ -56,7 +56,6 @@ public class GameManager_mg02 : MonoBehaviour
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
-    public float survivalTargetTime = 15f; // 기존 생존 시간 조건 (현재는 사용하지 않음)
 
     float currentGameTime;
     public float maxHealth = 100f;
@@ -212,12 +211,6 @@ public class GameManager_mg02 : MonoBehaviour
         {
             gameOver(false);
         }
-        else if (currentGameTime <= 0)
-        {
-            currentGameTime = 0;
-            bool isSuccess = correctCount >= 20;
-            gameOver(isSuccess);
-        }
     }
 
     void PlayPlayerAnimation(Sprite[] frames, bool loop, System.Action onComplete = null)
@@ -360,6 +353,12 @@ public class GameManager_mg02 : MonoBehaviour
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
+
+            if (correctCount >= 20 && !isGameOver)
+            {
+                gameOver(true);
+                return;
+            }
         }
         else
         {
@@ -391,6 +390,12 @@ public class GameManager_mg02 : MonoBehaviour
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
+
+            if (correctCount >= 20 && !isGameOver)
+            {
+                gameOver(true);
+                return;
+            }
         }
         else
         {
