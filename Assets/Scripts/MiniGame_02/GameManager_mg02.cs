@@ -58,6 +58,7 @@ public class GameManager_mg02 : MonoBehaviour
     public float maxGameTime = 20f;
 
     float currentGameTime;
+    float playTime; // 게임 시작 후 흘러간 누적 시간 (경과 시간)
     public float maxHealth = 100f;
     float currentHealth;
 
@@ -118,6 +119,7 @@ public class GameManager_mg02 : MonoBehaviour
             titlePanel.SetActive(false);
 
         currentGameTime = maxGameTime;
+        playTime = 0f; // 게임 시작 시 경과 시간 초기화
         currentHealth = maxHealth;
 
         correctCount = 0;
@@ -155,8 +157,6 @@ public class GameManager_mg02 : MonoBehaviour
         // 타이틀 화면(터치 대기 상태)에서 화면 전체 터치로 게임 시작
         if (!isGameStarted && !isStarting && titlePanel != null && titlePanel.activeSelf)
         {
-            // 종료 팝업이 떠 있는 동안에는 팝업의 예/아니오 터치로 게임이 시작되지 않게 한다
-            // (이 터치는 Input.GetMouseButtonDown으로 직접 읽기 때문에 UI가 막아주지 못함)
             bool exitPopupOpen = ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive;
 
             if (!exitPopupOpen && Input.GetMouseButtonDown(0))
@@ -170,38 +170,30 @@ public class GameManager_mg02 : MonoBehaviour
         if (!isGameStarted || isGameOver) return;
 
         currentGameTime -= Time.deltaTime;
+        playTime += Time.deltaTime; 
 
         float decreaseSpeed;
 
-        if (currentGameTime > 15f)
+        if (playTime < 5f)
         {
-            decreaseSpeed = 10f;
+            decreaseSpeed = 10f; 
         }
-        else if (currentGameTime > 10f)
+        else if (playTime < 10f)
         {
-            decreaseSpeed = 15f;
+            decreaseSpeed = 15f; 
         }
-        else if (currentGameTime > 5f)
+        else if (playTime < 15f)
         {
             decreaseSpeed = 20f;
+        }
+        else if (playTime < 20f)
+        {
+            decreaseSpeed = 25f; 
         }
         else
         {
-            decreaseSpeed = 25f;
+            decreaseSpeed = 25f; 
         }
-
-        /*if (currentGameTime <= 14f && currentGameTime > 10f)
-        {
-            decreaseSpeed = 15f;
-        }
-        else if (currentGameTime <= 9f && currentGameTime > 5f)
-        {
-            decreaseSpeed = 20f;
-        }
-        else if (currentGameTime <= 4f)
-        {
-            decreaseSpeed = 25f;
-        }*/
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -211,7 +203,7 @@ public class GameManager_mg02 : MonoBehaviour
             healthBar.value = currentHealth / maxHealth;
         }
 
-        timerText.text = Mathf.Ceil(currentGameTime) + "s";
+        timerText.text = Mathf.Ceil(Mathf.Max(0, currentGameTime)) + "s";
 
         if (decreaseText != null)
         {
@@ -220,6 +212,7 @@ public class GameManager_mg02 : MonoBehaviour
 
         updateCpsData();
 
+        // 체력이 0이 되면 실패 처리
         if (currentHealth <= 0)
         {
             gameOver(false);
@@ -367,6 +360,7 @@ public class GameManager_mg02 : MonoBehaviour
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
 
+            // 💡 20회 이상 성공 시 즉시 성공 패널 등장
             if (correctCount >= 20 && !isGameOver)
             {
                 gameOver(true);
@@ -404,6 +398,7 @@ public class GameManager_mg02 : MonoBehaviour
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
 
+            // 💡 20회 이상 성공 시 즉시 성공 패널 등장
             if (correctCount >= 20 && !isGameOver)
             {
                 gameOver(true);
