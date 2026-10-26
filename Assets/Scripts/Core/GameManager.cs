@@ -40,9 +40,31 @@ public class GameManager : MonoBehaviour
 
     public void SetPendingAchievementCheck(MiniGameKind kind, bool success)
     {
-        // 예약을 덮어쓰지 않고 큐에 쌓는다 - "다시하기"를 여러 번 눌러도
-        // 실제로 로비에 도착할 때까지 그동안의 모든 결과가 순서대로 유지된다.
-        pendingAchievementChecks.Add((kind, success));
+        if (gameData == null) return;
+        int idx = (int)kind;
+
+        if (success)
+        {
+            // 성공 시: 데이터 즉시 반영 및 팝업 즉시 호출
+            gameData.consecutiveSuccess[idx]++;
+            gameData.consecutiveFail[idx] = 0;
+            SaveGameData();
+
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnMiniGameResult(kind, true);
+            }
+        }
+        else
+        {
+            // 실패 시: 데이터(연속 성공 0 초기화 및 실패 횟수 증가)는 게임 내에서 즉시 반영하되,
+            // 팝업은 미니게임 안에서 뜨지 않고 기존처럼 로비 복귀 시 처리되도록 큐에 보관
+            gameData.consecutiveFail[idx]++;
+            gameData.consecutiveSuccess[idx] = 0; 
+            SaveGameData();
+
+            pendingAchievementChecks.Add((kind, false));
+        }
     }
 
     void Awake()

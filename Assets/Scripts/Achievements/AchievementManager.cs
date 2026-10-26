@@ -89,11 +89,10 @@ public class AchievementManager : MonoBehaviour
             data.consecutiveSuccess[idx]++;
             data.consecutiveFail[idx] = 0;
 
-            // 연속 성공 업적: 이걸 안 비켜?(DontMove, 업적 10번)만 5회로 하향, 나머지 게임은 그대로 10회
             int successCount = data.consecutiveSuccess[idx];
 
             if (kind == MiniGameKind.PickTrash && successCount >= 10) TryUnlock(9);
-            if (kind == MiniGameKind.DontMove && successCount >= 5) TryUnlock(10);
+            if (kind == MiniGameKind.DontMove && successCount >= 10) TryUnlock(10);
             if (kind == MiniGameKind.LogicFortress && successCount >= 10) TryUnlock(11);
         }
         else
