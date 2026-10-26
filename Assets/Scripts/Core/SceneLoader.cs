@@ -19,7 +19,7 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private float npcStartX = -501f; // NPC 시작 X 좌표
     [SerializeField] private float npcEndX = 523f;     // NPC 도착 X 좌표
 
-    [Header("멘트 (5초마다 전환, 반복)")]
+    [Header("멘트 (Message Interval초마다 순서대로 전환, 마지막 멘트는 로딩이 끝날 때까지 유지)")]
     [SerializeField]
     private string[] loadingMessages = new string[]
     {
@@ -215,14 +215,16 @@ public class SceneLoader : MonoBehaviour
     {
         if (loadingMessages == null || loadingMessages.Length == 0) yield break;
 
-        int index = 0;
-        while (true)
+        for (int i = 0; i < loadingMessages.Length; i++)
         {
             if (loadingMessageText != null)
-                loadingMessageText.text = loadingMessages[index];
+                loadingMessageText.text = loadingMessages[i];
 
-            index = (index + 1) % loadingMessages.Length;
-            yield return new WaitForSeconds(messageInterval);
+            // 마지막 멘트는 로딩이 끝날 때까지 그대로 유지
+            // (예전엔 처음 멘트로 되돌아가서, 멘트 합계 시간과 로딩 시간이 같으면
+            //  로딩이 끝나기 직전에 첫 멘트가 잠깐 다시 깜빡일 수 있었음)
+            if (i < loadingMessages.Length - 1)
+                yield return new WaitForSeconds(messageInterval);
         }
     }
 }

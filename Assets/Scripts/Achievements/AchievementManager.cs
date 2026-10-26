@@ -89,12 +89,11 @@ public class AchievementManager : MonoBehaviour
             data.consecutiveSuccess[idx]++;
             data.consecutiveFail[idx] = 0;
 
-            if (data.consecutiveSuccess[idx] >= 10)
-            {
-                if (kind == MiniGameKind.PickTrash) TryUnlock(9);
-                if (kind == MiniGameKind.DontMove) TryUnlock(10);
-                if (kind == MiniGameKind.LogicFortress) TryUnlock(11);
-            }
+            int successCount = data.consecutiveSuccess[idx];
+
+            if (kind == MiniGameKind.PickTrash && successCount >= 10) TryUnlock(9);
+            if (kind == MiniGameKind.DontMove && successCount >= 10) TryUnlock(10);
+            if (kind == MiniGameKind.LogicFortress && successCount >= 10) TryUnlock(11);
         }
         else
         {

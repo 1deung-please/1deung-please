@@ -68,6 +68,9 @@ public class ShallowManager : MonoBehaviour
 
     private void Update()
     {
+        if (UIInputGate.IsBlocked)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             clickRequested = true;
@@ -276,30 +279,42 @@ public class ShallowManager : MonoBehaviour
 
     private string GetMostPlayedGame()
     {
-        // 우선순위: 주워줘 쓰레기(0) > 이걸 안 비켜(1) > 출격 논리요새(2)
+        bool isReplay = GameManager.Instance != null && GameManager.Instance.IsEndingReplay;
+        int targetIndex = 0;
+
         int[] priorityOrder = { 0, 1, 2 };
 
-        int maxCount = -1;
-
-        // 1) 플레이한 게임 중 최대 플레이 횟수
-        for (int i = 0; i < gameData.playCount.Length; i++)
+        if (isReplay)
         {
-            if (gameData.playedGames[i] && gameData.playCount[i] > maxCount)
+            // 가방에서 다시보기일 경우: 저장된 가장 최근 플레이 기록 불러오기
+            targetIndex = EndingRecordStorage.GetShallowGameIndex();
+        }
+        else
+        {
+            // 실제 플레이 종료 시: 현재 데이터에서 가장 많이 한 게임 번호 산출 후 저장
+            int maxCount = -1;
+
+            for (int i = 0; i < gameData.playCount.Length; i++)
             {
-                maxCount = gameData.playCount[i];
+                if (gameData.playedGames[i] && gameData.playCount[i] > maxCount)
+                {
+                    maxCount = gameData.playCount[i];
+                }
             }
+
+            foreach (int index in priorityOrder)
+            {
+                if (gameData.playedGames[index] && gameData.playCount[index] == maxCount)
+                {
+                    targetIndex = index;
+                    break;
+                }
+            }
+
+            EndingRecordStorage.SaveShallowGameIndex(targetIndex);
         }
 
-        // 2) 최대 횟수와 같은 게임 중 우선순위가 가장 높은 것 선택
-        foreach (int index in priorityOrder)
-        {
-            if (gameData.playedGames[index] && gameData.playCount[index] == maxCount)
-            {
-                return GetGameName(index);
-            }
-        }
-
-        return "";
+        return GetGameName(targetIndex);
     }
 
     private string GetGameName(int index)

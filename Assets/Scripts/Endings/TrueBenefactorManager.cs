@@ -96,6 +96,9 @@ public class TrueBenefactorManager : MonoBehaviour
 
     private void Update()
     {
+        if (UIInputGate.IsBlocked)
+            return;
+
         if (Input.GetMouseButtonDown(0))
             clickRequested = true;
     }
@@ -125,9 +128,26 @@ public class TrueBenefactorManager : MonoBehaviour
             EndingAnimation.Animation1
         );
 
+        // 다시보기 여부에 따른 점수 데이터 분기 및 최고 점수 저장 처리
+        bool isReplay = GameManager.Instance != null && GameManager.Instance.IsEndingReplay;
+        int meritPointToDisplay = 0;
+
+        if (isReplay)
+        {
+            meritPointToDisplay = EndingRecordStorage.GetTrueBenefactorMerit();
+        }
+        else
+        {
+            if (gameData != null)
+            {
+                meritPointToDisplay = gameData.meritPoint;
+                EndingRecordStorage.SaveTrueBenefactorMerit(meritPointToDisplay);
+            }
+        }
+
         yield return Dialogue(
             "조상신",
-            gameData.meritPoint + "점이라니, 저승 공덕 인플루언서 랭킹 1위 각이로다!",
+            meritPointToDisplay + "점이라니, 저승 공덕 인플루언서 랭킹 1위 각이로다!",
             ancestorGod,
             EndingAnimation.Animation1
         );
@@ -195,7 +215,7 @@ public class TrueBenefactorManager : MonoBehaviour
         );
 
         RestoreBackgroundAnimation(EndingAnimation.Animation1);
-        
+
         yield return Dialogue(
             "조상신",
             "난 늘 네 곁에서 가슴을 쥐어짜며 함께 울고 있었다.",

@@ -56,6 +56,7 @@ public class GameManager_mg02 : MonoBehaviour
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
+
     float currentGameTime;
     public float maxHealth = 100f;
     float currentHealth;
@@ -103,6 +104,10 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void StartGame()
     {
+        // 종료 팝업이 떠 있는 동안에는 어떤 경로(터치/버튼 OnClick)로 불려도 게임을 시작하지 않는다
+        if (ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive)
+            return;
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnMiniGameStart();
@@ -150,7 +155,11 @@ public class GameManager_mg02 : MonoBehaviour
         // 타이틀 화면(터치 대기 상태)에서 화면 전체 터치로 게임 시작
         if (!isGameStarted && !isStarting && titlePanel != null && titlePanel.activeSelf)
         {
-            if (Input.GetMouseButtonDown(0))
+            // 종료 팝업이 떠 있는 동안에는 팝업의 예/아니오 터치로 게임이 시작되지 않게 한다
+            // (이 터치는 Input.GetMouseButtonDown으로 직접 읽기 때문에 UI가 막아주지 못함)
+            bool exitPopupOpen = ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive;
+
+            if (!exitPopupOpen && Input.GetMouseButtonDown(0))
             {
                 isStarting = true;
                 StartGame();
@@ -181,7 +190,7 @@ public class GameManager_mg02 : MonoBehaviour
             decreaseSpeed = 25f;
         }
 
-        if (currentGameTime <= 14f && currentGameTime > 10f)
+        /*if (currentGameTime <= 14f && currentGameTime > 10f)
         {
             decreaseSpeed = 15f;
         }
@@ -192,7 +201,7 @@ public class GameManager_mg02 : MonoBehaviour
         else if (currentGameTime <= 4f)
         {
             decreaseSpeed = 25f;
-        }
+        }*/
 
         currentHealth -= decreaseSpeed * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -217,7 +226,9 @@ public class GameManager_mg02 : MonoBehaviour
         }
         else if (currentGameTime <= 0)
         {
-            gameOver(true);
+            currentGameTime = 0;
+            bool isSuccess = correctCount >= 20;
+            gameOver(isSuccess);
         }
     }
 
@@ -361,6 +372,12 @@ public class GameManager_mg02 : MonoBehaviour
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
+
+            if (correctCount >= 20 && !isGameOver)
+            {
+                gameOver(true);
+                return;
+            }
         }
         else
         {
@@ -392,6 +409,12 @@ public class GameManager_mg02 : MonoBehaviour
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
+
+            if (correctCount >= 20 && !isGameOver)
+            {
+                gameOver(true);
+                return;
+            }
         }
         else
         {
@@ -528,7 +551,8 @@ public class GameManager_mg02 : MonoBehaviour
 
         while (!isGameStarted)
         {
-            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
+            // 종료 팝업이 떠서 Time.timeScale이 0이어도 계속 깜빡이도록 unscaledTime 사용
+            float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
 
             Color color = startImage.color;
             color.a = alpha;
