@@ -56,7 +56,6 @@ public class GameManager_mg02 : MonoBehaviour
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
-    public float survivalTargetTime = 15f;
 
     float currentGameTime;
     public float maxHealth = 100f;
@@ -221,8 +220,6 @@ public class GameManager_mg02 : MonoBehaviour
 
         updateCpsData();
 
-        float survivedTime = maxGameTime - currentGameTime;
-
         if (currentHealth <= 0)
         {
             gameOver(false);
@@ -230,7 +227,7 @@ public class GameManager_mg02 : MonoBehaviour
         else if (currentGameTime <= 0)
         {
             currentGameTime = 0;
-            bool isSuccess = survivedTime >= survivalTargetTime;
+            bool isSuccess = correctCount >= 20;
             gameOver(isSuccess);
         }
     }
@@ -375,6 +372,12 @@ public class GameManager_mg02 : MonoBehaviour
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
+
+            if (correctCount >= 20 && !isGameOver)
+            {
+                gameOver(true);
+                return;
+            }
         }
         else
         {
@@ -406,6 +409,12 @@ public class GameManager_mg02 : MonoBehaviour
             correctCount++;
             audioSource.PlayOneShot(correctSound);
             TriggerPunchScale();
+
+            if (correctCount >= 20 && !isGameOver)
+            {
+                gameOver(true);
+                return;
+            }
         }
         else
         {
