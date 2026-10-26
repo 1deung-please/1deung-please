@@ -443,7 +443,6 @@ public class GameManager_mg02 : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-
             GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.DontMove, isSuccess);
         }
 

@@ -49,6 +49,7 @@ public class AchievementManager : MonoBehaviour
 
     private readonly List<PopupRequest> pendingQueue = new List<PopupRequest>();
     private bool isShowingPopup = false;
+    private bool isPopupInputBlocked = false; // 팝업 등장 후 1초간 터치 차단 플래그
     public bool IsPopupActive => isShowingPopup;
 
     // 큐에 남은 팝업이 있거나 지금 뭔가 표시 중이면 true.
@@ -177,7 +178,6 @@ public class AchievementManager : MonoBehaviour
         AchievementStorage.Unlock(id);
         EnqueueAchievement(id);
 
-        // 20번(1~19 모두 달성) 자체는 여기서 재귀 체크하지 않음 - id가 20이면 아래 조건이 항상 false
         if (id != 20 && IsAllOfFirst19Unlocked())
             TryUnlock(20);
 
@@ -193,8 +193,6 @@ public class AchievementManager : MonoBehaviour
         }
         return true;
     }
-
-    // ---- 큐에 추가 + 정렬 + 처리 시작 ----
 
     void EnqueueAchievement(int id)
     {
@@ -267,8 +265,6 @@ public class AchievementManager : MonoBehaviour
         if (achievementBadgeImage != null && info.badge != null)
         {
             achievementBadgeImage.sprite = info.badge;
-
-            // 엔딩 팝업과 동일한 방식: 업적마다 다른 위치 보정값 적용
             achievementBadgeImage.rectTransform.anchoredPosition = info.popupImageOffset;
         }
 
@@ -287,7 +283,7 @@ public class AchievementManager : MonoBehaviour
         achievementPopup.SetActive(true);
         Debug.Log($"[Achievement] ID {id} 팝업 표시됨 (No.{id} {info.title})");
 
-        // 자동 닫힘 없이, 화면 터치(팝업 버튼/오버레이 클릭)로만 닫힘 - CloseAchievementPopup() 참고
+        StartCoroutine(BlockPopupInputRoutine());
     }
 
     static readonly Dictionary<string, string> endingColors = new Dictionary<string, string>
@@ -329,7 +325,19 @@ public class AchievementManager : MonoBehaviour
 
         endingPopup.SetActive(true);
 
-        // 자동 닫힘 없이, 화면 터치(팝업 버튼/오버레이 클릭)로만 닫힘 - CloseEndingPopup() 참고
+        StartCoroutine(BlockPopupInputRoutine());
+    }
+
+    IEnumerator BlockPopupInputRoutine()
+    {
+        isPopupInputBlocked = true;
+        float timer = 0f;
+        while (timer < 1.0f)
+        {
+            timer += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        isPopupInputBlocked = false;
     }
 
     void OnPopupFinished()
@@ -342,7 +350,7 @@ public class AchievementManager : MonoBehaviour
     {
         if (achievementList == null)
         {
-            Debug.LogWarning("[Achievement] achievementList 참조가 비어있음 (인스펙터에서 AchievementListData 할당 필요)");
+            Debug.LogWarning("[Achievement] achievementList 참조가 비어있음");
             return null;
         }
         foreach (var info in achievementList.achievements)
@@ -358,9 +366,10 @@ public class AchievementManager : MonoBehaviour
         return null;
     }
 
-    // 외부(버튼 등)에서 즉시 닫고 싶을 때 - 큐 처리도 이어서 진행
     public void CloseAchievementPopup()
     {
+        if (isPopupInputBlocked) return;
+
         StopAllCoroutines();
         if (achievementPopup != null)
             achievementPopup.SetActive(false);
@@ -369,25 +378,21 @@ public class AchievementManager : MonoBehaviour
 
     public void CloseEndingPopup()
     {
+        if (isPopupInputBlocked) return;
+
         StopAllCoroutines();
         if (endingPopup != null)
             endingPopup.SetActive(false);
         OnPopupFinished();
     }
 
-    // ==========================================
-    // [테스트용] 팝업 강제 노출 메서드 (큐 우회, 즉시 표시)
-    // ==========================================
-
     public void ForceShowAchievementPopup(int id)
     {
-        Debug.Log($"[AchievementManager] 업적 팝업 강제 노출 테스트 (ID: {id})");
         ShowAchievementPopup(id);
     }
 
     public void ForceShowEndingPopup(string endingId)
     {
-        Debug.Log($"[AchievementManager] 엔딩 팝업 강제 노출 테스트 (ID: {endingId})");
         ShowEndingPopup(endingId);
     }
 
@@ -409,8 +414,6 @@ public class AchievementManager : MonoBehaviour
         AchievementStorage.ClearAllAchievements();
     }
 
-    // [테스트용] 모든 엔딩(얄팍한속셈~히든)을 해금된 상태로 만들어서
-    // 가방(RecordBookPanel)에서 지폐 UI가 전부 클릭 가능한 상태로 뜨는지 테스트할 때 사용
     [ContextMenu("Test - Unlock All Endings")]
     public void TestUnlockAllEndings()
     {
@@ -420,13 +423,10 @@ public class AchievementManager : MonoBehaviour
         for (int i = 0; i < allEndings.Length; i++)
         {
             EndingStorage.Unlock(allEndings[i]);
-            AchievementStorage.Unlock(linkedAchievementIds[i]); // 엔딩 슬롯의 잠금 해제 조건(linkedAchievementId)도 함께 해금
+            AchievementStorage.Unlock(linkedAchievementIds[i]);
         }
-
-        Debug.Log("[AchievementManager] 모든 엔딩 테스트용 해금 완료");
     }
 
-    // [테스트용] 4개 일반 엔딩 중 3개만 해금 (얄팍한속셈/자격미달/절반의성공)
     [ContextMenu("Test - Unlock 3 Endings (진정한귀인 제외)")]
     public void TestUnlockThreeEndings()
     {
@@ -438,7 +438,5 @@ public class AchievementManager : MonoBehaviour
             EndingStorage.Unlock(threeEndings[i]);
             AchievementStorage.Unlock(linkedAchievementIds[i]);
         }
-
-        Debug.Log("[AchievementManager] 엔딩 3개(얄팍한속셈/자격미달/절반의성공) 테스트용 해금 완료 - 진정한귀인만 남음");
     }
 }

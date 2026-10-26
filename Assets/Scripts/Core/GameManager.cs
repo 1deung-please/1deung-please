@@ -45,25 +45,20 @@ public class GameManager : MonoBehaviour
 
         if (success)
         {
-            // 성공 시: 데이터 즉시 반영 및 팝업 즉시 호출
             gameData.consecutiveSuccess[idx]++;
             gameData.consecutiveFail[idx] = 0;
-            SaveGameData();
-
-            if (AchievementManager.Instance != null)
-            {
-                AchievementManager.Instance.OnMiniGameResult(kind, true);
-            }
         }
         else
         {
-            // 실패 시: 데이터(연속 성공 0 초기화 및 실패 횟수 증가)는 게임 내에서 즉시 반영하되,
-            // 팝업은 미니게임 안에서 뜨지 않고 기존처럼 로비 복귀 시 처리되도록 큐에 보관
             gameData.consecutiveFail[idx]++;
-            gameData.consecutiveSuccess[idx] = 0; 
-            SaveGameData();
+            gameData.consecutiveSuccess[idx] = 0;
+        }
+        SaveGameData();
 
-            pendingAchievementChecks.Add((kind, false));
+        // 성공이든 실패이든 조건 달성 즉시 미니게임 안에서 업적 체크 및 팝업 출력
+        if (AchievementManager.Instance != null)
+        {
+            AchievementManager.Instance.OnMiniGameResult(kind, success);
         }
     }
 
@@ -156,8 +151,6 @@ public class GameManager : MonoBehaviour
         }
 
         // playedGames(각 미니게임을 이번 회차에 플레이했는지 여부)도 저장
-        // - 이게 저장 안 되면 앱 종료 후 재실행 시 false로 초기화되어
-        //   "중간에 나갔다 들어오면 이전에 플레이한 게임이 안 한 것으로 처리"되는 버그가 생김
         for (int i = 0; i < gameData.playedGames.Length; i++)
         {
             PlayerPrefs.SetInt($"PlayedGames_{i}", gameData.playedGames[i] ? 1 : 0);
