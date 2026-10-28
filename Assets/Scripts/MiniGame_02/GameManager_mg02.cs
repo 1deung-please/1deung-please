@@ -46,7 +46,7 @@ public class GameManager_mg02 : MonoBehaviour
     Coroutine playerAnimCoroutine;
     Coroutine punchScaleCoroutine;
 
-    private readonly Vector3 baseScale = Vector3.one; // NPC의 기준 크기 고정
+    private readonly Vector3 baseScale = Vector3.one;
 
     [Header("Sound")]
     public AudioSource audioSource;
@@ -56,14 +56,16 @@ public class GameManager_mg02 : MonoBehaviour
 
     [Header("Game Settings")]
     public float maxGameTime = 20f;
+
     float currentGameTime;
+    float playTime;
     public float maxHealth = 100f;
     float currentHealth;
 
     bool needSeat;
     bool isGameOver;
     bool isGameStarted;
-    bool isStarting = false; // StartGame() 중복 실행 방지 (연출 중 추가 터치 무시)
+    bool isStarting = false;
 
     int correctCount;
     int wrongCount;
@@ -103,6 +105,9 @@ public class GameManager_mg02 : MonoBehaviour
 
     public void StartGame()
     {
+        if (ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive)
+            return;
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnMiniGameStart();
@@ -113,6 +118,7 @@ public class GameManager_mg02 : MonoBehaviour
             titlePanel.SetActive(false);
 
         currentGameTime = maxGameTime;
+        playTime = 0f;
         currentHealth = maxHealth;
 
         correctCount = 0;
@@ -147,10 +153,11 @@ public class GameManager_mg02 : MonoBehaviour
 
     void Update()
     {
-        // 타이틀 화면(터치 대기 상태)에서 화면 전체 터치로 게임 시작
         if (!isGameStarted && !isStarting && titlePanel != null && titlePanel.activeSelf)
         {
-            if (Input.GetMouseButtonDown(0))
+            bool exitPopupOpen = ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive;
+
+            if (!exitPopupOpen && Input.GetMouseButtonDown(0))
             {
                 isStarting = true;
                 StartGame();
@@ -161,35 +168,27 @@ public class GameManager_mg02 : MonoBehaviour
         if (!isGameStarted || isGameOver) return;
 
         currentGameTime -= Time.deltaTime;
+        playTime += Time.deltaTime;
 
         float decreaseSpeed;
 
-        if (currentGameTime > 15f)
+        if (playTime < 5f)
         {
             decreaseSpeed = 10f;
         }
-        else if (currentGameTime > 10f)
+        else if (playTime < 10f)
         {
             decreaseSpeed = 15f;
         }
-        else if (currentGameTime > 5f)
+        else if (playTime < 15f)
         {
             decreaseSpeed = 20f;
         }
-        else
+        else if (playTime < 20f)
         {
             decreaseSpeed = 25f;
         }
-
-        if (currentGameTime <= 14f && currentGameTime > 10f)
-        {
-            decreaseSpeed = 15f;
-        }
-        else if (currentGameTime <= 9f && currentGameTime > 5f)
-        {
-            decreaseSpeed = 20f;
-        }
-        else if (currentGameTime <= 4f)
+        else
         {
             decreaseSpeed = 25f;
         }
@@ -202,7 +201,7 @@ public class GameManager_mg02 : MonoBehaviour
             healthBar.value = currentHealth / maxHealth;
         }
 
-        timerText.text = Mathf.Ceil(currentGameTime) + "s";
+        timerText.text = Mathf.Ceil(Mathf.Max(0, currentGameTime)) + "s";
 
         if (decreaseText != null)
         {
@@ -213,11 +212,8 @@ public class GameManager_mg02 : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            gameOver(false);
-        }
-        else if (currentGameTime <= 0)
-        {
-            gameOver(true);
+            bool isSuccess = correctCount >= 20;
+            gameOver(isSuccess);
         }
     }
 
@@ -412,7 +408,6 @@ public class GameManager_mg02 : MonoBehaviour
         spawnPassenger();
     }
 
-    // 정답 시 연출 중첩 방지 및 코루틴 실행
     void TriggerPunchScale()
     {
         if (passengerImage == null) return;
@@ -420,7 +415,7 @@ public class GameManager_mg02 : MonoBehaviour
         if (punchScaleCoroutine != null)
         {
             StopCoroutine(punchScaleCoroutine);
-            passengerImage.transform.localScale = baseScale; // 즉시 원본 스케일로 복구
+            passengerImage.transform.localScale = baseScale;
         }
 
         punchScaleCoroutine = StartCoroutine(PunchScaleRoutine(passengerImage.transform));
@@ -448,9 +443,6 @@ public class GameManager_mg02 : MonoBehaviour
         {
             GameManager.Instance.PauseTimer();
             GameManager.Instance.CompleteMiniGame2(correctCount);
-
-            // 업적/엔딩 팝업은 다른 미니게임들과 동일하게 로비(또는 다시하기 소비 시점)에서 표시되도록
-            // 예약만 해둔다 (기존에는 여기서 즉시 AchievementManager를 호출했음)
             GameManager.Instance.SetPendingAchievementCheck(MiniGameKind.DontMove, isSuccess);
         }
 
@@ -528,7 +520,7 @@ public class GameManager_mg02 : MonoBehaviour
 
         while (!isGameStarted)
         {
-            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
+            float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
 
             Color color = startImage.color;
             color.a = alpha;
@@ -592,7 +584,6 @@ public class GameManager_mg02 : MonoBehaviour
         passenger.anchoredPosition = originalPosition;
     }
 
-    // 수정된 Punch Scale (고정된 baseScale 기준 연출)
     IEnumerator PunchScaleRoutine(Transform target)
     {
         if (target == null) yield break;

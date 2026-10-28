@@ -78,6 +78,12 @@ public class MiniGame01Controller : MonoBehaviour
 
     void Update()
     {
+        // 종료 팝업이 떠 있는 동안에는 화면 터치를 게임 입력으로 처리하지 않는다
+        // (이 스크립트는 Input.GetMouseButtonDown으로 직접 터치를 읽어서, 팝업의 예/아니오를
+        //  눌러도 쓰레기를 주운 것으로 집계되거나 단계가 넘어가버림)
+        if (ExitPopupManager.Instance != null && ExitPopupManager.Instance.IsPopupActive)
+            return;
+
         switch (currentPhase)
         {
             case MiniGame01Phase.Start:
@@ -137,7 +143,8 @@ public class MiniGame01Controller : MonoBehaviour
     {
         while (true)
         {
-            float alpha = Mathf.PingPong(Time.time * 1.5f, 1f);
+            // 종료 팝업이 떠서 Time.timeScale이 0이어도 계속 깜빡이도록 unscaledTime 사용
+            float alpha = Mathf.PingPong(Time.unscaledTime * 1.5f, 1f);
             Color c = touchToStartText.color;
             c.a = alpha;
             touchToStartText.color = c;

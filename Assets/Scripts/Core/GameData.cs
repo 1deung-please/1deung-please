@@ -41,6 +41,7 @@ public class GameData : ScriptableObject
     // 개발 중 초기화용
     public void ResetData()
     {
+        playCycle = 1;
         miniGame1Score = 0;
         miniGame2Score = 0;
         miniGame3Score = 0;

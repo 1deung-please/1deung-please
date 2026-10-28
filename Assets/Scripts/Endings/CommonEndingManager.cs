@@ -69,7 +69,7 @@ public class CommonEndingManager : MonoBehaviour
 
         if (scoreText != null)
             scoreText.gameObject.SetActive(false);
-        
+
         if (ptText != null)
             ptText.gameObject.SetActive(false);
 
@@ -98,6 +98,9 @@ public class CommonEndingManager : MonoBehaviour
 
     void Update()
     {
+        if (UIInputGate.IsBlocked)
+            return;
+
         if (!isDialogueEnding && dialoguePanel != null && dialoguePanel.activeSelf)
         {
             if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
@@ -306,7 +309,7 @@ public class CommonEndingManager : MonoBehaviour
 
         isScoreInfoPlaying = false;
         scoreInfoFinished = true;
-    }    
+    }
 
     private void ShowFullPointText(GameData gameData)
     {

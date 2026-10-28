@@ -97,7 +97,6 @@ public class BagManager : MonoBehaviour
     public void OpenRestartConfirm()
     {
         PlaySfx(buttonSfx);
-        recordBookPanel.SetActive(false);
         restartConfirmPanel.SetActive(true);
     }
 

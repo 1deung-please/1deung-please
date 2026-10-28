@@ -22,22 +22,19 @@ MonoBehaviour:
     popupImageOffset: {x: -202, y: -243}
   - id: 2
     title: "\uB208\uCE58\uBCF4\uC5EC\u2026"
-    description: "[\uC774\uAC78 \uC548 \uBE44\uCF1C? 5\uD68C \uC774\uC0C1 \uC5F0\uC18D
-      \uC2E4\uD328]"
+    description: "[\uC774\uAC78 \uC548 \uBE44\uCF1C? 5\uD68C \uC5F0\uC18D \uC2E4\uD328]"
     badge: {fileID: 21300000, guid: 16c7c95eb4d6e2f4caa7b91eec3c16f9, type: 3}
     popupImage: {fileID: 21300000, guid: 277867cbc706b9545b2d55163e6e6ac5, type: 3}
     popupImageOffset: {x: -409, y: -243}
   - id: 3
     title: "\uB354\uB7EC\uC6B4 \uAE38\uAC70\uB9AC"
-    description: "[\uC8FC\uC6CC\uC918, \uC4F0\uB808\uAE30! 5\uD68C \uC774\uC0C1 \uC5F0\uC18D
-      \uC2E4\uD328]"
+    description: "[\uC8FC\uC6CC\uC918, \uC4F0\uB808\uAE30! 5\uD68C \uC5F0\uC18D \uC2E4\uD328]"
     badge: {fileID: 21300000, guid: 2c38c3a3a2c3881438b403c263d48f8a, type: 3}
     popupImage: {fileID: 21300000, guid: 9cb9f5ee709d6704e84fbe57613e968f, type: 3}
     popupImageOffset: {x: -631, y: -243}
   - id: 4
     title: "\uD6C4\uD6C4... \uC778\uC0C1\uC774 \uC88B\uC73C\uC2DC\uB124\uC694"
-    description: "[\uCD9C\uACA9! \uB17C\uB9AC\uC694\uC0C8 5\uD68C \uC774\uC0C1 \uC5F0\uC18D
-      \uC2E4\uD328]"
+    description: "[\uCD9C\uACA9! \uB17C\uB9AC\uC694\uC0C8 5\uD68C \uC5F0\uC18D \uC2E4\uD328]"
     badge: {fileID: 21300000, guid: c9fd651e81f28db4cbb5d37538b09d54, type: 3}
     popupImage: {fileID: 21300000, guid: e455e310c6c97c642b41999879cb4545, type: 3}
     popupImageOffset: {x: -853, y: -243}
