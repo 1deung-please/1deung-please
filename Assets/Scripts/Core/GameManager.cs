@@ -219,6 +219,12 @@ public class GameManager : MonoBehaviour
 
             for (int i = 0; i < gameData.playedGames.Length; i++)
                 PlayerPrefs.DeleteKey($"PlayedGames_{i}");
+
+            for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
+            {
+                PlayerPrefs.DeleteKey($"ConsecutiveSuccess_{i}");
+                PlayerPrefs.DeleteKey($"ConsecutiveFail_{i}");
+            }
         }
 
         PlayerPrefs.Save();
