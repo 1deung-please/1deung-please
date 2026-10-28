@@ -622,12 +622,14 @@ public class GameManager : MonoBehaviour
     // 이 함수를 거치는데, 그건 "다시 시작하기"를 누른 게 아니므로 카운트 대상이 아님.
     private void ResetCycleData()
     {
-        gameData.playCycle++;
+        int nextCycle = gameData.playCycle + 1;
 
-        // 새 회차 시작 시 기기 내부 세이브 파일 초기화
+        // 다른 세션 데이터(점수, 타이머 등)만 클리어
         ClearSavedData();
 
         gameData.ResetData(); // 세션 데이터 초기화
+
+        gameData.playCycle = nextCycle;
 
         // 회차 리셋 시에도 튜토리얼을 스킵하도록 true 처리 후 저장
         gameData.tutorialDone = false;
