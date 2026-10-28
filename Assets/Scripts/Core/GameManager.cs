@@ -156,6 +156,12 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt($"PlayedGames_{i}", gameData.playedGames[i] ? 1 : 0);
         }
 
+        for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
+        {
+            PlayerPrefs.SetInt($"ConsecutiveSuccess_{i}", gameData.consecutiveSuccess[i]);
+            PlayerPrefs.SetInt($"ConsecutiveFail_{i}", gameData.consecutiveFail[i]);
+        }
+
         PlayerPrefs.Save();
         Debug.Log($"[GameManager] 플레이 데이터 저장 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초, 튜토리얼 완료: {gameData.tutorialDone})");
     }
@@ -188,6 +194,12 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < gameData.playedGames.Length; i++)
             {
                 gameData.playedGames[i] = PlayerPrefs.GetInt($"PlayedGames_{i}", 0) == 1;
+            }
+
+            for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
+            {
+                gameData.consecutiveSuccess[i] = PlayerPrefs.GetInt($"ConsecutiveSuccess_{i}", 0);
+                gameData.consecutiveFail[i] = PlayerPrefs.GetInt($"ConsecutiveFail_{i}", 0);
             }
 
             Debug.Log($"[GameManager] 저장된 플레이 데이터 불러오기 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초)");

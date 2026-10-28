@@ -24,9 +24,9 @@ MonoBehaviour:
   tutorialNoButtonCount: 0
   meritPoint: 0
   tutorialDone: 0
-  tutorialSkipAvailable: 0
+  tutorialSkipAvailable: 1
   globalTimeRemaining: 300
   isTimerFrozen: 1
   lotteryRoomUnlocked: 0
   isTimeOver: 0
-  playCycle: 0
+  playCycle: 3
