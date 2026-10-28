@@ -101,6 +101,8 @@ public class AchievementManager : MonoBehaviour
             data.consecutiveFail[idx]++;
             data.consecutiveSuccess[idx] = 0;
 
+              int failCount = data.consecutiveFail[idx];
+
             if (data.consecutiveFail[idx] >= 5)
             {
                 if (kind == MiniGameKind.DontMove) TryUnlock(2);

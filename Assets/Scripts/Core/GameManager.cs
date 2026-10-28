@@ -41,25 +41,15 @@ public class GameManager : MonoBehaviour
     public void SetPendingAchievementCheck(MiniGameKind kind, bool success)
     {
         if (gameData == null) return;
-        int idx = (int)kind;
 
-        if (success)
-        {
-            gameData.consecutiveSuccess[idx]++;
-            gameData.consecutiveFail[idx] = 0;
-        }
-        else
-        {
-            gameData.consecutiveFail[idx]++;
-            gameData.consecutiveSuccess[idx] = 0;
-        }
-        SaveGameData();
-
-        // 성공이든 실패이든 조건 달성 즉시 미니게임 안에서 업적 체크 및 팝업 출력
+        // 연속 성공/실패 횟수 갱신과 업적 검사는 AchievementManager에서 한 번만 처리
         if (AchievementManager.Instance != null)
         {
             AchievementManager.Instance.OnMiniGameResult(kind, success);
         }
+
+        // 갱신된 횟수와 게임 데이터를 저장
+        SaveGameData();
     }
 
     void Awake()
@@ -155,11 +145,19 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetInt($"PlayedGames_{i}", gameData.playedGames[i] ? 1 : 0);
         }
-
+        
+        // 미니게임별 연속 성공/실패 횟수 저장
         for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
         {
-            PlayerPrefs.SetInt($"ConsecutiveSuccess_{i}", gameData.consecutiveSuccess[i]);
-            PlayerPrefs.SetInt($"ConsecutiveFail_{i}", gameData.consecutiveFail[i]);
+            PlayerPrefs.SetInt(
+            $"ConsecutiveSuccess_{i}",
+            gameData.consecutiveSuccess[i]
+            );
+
+            PlayerPrefs.SetInt(
+            $"ConsecutiveFail_{i}",
+            gameData.consecutiveFail[i]
+            );
         }
 
         PlayerPrefs.Save();
@@ -196,18 +194,28 @@ public class GameManager : MonoBehaviour
                 gameData.playedGames[i] = PlayerPrefs.GetInt($"PlayedGames_{i}", 0) == 1;
             }
 
-            for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
-            {
-                gameData.consecutiveSuccess[i] = PlayerPrefs.GetInt($"ConsecutiveSuccess_{i}", 0);
-                gameData.consecutiveFail[i] = PlayerPrefs.GetInt($"ConsecutiveFail_{i}", 0);
-            }
+        // 미니게임별 연속 성공/실패 횟수 불러오기
+        for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
+        {
+            gameData.consecutiveSuccess[i] =
+            PlayerPrefs.GetInt($"ConsecutiveSuccess_{i}", 0);
 
+            gameData.consecutiveFail[i] =
+            PlayerPrefs.GetInt($"ConsecutiveFail_{i}", 0);
+        }
             Debug.Log($"[GameManager] 저장된 플레이 데이터 불러오기 완료 (남은 시간: {gameData.globalTimeRemaining:F1}초)");
         }
         else
         {
             // 저장된 기록이 없는 완전 첫 실행일 때만 리셋
             gameData.ResetData();
+            
+            // 새로운 회차 시작 시 연속 성공/실패 횟수 초기화
+            for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
+            {  
+                gameData.consecutiveSuccess[i] = 0;
+                gameData.consecutiveFail[i] = 0;
+            }
         }
     }
 
@@ -700,5 +708,37 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.Save();
         Debug.Log("[GameManager] 세이브 데이터가 완전히 삭제되었습니다.");
+    }
+
+    [ContextMenu("RESET ALL GAME DATA")]    
+    public void ResetAllGameData()
+    {
+        // 모든 PlayerPrefs 저장 데이터 삭제
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+
+        // 현재 메모리에 남아 있는 게임 데이터 초기화
+        if (gameData != null)
+        {
+            gameData.ResetData();
+            gameData.playCycle = 1;
+
+            for (int i = 0; i < gameData.consecutiveSuccess.Length; i++)
+            {
+                gameData.consecutiveSuccess[i] = 0;
+                gameData.consecutiveFail[i] = 0;
+            }
+        }
+
+        // 진행 상태 초기화
+        isMiniGamePlaying = false;
+        pendingEndingTransition = false;
+        pendingAchievementChecks.Clear();
+        IsEndingReplay = false;
+
+        exitPopupPauseActive = false;
+        Time.timeScale = 1f;
+
+        Debug.Log("[GameManager] 전체 게임 데이터 초기화 완료!");
     }
 }
